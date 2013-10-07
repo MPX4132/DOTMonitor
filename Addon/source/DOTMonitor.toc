@@ -1,0 +1,11 @@
+## Interface: 50400
+## Title: DOTMonitor
+## Author: MPX-4132
+## Notes: Monitor DOTs (Damage Over Time) effects on foes, once the DOTS end their duration, DOTMonior will show a picture of the DOT that should be refreshed.
+## Version: 0.1.0
+## SavedVariablesPerCharacter: DOTMONITOR_HUD_SETTINGS
+
+locale\language.enUS.lua
+
+DOTMonitor.lua
+DOTMonitor_Delta_UI.lua
