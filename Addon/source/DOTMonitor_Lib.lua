@@ -62,13 +62,13 @@ DOTMonitor.utility.getSpellName = function(aDebuff)
 	return (type(aDebuff) == "string") and aDebuff or aDebuff[1]
 end
 
-DOTMonitor.utility.getAbilityTexture = function(source, ability)
-	return source[ability] and (select(3, GetSpellInfo(source[ability]))) or false
+DOTMonitor.utility.getAbilityTexture = function(anAblity)
+	return (select(3, GetSpellInfo(anAblity)))
 end
 
 DOTMonitor.utility.getAbilitesForClassSpec = function(aClass, aSpec)
 	local debuffData = getglobal("DOTMonitorDebuffs_"..GetLocale()) or getglobal("DOTMonitorDebuffs_enUS")
-	return debuffData[aClass][aSpec]
+	return debuffData[aClass][aSpec], debuffData[aClass].spellIconFor[aSpec]
 end
 
 DOTMonitor.utility.frameEnabled = function(aFrame, enabled)
@@ -140,12 +140,11 @@ DOTMonitor.inspector.checkUnitForDebuff = function(aUnit, debuff)
 end
 
 DOTMonitor.inspector.getPlayerInfo = function()
-	local standardPlayerInfo = {
+	return {
 		class 		= DOTMonitor.utility.getClassName(), 
 		level 		= UnitLevel("player"),
 		healthMax 	= UnitHealthMax("player")
 	}
-	return standardPlayerInfo
 end
 
 
@@ -160,8 +159,9 @@ Player.Synchronize = function(self)
 	
 	if self.spec then -- Player CAN'T Be Tracked
 		status = ("Player: "..(self.info.class).." ("..(self.spec.name)..")")
-		local allAbilities 	= DOTMonitor.utility.getAbilitesForClassSpec(self.info.class, self.spec.name)
+		local allAbilities, allTextures	= DOTMonitor.utility.getAbilitesForClassSpec(self.info.class, self.spec.name)
 		self.spec.spells 	= DOTMonitor.inspector.getPossibleAbilities(allAbilities)
+		self.spec.textures 	= allTextures
 		self.ready = true
 	else
 		status = "UNSUPPORTED UNIT"
@@ -182,7 +182,8 @@ Player.New = function(self)
 			name 		= nil,
 			id			= nil,
 			description = nil,
-			spells = {}
+			spells 		= nil,
+			spellTexture= nil
 		},
 		ready = false,
 		
@@ -230,9 +231,15 @@ DOTMonitor.HUD.IconFormalXOffset = function(self, iconIndex)
 end
 
 DOTMonitor.HUD.SetIconPosition = function(self, iconIndex, position)
-	local pos = position and position or {x = self:IconFormalXOffset(iconIndex),
-										  y = self.preferences.yOffset}
+	local pos = position or {x = self:IconFormalXOffset(iconIndex),
+							 y = self.preferences.yOffset}
 	self.frame[iconIndex]:SetPoint("CENTER", UIParent, "CENTER", pos.x, pos.y)
+end
+
+DOTMonitor.HUD.FormalPosition = function()
+	for aPosition, aFrame in ipairs(self.frame) do
+		self:SetIconPosition(aPosition, nil)
+	end
 end
 
 DOTMonitor.HUD.SetIconAlpha = function(self, iconIndex, ...)
@@ -318,14 +325,33 @@ DOTMonitor.HUD.SetMovable = function(self, movable)
 	end
 end
 
-DOTMonitor.HUD.Update = function(self, abilities)
+DOTMonitor.HUD.Update = function(self, playerSpec)
 	self:SetEnabled(false)
 	self:SetVisible(false)
 	
-	for aPosition, aSpell in ipairs(abilities) do
-		
+	for aPosition, aSpell in ipairs(self.player.spec.spells) do
+		local spellName = DOTMonitor.utility.getSpellName(aSpell)
+		if spellName ~= self:IconID(aPosition) then
+			
+		end
 	end
 	
 	self:SetVisible(true)
 	self:SetEnabled(true)
+end
+
+DOTMonitor.HUD.Initialize = function(self, aPlayer, preferences)
+	self:SetPreferences(preferences)
+	self.player = aPlayer
+	
+	self.frame = {}
+	for aPosition, aSpell in ipairs(self.player.spec) do
+		local spellName = DOTMonitor.utility.getSpellName(aSpell)
+		local spellTextureID = self.player.spec.spellTexture[aPosition]
+		local aTexture	= DOTMonitor.utility.getAbilityTexture(spellTextureID)
+		local zeroPoint = {x=0,y=0}
+		self:CreateIcon(zeroPoint, aTexture, spellName)
+	end
+	
+	self:FormalPosition()
 end

@@ -17,8 +17,9 @@ end
 local DOTMonitorReaction_playerChangedTarget 	= function()
 	local targetName = "No Target"
 	if DOTMonitor.inspector.playerTargetingLivingEnemy() then
-		targetName = UnitName("target")
 		DOTMonitor.unit.enemy:Synchronize()
+		
+		targetName = UnitName("target")
 	end
 	DOTMonitor.logMessage("Target changed: "..targetName)
 end
@@ -46,8 +47,7 @@ local DOTMonitorReaction_playerEnteringWorld 	= function()
 	
 	if DOTMonitor.unit.player.ready then
 		local userHUDPreferences = getglobal("DOTMONITOR_HUD_SETTINGS")
-		DOTMonitor.HUD:SetPreferences(userHUDPreferences)
-		DOTMonitor.HUD:Update()
+		DOTMonitor.HUD:Initialize(DOTMonitor.unit.player, nil)
 		DOTMonitorEventCenter_StartResponding()
 		DOTMonitor.printMessage("Ready", "epic")
 	else
