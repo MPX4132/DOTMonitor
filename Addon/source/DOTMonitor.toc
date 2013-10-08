@@ -7,5 +7,6 @@
 
 locale\language.enUS.lua
 
-DOTMonitor.lua
-DOTMonitor_Delta_UI.lua
+DOTMonitor_Lib.lua
+DOTMonitor_EventCenter.lua
+DOTMonitor_Terminal.lua

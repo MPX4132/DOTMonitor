@@ -171,6 +171,18 @@ Player.Synchronize = function(self)
 	DOTMonitor.logMessage(result)
 end
 
+Player.GetAbilityTexture = function(self, position)
+	return self.spec.textures[position]
+end
+
+Player.GetAbilities = function(self)
+	return self.spec.spells
+end
+
+Player.GetAbility = function(self, position)
+	return self.spec.spells[position], self:GetAbilityTexture(position)
+end
+
 Player.New = function(self)
 	local aPlayer = { -- Player Instance
 		info = {
@@ -254,6 +266,10 @@ DOTMonitor.HUD.SetIconDimensions = function(self, iconIndex, width, ...)
 	self.frame[iconIndex]:SetHeight(h)
 end
 
+DOTMonitor.HUD.GetIcons = function(self)
+	return self.frame
+end
+
 DOTMonitor.HUD.IconID = function(self, iconIndex, ...)
 	local iconID = (select(1, ...))
 	-- If ID nil, then return icon name otherwise set!
@@ -325,16 +341,30 @@ DOTMonitor.HUD.SetMovable = function(self, movable)
 	end
 end
 
+DOTMonitor.HUD.AdjustIconsToSpec = function(self)
+	local player = self.player
+	local availableSlots, requiredSlots = #self:GetIcons(), #player:GetAbilities()
+	
+	-- Create Frames If Needed
+	if requiredSlots > availableSlots then
+		local zeroPoint = {x=0, y=0}
+		for i = 0, (requiredSlots-availableSlots) do
+			self:CreateIcon(zeroPoint, "", "")
+		end
+	end
+	
+	for aPos = 0, #self.frame do
+		local spellName, spellTextureID = player:GetAbility(aPos)
+		self:IconID(aPos, spellName)
+		self:SetIconBackground(DOTMonitor.utility.getAbilityTexture(spellTextureID))
+	end
+end
+
 DOTMonitor.HUD.Update = function(self, playerSpec)
 	self:SetEnabled(false)
 	self:SetVisible(false)
 	
-	for aPosition, aSpell in ipairs(self.player.spec.spells) do
-		local spellName = DOTMonitor.utility.getSpellName(aSpell)
-		if spellName ~= self:IconID(aPosition) then
-			
-		end
-	end
+	self:AdjustIconsToSpec()
 	
 	self:SetVisible(true)
 	self:SetEnabled(true)
