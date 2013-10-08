@@ -16,18 +16,15 @@ DOTMonitor.printMessage = (function(aMessage, ...)
 	}
 	local colorType = "info";
 	
-	if not (...) then
-		colorType = "info"
-		DEFAULT_CHAT_FRAME:AddMessage("\[DOTMonitor\] "..aMessage, 0, 1, 1); return;
+	if (...) then
+		local r, g, b = ...
+		if type(r) == "number" and type(g) == "number" and type(b) == "number" then
+			colorType = "custom";
+			colorScheme[colorType] 	= {r=r,g=g,b=b}; 
+		elseif type(r) == "string" then
+			colorType = r
+		end
 	end
-	
-	local r, g, b = ...
-	if type(r) == "number" and type(g) == "number" and type(b) == "number" then
-		colorType = "custom";
-		colorScheme[colorType] 	= {r=r,g=g,b=b}; 
-	end
-	
-	
 	
 	local color = colorScheme[colorType]
 	DEFAULT_CHAT_FRAME:AddMessage("\[DOTMonitor "..aMessage, color.r, color.g, color.b)
