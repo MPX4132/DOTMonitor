@@ -88,7 +88,7 @@ end
 DOTMonitor.inspector.getSpecInfo = function()
 	local specInfo = {id = nil, name = nil, description = nil}
 	
-	if not DOTMonitor.inspector.canMonitorPlayer() return false end
+	if not DOTMonitor.inspector.canMonitorPlayer() then return false end
 	specInfo.id, specInfo.name, specInfo.description = select(1,GetSpecializationInfo(GetSpecialization()))
 	specInfo.name = specInfo.name:gsub(" ", "_") -- Death Knights -> Death_Knights
 	return specInfo
