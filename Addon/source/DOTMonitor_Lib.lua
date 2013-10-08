@@ -26,8 +26,10 @@ DOTMonitor.printMessage = (function(aMessage, ...)
 		end
 	end
 	
-	local color = colorScheme[colorType]
-	DEFAULT_CHAT_FRAME:AddMessage("\[DOTMonitor "..aMessage, color.r, color.g, color.b)
+	local color 	= colorScheme[colorType]
+	local output 	= (type(r) == "string") and ("\[DOTMonitor "..aMessage.."]") or ("\[DOTMonitor] "..aMessage)
+	
+	DEFAULT_CHAT_FRAME:AddMessage(output, color.r, color.g, color.b)
 end)
 
 -- logMessage( messageText ) -> IF debugMode enabled: prints messageText to DEFAULT_CHAT_FRAME
@@ -45,10 +47,6 @@ end)
 -- ================================================================================
 DOTMonitor.utility.capitalize = function(aString)
 	return (aString:gsub("^%l", string.upper))
-end
-
-DOTMonitor.utility.replaceCharInString = function(aString, aChar)
-	return aString:gsub(" ", "_")
 end
 
 DOTMonitor.utility.getSpellID = function(aSpell)
@@ -154,22 +152,8 @@ end
 
 -- @ Player Methods Implementation
 -- ================================================================================
-local Player = { -- Player Instance
-	info = {
-		class			= nil,
-		level 			= nil,
-		healthMax 		= nil
-	},
-	spec = {
-		name 		= nil,
-		id			= nil,
-		description = nil,
-		spells = {
-		
-		}
-	},
-	ready = false
-}
+local Player = {} -- Player Class
+
 Player.Synchronize = function(self)
 	self.info = DOTMonitor.inspector.getPlayerInfo()
 	self.spec = DOTMonitor.inspector.getSpecInfo()
@@ -187,14 +171,34 @@ Player.Synchronize = function(self)
 	DOTMonitor.logMessage(result)
 end
 
-DOTMonitor.unit.player = Player
+Player.New = function(self)
+	local aPlayer = { -- Player Instance
+		info = {
+			class			= nil,
+			level 			= nil,
+			healthMax 		= nil
+		},
+		spec = {
+			name 		= nil,
+			id			= nil,
+			description = nil,
+			spells = {}
+		},
+		ready = false,
+		
+		-- Methods
+		Synchronize = self.Synchronize
+	}
+	return aPlayer
+end
 
 
 
 
 -- @ HUD Methods Implementation
 -- ================================================================================
-DOTMonitor.HUD.SetPreferences = function(self, preferences)
+DOTMonitor.HUD.SetPreferences = function(self, ...)
+	local preferences = (select(1,...)) or nil
 	local defaultPreferences = {
 		iconSize 	=   44,
 		yOffset 	= -126,
@@ -219,7 +223,8 @@ end
 DOTMonitor.HUD.IconFormalXOffset = function(self, iconIndex)
 	local iconSize 		= self.preferences.iconSize
 	local spellQuantity	= #self.frame -- Here's the catch!
-	local derivedOrigin = -((spellQuantity * iconSize)/2) + (spellIconSize/2) -- Note the + () is due to adjusted to icon center point
+	-- Note the + () is due to adjusted to icon center point
+	local derivedOrigin = -((spellQuantity * iconSize)/2) + (spellIconSize/2) 
 	local iconOffset 	= (iconSize * (iconIndex-1))
 	return derivedOrigin + iconOffset
 end
@@ -313,13 +318,12 @@ DOTMonitor.HUD.SetMovable = function(self, movable)
 	end
 end
 
-DOTMonitor.HUD.Update = function(self)
+DOTMonitor.HUD.Update = function(self, abilities)
 	self:SetEnabled(false)
 	self:SetVisible(false)
 	
-	for aPos, aFrame in ipairs(self.frame) do
-		aFrame:SetMovable(movable)
-		aFrame:EnableMouse(movable)
+	for aPosition, aSpell in ipairs(abilities) do
+		
 	end
 	
 	self:SetVisible(true)
