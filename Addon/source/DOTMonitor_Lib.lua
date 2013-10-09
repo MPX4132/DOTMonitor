@@ -56,10 +56,6 @@ DOTMonitor.utility.getSpellID = function(aSpell)
 	return spellInfo and string.match(spellInfo, "spell:(%d+)") or false
 end
 
-DOTMonitor.utility.getClassName = function()
-	return DOTMonitor.utility.capitalize(string.lower(select(2,UnitClass("player")))):gsub(" ", "_")
-end
-
 DOTMonitor.utility.getSpellName = function(aDebuff)
 	return (type(aDebuff) == "string") and aDebuff or aDebuff[1]
 end
@@ -68,10 +64,21 @@ DOTMonitor.utility.getAbilityTexture = function(anAblity)
 	return (select(3, GetSpellInfo(anAblity)))
 end
 
+DOTMonitor.utility.getAbilitiesForPlayer = function(abilityType, aPlayer)
+	local pClass, pSpec = aPlayer.info.class, aPlayer.spec.name
+	abilityType = abilityType:gsub("^%l", string.upper)
+	local abilityData = getglobal("DOTMonitor"..abilityType.."_"..GetLocale()) 
+					 or getglobal("DOTMonitor"..abilityType.."_enUS")
+	
+	--return {spell = abilityData[pClass][pSpec],effect = abilityData[pClass].effect[pSpec]}
+	return {effect = abilityData[pClass][pSpec],spell = abilityData[pClass].spellIconFor[pSpec]}
+end
+--[[
 DOTMonitor.utility.getAbilitesForClassSpec = function(aClass, aSpec)
 	local debuffData = getglobal("DOTMonitorDebuffs_"..GetLocale()) or getglobal("DOTMonitorDebuffs_enUS")
 	return debuffData[aClass][aSpec], debuffData[aClass].spellIconFor[aSpec]
 end
+--]]
 
 DOTMonitor.utility.frameEnabled = function(aFrame, enabled)
 	if enabled 
@@ -85,6 +92,10 @@ end
 -- ================================================================================
 DOTMonitor.inspector.canMonitorPlayer = function()
 	return UnitLevel("player") >= 10 and GetSpecialization() and true
+end
+
+DOTMonitor.inspector.getClassName = function()
+	return DOTMonitor.utility.capitalize(string.lower(select(2,UnitClass("player")))):gsub(" ", "_")
 end
 
 DOTMonitor.inspector.getSpecInfo = function()
@@ -144,7 +155,8 @@ end
 
 DOTMonitor.inspector.getPlayerInfo = function()
 	return {
-		class 		= DOTMonitor.utility.getClassName(), 
+		class 		= DOTMonitor.inspector.getClassName(),
+		spec		= DOTMonitor.inspector.getSpecInfo()
 		level 		= UnitLevel("player"),
 		healthMax 	= UnitHealthMax("player")
 	}
@@ -154,9 +166,64 @@ end
 
 -- @ Player Methods Implementation
 -- ================================================================================
-DOTMonitor.PlayerClass = {}
-local Player = DOTMonitor.PlayerClass -- Player Class
+--DOTMonitor.PlayerClass = {}
+--local Player = DOTMonitor.PlayerClass -- Player Class
 
+local Player = {}
+
+Player.Synchronize = function(self)
+	self.info = DOTMonitor.inspector.getPlayerInfo()
+	
+	if not self.info.spec then return nil end-- Player can't be tracked -> Don't Initialize
+	
+	self.spec = {debuff = DOTMonitor.utility.getAbilitiesForPlayer("debuffs", self)}
+end
+
+Player.Ready = function(self)
+	return self.info.spec.name and self.spec and true or false
+end
+
+Player.GetAbilities = function(self, abilityType)
+	return self.spec[abilityType]
+end
+
+Player.GetAbility = function(self, abilityType, position)
+	local playerAbilities = self:GetAbilities(abilityType) 
+	return playerAbilities.spell[position], playerAbilities.effect[position]
+end
+
+Player.ShowTrackingInfo = function(self)
+	DOTMonitor.printMessage(("adjusted for "..self.info.spec.name.." "..self.info.class), "info")
+	for abilityTypePos, anAbilityType in ipairs(self.spec) then
+		DOTMonitor.printMessage((anAbilityType:gsub("^%l", string.upper)).." types being monitored:")
+		for aPos, aSpell in ipairs(anAbilityType) then
+			DOTMonitor.printMessage(("monitoring "..anAbility), "info")
+		end
+	end
+end
+
+Player.New = function(self)
+	return { -- Player Instance
+		info = {
+			class			= nil,
+			spec			= nil,
+			level 			= nil,
+			healthMax 		= nil
+		},
+		spec = {
+			debuff = nil
+		},
+		
+		-- Methods
+		Synchronize 		= self.Synchronize,
+		Ready				= self.Ready,
+		GetAbilities		= self.GetAbilities,
+		GetAbility			= self.GetAbility,
+		ShowMonitoringInfo	= self.ShowMonitoringInfo
+	}
+end
+
+--[[
 Player.Synchronize = function(self)
 	self.info = DOTMonitor.inspector.getPlayerInfo()
 	self.spec = DOTMonitor.inspector.getSpecInfo()
@@ -222,11 +289,46 @@ Player.New = function(self)
 	return aPlayer
 end
 
-
+--]]
 
 
 -- @ HUD Methods Implementation
 -- ================================================================================
+local HUD ={}
+HUD.SetPreferences = function(self, ...)
+	self.settings = (select(1, ...)) or {
+		iconSize 	=   44,
+		yOffset 	= -126,
+		maxAlpha	=  .60
+	}
+end
+
+HUD.SetIconBackground = function(self, position, spellName)
+	local iconTexturePath = DOTMonitor.utility.getAbilityTexture(spellName)
+	local anIcon = self.icon[position]
+	
+	if not anIcon.texture then
+		anIcon.texture = anIcon:CreateTexture(nil, "BACKGROUND")
+	end
+	anIcon.texture:SetTexture(iconTexturePath)
+	anIcon.texture:SetAllPoints(anIcon)
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 DOTMonitor.HUD.SetPreferences = function(self, ...)
 	local preferences = (select(1,...)) or nil
 	local defaultPreferences = {
@@ -234,7 +336,7 @@ DOTMonitor.HUD.SetPreferences = function(self, ...)
 		yOffset 	= -126,
 		maxAlpha	=  .60
 	}
-	self.preferences = (preferences ~= nil) and preferences or defaultPreferences;
+	self.preferences = preferences or defaultPreferences;
 	--self.preferences = defaultPreferences
 end
 
@@ -287,7 +389,6 @@ end
 
 DOTMonitor.HUD.IconID = function(self, iconIndex, iconID)
 	if iconID then
-		--DOTMonitor.logMessage("Icon\["..iconIndex.."\] = "..iconID)
 		self.frame[iconIndex].name = iconID
 	end
 

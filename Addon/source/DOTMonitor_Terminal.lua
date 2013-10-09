@@ -39,7 +39,7 @@ end)
 DOTMonitorTerminal.GetCommandHelp = (function(self)
 	DOTMonitor.pringMessage("The following commands are recognized:")
 	for aPos, aCommand in ipairs(self.executables) do
-		DOTMonitor.pringMessage(aPos .. " ->"..self.commandHelp[aPos])
+		return aPos .. " ->"..self.commandHelp[aPos]
 	end
 end)
 
