@@ -291,8 +291,32 @@ DOTMonitor.HUD.IconID = function(self, iconIndex, iconID)
 		self.frame[iconIndex].name = iconID
 	end
 
-	-- If ID nil, then return icon name otherwise set!
 	return self.frame[iconIndex].name
+end
+
+-- DEBUFF TRACKING CODE!
+local debuffMonitor = function(self, elapsed)
+	if not self.enabled then return false end
+	self.lastUpdate = self.timer.lastUpdate and (self.timer.lastUpdate + elapsed) or 0
+	if self.lastUpdate < 0.1 then return false end
+	
+	local duration, expiration, caster = DOTMonitor.checkTargetForDebuff(self.debuffID)
+	
+	local spellIconSize = self.owner.preferences.iconSize
+	local spellMaxAlpha = self.owner.preferences.maxAlpha
+	
+	if caster == "player" then
+		local timeRemaining = (expiration - GetTime())
+		local timeFraction 	= (duration ~= 0) and (timeRemaining / duration) or 0
+
+		self:SetHeight(spellIconSize - (timeFraction * spellIconSize))
+		self:SetAlpha(spellMaxAlpha	- (timeFraction * spellMaxAlpha))
+	else
+		self:SetHeight(spellIconSize)
+		self:SetAlpha(spellMaxAlpha)
+	end
+	
+	self.lastUpdate = 0
 end
 
 DOTMonitor.HUD.CreateIcon = function(self, position, texture, spellID)
@@ -302,6 +326,7 @@ DOTMonitor.HUD.CreateIcon = function(self, position, texture, spellID)
 	
 	local aFrame = CreateFrame("Frame", frameGlobalID, UIParent)
 	aFrame:SetFrameStrata("BACKGROUND")
+	aFrame.owner 	= self
 	
 	
 	-- Register Frames For MOVEMENT! (THERE NOW BE HAPPY PEOPLE!)
@@ -322,6 +347,9 @@ DOTMonitor.HUD.CreateIcon = function(self, position, texture, spellID)
 			self:StopMovingOrSizing(); 	self.isMoving = false;
 		end
 	end))
+	
+	-- Updater function
+	aFrame:SetScript("OnUpdate", debuffMonitor)
 	
 	table.insert(self.frame, aFrame)
 	
@@ -373,11 +401,12 @@ DOTMonitor.HUD.AdjustIconsToSpec = function(self)
 	for aPos = 1, #self.frame do
 		if aPos <= requiredSlots then
 			local spellName, textureSpellName = player:GetAbility(aPos)
-			local iconTexture = DOTMonitor.utility.getAbilityTexture(textureSpellName)
 			self:IconID(aPos, spellName)
-			self:SetIconBackground(aPos, iconTexture)
+			self:SetIconBackground(aPos, DOTMonitor.utility.getAbilityTexture(textureSpellName))
+			self.enabled = true
 		else
 			self:SetIconAlpha(aPos, 0)
+			self.enabled = false
 		end
 	end
 end
