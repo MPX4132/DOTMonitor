@@ -11,7 +11,8 @@ local DOTMonitor = getglobal("DOTMonitor") or {}
 -- ================================================================================
 local DOTMonitorCommand_setDraggable = (function(canMove)
 	local shouldMove = (canMove == "on") or (canMove == "yes")
-	DOTMonitor:SetMovable(shouldMove)
+	DOTMonitor.HUD:SetMovable(shouldMove)
+	return "HUD Now "..(shouldMove and "Unlocked" or "Locked")
 end)
 
 
@@ -33,8 +34,8 @@ DOTMonitorTerminal.GetCommand = (function(self)
 	return self:HasValidCommand() and string.sub(self.command, 1, 4) or false
 end)
 
-DOTMonitorTerminal.HasFunction = (function(aFunction)
-	return (type(DOTMonitorTerminal.executable[aFunction]) == "function")
+DOTMonitorTerminal.HasFunction = (function(self, aFunction)
+	return (type(self.executables[aFunction]) == "function")
 end)
 
 DOTMonitorTerminal.HasArguments = (function(self)
@@ -48,14 +49,16 @@ end)
 
 DOTMonitorTerminal.Execute = (function(self, aCommand)
 	DOTMonitorTerminal.command = aCommand;
-	local aFunction = DOTMonitorTerminal:GetCommand()
+	local aFunction 	= DOTMonitorTerminal:GetCommand()
+	local result		= "Invalid Command Given"
+	local executable 	= DOTMonitorTerminal:HasFunction(aFunction)
 	
-	if DOTMonitorTerminal:HasFunction(aFunction) then
-		self.executables[aFunction](self:GetArguments())
+	if executable then
+		result = self.executables[aFunction](self:GetArguments())
 		DOTMonitor.logMessage("Called: "..aFunction.."("..(self:HasArguments() and self:GetArguments() or "")..")")
-	else
-		DOTMonitor.printMessage("Invalid Command: "..aFunction)
 	end
+	
+	DOTMonitor.printMessage(result, executable and "info" or "alert")
 end)
 
 
