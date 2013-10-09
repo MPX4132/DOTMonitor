@@ -30,10 +30,8 @@ end
 
 local DOTMonitorReaction_playerStartedFighting 	= function()
 	DOTMonitor.HUD:SetEnabled(true)
-	DOTMonitor.HUD:SetVisible(true)
 end
 local DOTMonitorReaction_playerStoppedFighting 	= function()
-	DOTMonitor.HUD:SetVisible(false)
 	DOTMonitor.HUD:SetEnabled(false)
 end
 

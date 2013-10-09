@@ -294,13 +294,23 @@ DOTMonitor.HUD.IconID = function(self, iconIndex, iconID)
 	return self.frame[iconIndex].name
 end
 
+DOTMonitor.HUD.EnableIcon = function(self, position, ready)
+	self.frame[position].enabled = ready
+end
+
 -- DEBUFF TRACKING CODE!
 local debuffMonitor = function(self, elapsed)
 	if not self.enabled then return false end
-	self.lastUpdate = self.timer.lastUpdate and (self.timer.lastUpdate + elapsed) or 0
+	
+	self.lastUpdate = self.lastUpdate and (self.lastUpdate + elapsed) or 0
 	if self.lastUpdate < 0.1 then return false end
 	
-	local duration, expiration, caster = DOTMonitor.checkTargetForDebuff(self.debuffID)
+	if not DOTMonitor.inspector.playerTargetingLivingEnemy() then
+		self:SetAlpha(0) 
+		return false
+	end
+	
+	local duration, expiration, caster = DOTMonitor.inspector.checkUnitForDebuff("target",self.name)
 	
 	local spellIconSize = self.owner.preferences.iconSize
 	local spellMaxAlpha = self.owner.preferences.maxAlpha
@@ -317,6 +327,12 @@ local debuffMonitor = function(self, elapsed)
 	end
 	
 	self.lastUpdate = 0
+end
+
+DOTMonitor.HUD.SetMonitor = function(self, monitor)
+	for aPos, aFrame in ipairs(self.frame) do
+		aFrame:SetScript("OnUpdate", (monitor and debuffMonitor or nil))
+	end
 end
 
 DOTMonitor.HUD.CreateIcon = function(self, position, texture, spellID)
@@ -349,7 +365,7 @@ DOTMonitor.HUD.CreateIcon = function(self, position, texture, spellID)
 	end))
 	
 	-- Updater function
-	aFrame:SetScript("OnUpdate", debuffMonitor)
+	--aFrame:SetScript("OnUpdate", debuffMonitor)
 	
 	table.insert(self.frame, aFrame)
 	
@@ -379,6 +395,7 @@ end
 
 DOTMonitor.HUD.SetMovable = function(self, movable)
 	self:SetEnabled(movable)
+	self:SetMonitor(not movable)
 	self:SetVisible(movable)
 	for aPos, aFrame in ipairs(self.frame) do
 		aFrame:SetMovable(movable)
@@ -403,12 +420,13 @@ DOTMonitor.HUD.AdjustIconsToSpec = function(self)
 			local spellName, textureSpellName = player:GetAbility(aPos)
 			self:IconID(aPos, spellName)
 			self:SetIconBackground(aPos, DOTMonitor.utility.getAbilityTexture(textureSpellName))
-			self.enabled = true
+			self:EnableIcon(aPos,true)
 		else
 			self:SetIconAlpha(aPos, 0)
-			self.enabled = false
+			self:EnableIcon(aPos,false)
 		end
 	end
+	self:SetMonitor(true)
 end
 
 DOTMonitor.HUD.Update = function(self)
