@@ -226,7 +226,15 @@ Player.Synchronize = function(self)
 	self.spec = {debuff = DOTMonitor.inspector.getPossibleAbilities(allDebuffs)}
 	
 	--if self.delegate then delegate:PlayerSpecDidChange(self) end
-	if self.delegate then delegate:SynchronizeWithPlayer(self) end
+	if self.delegate then self.delegate:SynchronizeWithPlayer(self) end
+end
+
+Player.Delegate = function(self, ...)
+	if ... then
+		self.delegate = (select(1,...))
+	else
+		return self.delegate
+	end
 end
 
 Player.Ready = function(self)
@@ -263,10 +271,11 @@ Player.New = function(self)
 		spec = {
 			debuff = nil
 		},
-		delegate = nil
+		delegate = nil,
 		
 		-- Methods
 		Synchronize 		= self.Synchronize,
+		Delegate			= self.Delegate,
 		Ready				= self.Ready,
 		GetAbilities		= self.GetAbilities,
 		GetAbility			= self.GetAbility,
@@ -343,28 +352,31 @@ end
 
 HUD.IconEffect = function(self, iconIndex, ...)
 	if ... then
-		self.icon[iconIndex] = (select(1,...))
+		self.icon[iconIndex].effect = (select(1,...))
 	end
-	return self.icon[iconIndex]
+	return self.icon[iconIndex].effect
 end
 
 HUD.IconMonitoring = function(self, iconIndex, anEffect)
-	self.icon[iconIndex].effect = anEffect or nil
+	self:IconEffect(iconIndex, anEffect or nil)
 	self.icon[iconIndex]:SetScript("OnUpdate", (anEffect and DOTMonitor.scanner.debuffMonitor) or nil)
 end
 
+-- HUD Setting
 HUD.SetVisible = function(self, ...)
 	for aPos, anIcon in ipairs(self:GetIconsEnabled()) do
 		anIcon:SetAlpha(... and (select(1,...)) or 0)
 	end
 end
 
+-- HUD Setting
 HUD.Monitoring = function(self, enabled)
 	for aPos, anIcon in ipairs(self:GetIconsEnabled()) do
 		anIcon:SetScript("OnUpdate", (enabled and DOTMonitor.scanner.debuffMonitor) or nil)
 	end
 end
 
+-- HUD Setting
 HUD.SetEnabled = function(self, enabled, ...)
 	if enabled and self.ignoringEverything then
 		DOTMonitor.logMessage("Ignoring enable request...")
@@ -428,6 +440,7 @@ HUD.NewIcon = function(self, position, spell, effect)
 	self:IconMonitoring(iconIndex, effect)
 end
 
+-- HUD Setting
 HUD.SetMovable = function(self, movable)
 	self:Monitoring(not movable)
 	self:SetEnabled(movable)
@@ -438,6 +451,7 @@ HUD.SetMovable = function(self, movable)
 	end
 end
 
+-- HUD Setting
 HUD.SynchronizeWithPlayer = function(self, aPlayer)
 	self:SetEnabled(false, true)
 	
@@ -446,6 +460,7 @@ HUD.SynchronizeWithPlayer = function(self, aPlayer)
 	self:SetEnabled(false, false)
 end
 
+-- HUD Setting
 HUD.AdjustIconsToPlayer = function(self, aPlayer)
 	if not aPlayer:Ready() then return false end
 	local availableSlots, requiredSlots = #self.icon, #aPlayer:GetAbilities()
@@ -470,7 +485,7 @@ HUD.AdjustIconsToPlayer = function(self, aPlayer)
 	self:SetMonitor(true)
 end
 
-HUD.New = function(self, aPlayer, preferences)
+HUD.New = function(self, preferences)
 	local newHUD = {
 		icon 		= {},
 		settings	= {},
@@ -498,8 +513,8 @@ HUD.New = function(self, aPlayer, preferences)
 	
 	
 	newHUD:SetPreferences(preferences)
-	newHUD:SynchronizeWithPlayer(aPlayer)
-	newHUD:FormalPosition()
+	--newHUD:SynchronizeWithPlayer(aPlayer)
+	--newHUD:FormalPosition()
 	return newHUD
 end
 

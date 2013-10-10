@@ -1,6 +1,6 @@
 local DOTMonitor = getglobal("DOTMonitor") or {}
 local Player 	= DOTMonitor.library.Player:New()
-local HUD		= nil--DOTMonitor.library.HUD:New()
+local HUD		= DOTMonitor.library.HUD:New(nil)
 
 DOTMonitorEventCenter = CreateFrame("Frame"); DOTMonitorEventCenter:SetAlpha(0);
 local DOTMonitorEventCenter_StartResponding = function()
@@ -20,6 +20,8 @@ end
 -- @ Responder Functions Implementation
 -- ================================================================================
 local DOTMonitorReaction_playerChangedTarget 	= function()
+	HUD:SetVisible(DOTMonitor.inspector.playerTargetingLivingEnemy())
+	DOTMonitor.logMessage("Target Changed: "..UnitName("target") or "NONE")
 	--[[
 	local targetName = "[NONE]"
 	if DOTMonitor.inspector.playerTargetingLivingEnemy() then
@@ -32,14 +34,17 @@ end
 
 
 local DOTMonitorReaction_playerStartedFighting 	= function()
+	HUD:SetEnabled(true)
 	--DOTMonitor.HUD:SetEnabled(true)
 end
 local DOTMonitorReaction_playerStoppedFighting 	= function()
+	HUD:SetEnabled(false)
 	--DOTMonitor.HUD:SetEnabled(false)
 end
 
 
 local DOTMonitorReaction_playerAbilitiesPossiblyChanged = function()
+	Player:Synchronize()
 	--[[
 	DOTMonitor.unit.player:Synchronize()
 	DOTMonitor.HUD:Update()
@@ -49,6 +54,8 @@ end
 
 
 local DOTMonitorReaction_playerEnteringWorld 	= function()
+	Player:Delegate(HUD)
+	Player:Synchronize()
 	--[[
 	DOTMonitor.unit = {	-- Start Players
 		player 	= Player:New()-- ,enemy	= Player:New()
@@ -94,8 +101,6 @@ local DOTMonitorEventResponder = { -- Main Response Handeler
 DOTMonitorEventCenter:SetScript("OnEvent", (function(self, event, ...)
 	if DOTMonitorEventResponder[event] then
 		DOTMonitorEventResponder[event](...)
-	else
-		DOTMonitor.printMessage("ERROR!")
 	end
 end))
 

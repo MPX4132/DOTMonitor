@@ -2,6 +2,9 @@ SLASH_DOTMonitor_COMMAND1, SLASH_DOTMonitor_COMMAND2 = "/dotmonitor", "/dmon"
 
 local DOTMonitor = getglobal("DOTMonitor") or {}
 
+local Player 	= DOTMonitor.library.Player:New()
+local HUD		= DOTMonitor.library.HUD:New(nil)
+
 
 
 
@@ -9,7 +12,7 @@ local DOTMonitor = getglobal("DOTMonitor") or {}
 -- ================================================================================
 local DOTMonitorCommand_setDraggable = (function(canMove)
 	local shouldMove = (canMove == "on") or (canMove == "yes")
-	DOTMonitor.HUD:SetMovable(shouldMove)
+	HUD:SetMovable(shouldMove)
 	return "HUD Now "..(shouldMove and "Unlocked" or "Locked")
 end)
 
@@ -23,6 +26,7 @@ DOTMonitorTerminal.command 	= nil 	-- The Command
 DOTMonitorTerminal.executables = {
 	["drag"] = DOTMonitorCommand_setDraggable
 }
+
 DOTMonitorTerminal.commandHelp = {
 	["drag"] = "Lock/Unlock the HUD"
 }
