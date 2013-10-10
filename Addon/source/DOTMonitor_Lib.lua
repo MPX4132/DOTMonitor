@@ -25,9 +25,11 @@ DOTMonitor.scanner = {
 				local timeFraction 	= (duration ~= 0) and (timeRemaining / duration) or 0
 
 				self:SetHeight(spellIconSize - (timeFraction * spellIconSize))
+				self:SetWidth(spellIconSize - (timeFraction * spellIconSize))
 				self:SetAlpha(spellMaxAlpha	- (timeFraction * spellMaxAlpha))
 			else
 				self:SetHeight(spellIconSize)
+				self:SetWidth(spellIconSize)
 				self:SetAlpha(spellMaxAlpha)
 			end
 	
@@ -98,13 +100,14 @@ DOTMonitor.utility.getAbilityTexture = function(anAblity)
 end
 
 DOTMonitor.utility.getAbilitiesForPlayer = function(abilityType, aPlayer)
-	local pClass, pSpec = aPlayer.info.class, aPlayer.spec.name
+	local pClass, pSpec = aPlayer.info.class, aPlayer.info.spec.name
 	abilityType = abilityType:gsub("^%l", string.upper)
+	DOTMonitor.logMessage("Retriving "..abilityType.." for "..pSpec.." "..pClass)
 	local abilityData = getglobal("DOTMonitor"..abilityType.."_"..GetLocale()) 
 					 or getglobal("DOTMonitor"..abilityType.."_enUS")
 	
 	--return {spell = abilityData[pClass][pSpec],effect = abilityData[pClass].effect[pSpec]}
-	return {effect = abilityData[pClass][pSpec],spell = abilityData[pClass].spellIconFor[pSpec]}
+	return {effect = abilityData[pClass][pSpec], spell = abilityData[pClass].spellIconFor[pSpec]}
 end
 --[[
 DOTMonitor.utility.getAbilitesForClassSpec = function(aClass, aSpec)
@@ -168,6 +171,7 @@ DOTMonitor.inspector.getPossibleAbilities = function(allAbilities)
 			DOTMonitor.logMessage("Not Supported: "..anAbility) 
 		end
 	end
+	return availableAbilities
 end
 	
 
@@ -204,7 +208,7 @@ end
 DOTMonitor.inspector.getPlayerInfo = function()
 	return {
 		class 		= DOTMonitor.inspector.getClassName(),
-		spec		= DOTMonitor.inspector.getSpecInfo()
+		spec		= DOTMonitor.inspector.getSpecInfo(),
 		level 		= UnitLevel("player"),
 		healthMax 	= UnitHealthMax("player")
 	}
@@ -220,13 +224,16 @@ local Player = {}
 Player.Synchronize = function(self)
 	self.info = DOTMonitor.inspector.getPlayerInfo()
 	
-	if not self.info.spec then return nil end-- Player can't be tracked -> Don't Initialize
+	if not self.info.spec then 
+		DOTMonitor.logMessage("Player wasn't initialized!")
+		return nil;
+	end-- Player can't be tracked -> Don't Initialize
 	
 	local allDebuffs = DOTMonitor.utility.getAbilitiesForPlayer("debuffs", self)
 	self.spec = {debuff = DOTMonitor.inspector.getPossibleAbilities(allDebuffs)}
 	
-	--if self.delegate then delegate:PlayerSpecDidChange(self) end
-	if self.delegate then self.delegate:SynchronizeWithPlayer(self) end
+	self:ShowMonitoringInfo()
+	if self:Ready() and self.delegate then self.delegate:SynchronizeWithPlayer(self) end
 end
 
 Player.Delegate = function(self, ...)
@@ -238,9 +245,11 @@ Player.Delegate = function(self, ...)
 end
 
 Player.Ready = function(self)
+	--DOTMonitor.logMessage("spec name: "..self.info.spec.name)
+	--DOTMonitor.logMessage("spec is "..(self.spec and "ready" or "empty").." size: "..#self.spec)
 	return self.info.spec.name and self.spec and true or false
 end
-
+--aPlayer:GetAbilities("debuff")
 Player.GetAbilities = function(self, abilityType)
 	return self.spec[abilityType]
 end
@@ -252,9 +261,9 @@ end
 
 Player.ShowMonitoringInfo = function(self)
 	DOTMonitor.printMessage(("adjusted for "..self.info.spec.name.." "..self.info.class), "info")
-	for abilityTypePos, anAbilityType in ipairs(self.spec) then
+	for abilityTypePos, anAbilityType in ipairs(self.spec) do
 		DOTMonitor.printMessage((anAbilityType:gsub("^%l", string.upper)).." types being monitored:")
-		for aPos, aSpell in ipairs(anAbilityType) then
+		for aPos, aSpell in ipairs(anAbilityType) do
 			DOTMonitor.printMessage(("monitoring "..anAbility), "info")
 		end
 	end
@@ -300,7 +309,7 @@ end
 HUD.GetIconsEnabled = function(self)
 	local active = {}
 	for aPos, icon in ipairs(self.icon) do
-		if anIcon.effect then
+		if icon.effect then
 			table.insert(active, icon)
 		end
 	end
@@ -322,7 +331,7 @@ HUD.GetFormalIconPosition = function(self, iconIndex)
 	local iconSize 		= self.settings.iconSize
 	local iconQuantity	= #self:GetIconsEnabled() -- Here's the catch!
 	-- Note the + () is due to adjusted to icon center point
-	local derivedOrigin = -((iconQuantity * iconSize)/2) + (iconSize/2) 
+	local derivedOrigin = -((iconQuantity * iconSize)/2) + iconSize 
 	local iconOffset 	= (iconSize * (iconIndex-1))
 	return {x = (derivedOrigin + iconOffset), y = (self.settings.yOffset)}
 end
@@ -364,6 +373,7 @@ end
 
 -- HUD Setting
 HUD.SetVisible = function(self, ...)
+	DOTMonitor.logMessage("Setting HUD Visible")
 	for aPos, anIcon in ipairs(self:GetIconsEnabled()) do
 		anIcon:SetAlpha(... and (select(1,...)) or 0)
 	end
@@ -371,6 +381,7 @@ end
 
 -- HUD Setting
 HUD.Monitoring = function(self, enabled)
+	DOTMonitor.logMessage("Setting Monitoring "..(enabled and "on" or "off"))
 	for aPos, anIcon in ipairs(self:GetIconsEnabled()) do
 		anIcon:SetScript("OnUpdate", (enabled and DOTMonitor.scanner.debuffMonitor) or nil)
 	end
@@ -378,6 +389,7 @@ end
 
 -- HUD Setting
 HUD.SetEnabled = function(self, enabled, ...)
+	DOTMonitor.logMessage((enabled and "Enabling" or "Disabling").." HUD!")
 	if enabled and self.ignoringEverything then
 		DOTMonitor.logMessage("Ignoring enable request...")
 		return false
@@ -419,6 +431,7 @@ HUD.NewFrame = function(self, frameGlobalID, frameLayer)
 			self.isMoving = false;
 		end
 	end))
+	
 	return aFrame
 end
 
@@ -433,6 +446,11 @@ HUD.NewIcon = function(self, position, spell, effect)
 	
 	self.icon[iconIndex] = self:NewFrame(("DOTM_HUD_ICON_"..iconIndex), "BACKGROUND")
 	
+	self.icon[iconIndex].settings = {
+		iconSize = self.settings.iconSize,
+		maxAlpha = self.settings.maxAlpha
+	}
+	
 	self:SetIconDimensions(iconIndex, iconSize)
 	self:SetIconBackground(iconIndex, texture)
 	self:SetIconPosition(iconIndex, position)
@@ -441,10 +459,10 @@ HUD.NewIcon = function(self, position, spell, effect)
 end
 
 -- HUD Setting
-HUD.SetMovable = function(self, movable)
+HUD.Unlock = function(self, movable)
 	self:Monitoring(not movable)
 	self:SetEnabled(movable)
-	self:SetVisible(movable)
+	self:SetVisible(movable and 1 or 0)
 	for aPos, aFrame in ipairs(self:GetIconsEnabled()) do
 		aFrame:SetMovable(movable)
 		aFrame:EnableMouse(movable)
@@ -453,17 +471,23 @@ end
 
 -- HUD Setting
 HUD.SynchronizeWithPlayer = function(self, aPlayer)
-	self:SetEnabled(false, true)
+	--self:SetEnabled(false, true)
 	
 	self:AdjustIconsToPlayer(aPlayer)
 	
-	self:SetEnabled(false, false)
+	--self:SetEnabled(false, false)
 end
 
 -- HUD Setting
 HUD.AdjustIconsToPlayer = function(self, aPlayer)
-	if not aPlayer:Ready() then return false end
-	local availableSlots, requiredSlots = #self.icon, #aPlayer:GetAbilities()
+	DOTMonitor.logMessage("Adjusting Icons!")
+	if not aPlayer:Ready() then
+		DOTMonitor.logMessage("Player hasn't been initialized!")
+		return false
+	end
+	
+	--local playerAbilities = aPlayer:GetAbilities("debuff")
+	local availableSlots, requiredSlots = #self.icon, #(aPlayer:GetAbilities("debuff")).spell
 	
 	if availableSlots < requiredSlots then -- Create frames if needed
 		local zeroPoint = {x=0,y=0}
@@ -474,7 +498,7 @@ HUD.AdjustIconsToPlayer = function(self, aPlayer)
 	
 	for aPos = 1, #self.icon do
 		if aPos <= requiredSlots then
-			local spell, effect = aPlayer:GetAbility(aPos)
+			local spell, effect = aPlayer:GetAbility("debuff", aPos)
 			self:SetIconBackground(aPos, spell)
 			self:IconMonitoring(aPos, effect)
 		else
@@ -482,7 +506,7 @@ HUD.AdjustIconsToPlayer = function(self, aPlayer)
 			self:IconMonitoring(aPos, nil)
 		end
 	end
-	self:SetMonitor(true)
+	--self:Monitoring(true)
 end
 
 HUD.New = function(self, preferences)
@@ -506,7 +530,7 @@ HUD.New = function(self, preferences)
 		SetEnabled				= self.SetEnabled,
 		NewFrame				= self.NewFrame,
 		NewIcon					= self.NewIcon,
-		SetMovable				= self.SetMovable,
+		Unlock					= self.Unlock,
 		SynchronizeWithPlayer 	= self.SynchronizeWithPlayer,
 		AdjustIconsToPlayer 	= self.AdjustIconsToPlayer
 	}

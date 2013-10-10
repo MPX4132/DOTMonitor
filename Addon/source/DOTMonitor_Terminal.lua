@@ -12,7 +12,7 @@ local HUD		= DOTMonitor.library.HUD:New(nil)
 -- ================================================================================
 local DOTMonitorCommand_setDraggable = (function(canMove)
 	local shouldMove = (canMove == "on") or (canMove == "yes")
-	HUD:SetMovable(shouldMove)
+	HUD:Unlock(shouldMove)
 	return "HUD Now "..(shouldMove and "Unlocked" or "Locked")
 end)
 

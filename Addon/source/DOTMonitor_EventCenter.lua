@@ -1,6 +1,13 @@
 local DOTMonitor = getglobal("DOTMonitor") or {}
+
 local Player 	= DOTMonitor.library.Player:New()
 local HUD		= DOTMonitor.library.HUD:New(nil)
+
+--Test vars:
+DOTMonitor.unit = {
+	player 	= Player,
+	HUD		= HUD
+}
 
 DOTMonitorEventCenter = CreateFrame("Frame"); DOTMonitorEventCenter:SetAlpha(0);
 local DOTMonitorEventCenter_StartResponding = function()
@@ -21,61 +28,29 @@ end
 -- ================================================================================
 local DOTMonitorReaction_playerChangedTarget 	= function()
 	HUD:SetVisible(DOTMonitor.inspector.playerTargetingLivingEnemy())
-	DOTMonitor.logMessage("Target Changed: "..UnitName("target") or "NONE")
-	--[[
-	local targetName = "[NONE]"
-	if DOTMonitor.inspector.playerTargetingLivingEnemy() then
-		targetName = UnitName("target")
-		--DOTMonitor.unit.enemy:Synchronize()
-	end
-	DOTMonitor.logMessage("Target: "..targetName)
-	--]]
+	DOTMonitor.logMessage("Target Changed: "..(UnitName("target") or "\[x\]"))
 end
 
 
 local DOTMonitorReaction_playerStartedFighting 	= function()
 	HUD:SetEnabled(true)
-	--DOTMonitor.HUD:SetEnabled(true)
 end
 local DOTMonitorReaction_playerStoppedFighting 	= function()
 	HUD:SetEnabled(false)
-	--DOTMonitor.HUD:SetEnabled(false)
 end
 
 
 local DOTMonitorReaction_playerAbilitiesPossiblyChanged = function()
 	Player:Synchronize()
-	--[[
-	DOTMonitor.unit.player:Synchronize()
-	DOTMonitor.HUD:Update()
-	DOTMonitor.unit.player:ShowTrackingInfo()
-	--]]
+	HUD:SetEnabled(false)
 end
 
 
 local DOTMonitorReaction_playerEnteringWorld 	= function()
 	Player:Delegate(HUD)
-	Player:Synchronize()
-	--[[
-	DOTMonitor.unit = {	-- Start Players
-		player 	= Player:New()-- ,enemy	= Player:New()
-	}
-
-	-- Get User Set
-	DOTMonitor.unit.player:Synchronize()
-	
-	if DOTMonitor.unit.player.ready then
-		local userHUDPreferences = getglobal("DOTMONITOR_HUD_SETTINGS")
-		DOTMonitor.HUD:Initialize(DOTMonitor.unit.player, nil)
-		DOTMonitor.unit.player:ShowTrackingInfo()
-		
-		DOTMonitorEventCenter_StartResponding()
-		
-		DOTMonitor.printMessage("Ready", "epic")
-	else
-		DOTMonitor.printMessage("requires a specialization!", "info")
-	end
-	--]]
+	DOTMonitorReaction_playerAbilitiesPossiblyChanged()
+	HUD:FormalPosition()
+	DOTMonitorEventCenter_StartResponding()
 end
 
 
