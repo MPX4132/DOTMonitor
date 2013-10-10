@@ -2,6 +2,39 @@ DOTMonitor 				= {} -- Main Addon
 DOTMonitor.inspector 	= {} -- Inspector Library
 DOTMonitor.utility		= {} -- Utility Library
 DOTMonitor.HUD			= {} -- HUD
+DOTMonitor.library		= {} -- Class Library
+
+DOTMonitor.scanner = {
+	debuffMonitor = (function(self, elapsed)
+		self.lastUpdate = self.lastUpdate and (self.lastUpdate + elapsed) or 0
+		if self.lastUpdate >= 0.1 then
+		--[[	
+			if not DOTMonitor.inspector.playerTargetingLivingEnemy() then
+				self:SetAlpha(0) 
+				return false
+			end
+			--]]
+	
+			local duration, expiration, caster = DOTMonitor.inspector.checkUnitForDebuff("target",self.effect)
+	
+			local spellIconSize = self.settings.iconSize
+			local spellMaxAlpha = self.settings.maxAlpha
+	
+			if caster == "player" then
+				local timeRemaining = (expiration - GetTime())
+				local timeFraction 	= (duration ~= 0) and (timeRemaining / duration) or 0
+
+				self:SetHeight(spellIconSize - (timeFraction * spellIconSize))
+				self:SetAlpha(spellMaxAlpha	- (timeFraction * spellMaxAlpha))
+			else
+				self:SetHeight(spellIconSize)
+				self:SetAlpha(spellMaxAlpha)
+			end
+	
+			self.lastUpdate = 0
+		end
+	end)
+}
 
 local debugMode = true
 
@@ -106,7 +139,7 @@ DOTMonitor.inspector.getSpecInfo = function()
 	specInfo.name = specInfo.name:gsub(" ", "_") -- Death Knights -> Death_Knights
 	return specInfo
 end
-
+--[[
 DOTMonitor.inspector.getPossibleAbilities = function(allAbilities)
 	local availableAbilities = {}
 	
@@ -122,6 +155,21 @@ DOTMonitor.inspector.getPossibleAbilities = function(allAbilities)
 	
 	return availableAbilities
 end
+--]]
+DOTMonitor.inspector.getPossibleAbilities = function(allAbilities)
+	local availableAbilities = {spell = {}, effect = {}}
+	
+	for atIndex, anAbility in ipairs(allAbilities.spell) do
+		DOTMonitor.logMessage("Testing "..anAbility)
+		if DOTMonitor.utility.getSpellID(anAbility) then
+			table.insert(availableAbilities.spell, anAbility)
+			table.insert(availableAbilities.effect, allAbilities.effect[atIndex])
+		else
+			DOTMonitor.logMessage("Not Supported: "..anAbility) 
+		end
+	end
+end
+	
 
 DOTMonitor.inspector.unitIsAlive = function(aUnit)
 	return (UnitExists(aUnit) and (not UnitIsDead(aUnit))) or false
@@ -168,15 +216,17 @@ end
 -- ================================================================================
 --DOTMonitor.PlayerClass = {}
 --local Player = DOTMonitor.PlayerClass -- Player Class
-
 local Player = {}
-
 Player.Synchronize = function(self)
 	self.info = DOTMonitor.inspector.getPlayerInfo()
 	
 	if not self.info.spec then return nil end-- Player can't be tracked -> Don't Initialize
 	
-	self.spec = {debuff = DOTMonitor.utility.getAbilitiesForPlayer("debuffs", self)}
+	local allDebuffs = DOTMonitor.utility.getAbilitiesForPlayer("debuffs", self)
+	self.spec = {debuff = DOTMonitor.inspector.getPossibleAbilities(allDebuffs)}
+	
+	--if self.delegate then delegate:PlayerSpecDidChange(self) end
+	if self.delegate then delegate:SynchronizeWithPlayer(self) end
 end
 
 Player.Ready = function(self)
@@ -192,7 +242,7 @@ Player.GetAbility = function(self, abilityType, position)
 	return playerAbilities.spell[position], playerAbilities.effect[position]
 end
 
-Player.ShowTrackingInfo = function(self)
+Player.ShowMonitoringInfo = function(self)
 	DOTMonitor.printMessage(("adjusted for "..self.info.spec.name.." "..self.info.class), "info")
 	for abilityTypePos, anAbilityType in ipairs(self.spec) then
 		DOTMonitor.printMessage((anAbilityType:gsub("^%l", string.upper)).." types being monitored:")
@@ -213,6 +263,7 @@ Player.New = function(self)
 		spec = {
 			debuff = nil
 		},
+		delegate = nil
 		
 		-- Methods
 		Synchronize 		= self.Synchronize,
@@ -223,73 +274,7 @@ Player.New = function(self)
 	}
 end
 
---[[
-Player.Synchronize = function(self)
-	self.info = DOTMonitor.inspector.getPlayerInfo()
-	self.spec = DOTMonitor.inspector.getSpecInfo()
-	
-	if self.spec then -- Player CAN'T Be Tracked
-		status = ("Player: "..(self.info.class).." ("..(self.spec.name)..")")
-		local abilities, allAbilities	= DOTMonitor.utility.getAbilitesForClassSpec(self.info.class, self.spec.name)
-		self.spec.spells 	= DOTMonitor.inspector.getPossibleAbilities(allAbilities)
-		self.spec.textures 	= allAbilities
-		self.ready = true
-	else
-		status = "Missing Specialization!"
-		self.ready = false
-	end
-	
-	DOTMonitor.logMessage(status)
-end
 
-Player.GetAbilityTexture = function(self, position)
-	return self.spec.textures[position]
-end
-
-Player.GetAbilities = function(self)
-	return self.spec.spells
-end
-
-Player.GetAbility = function(self, position)
-	return DOTMonitor.utility.getSpellName(self.spec.spells[position]), self:GetAbilityTexture(position)
-end
-
-Player.ShowTrackingInfo = function(self)
-	local className, classSpec = self.info.class, self.spec.name
-	DOTMonitor.printMessage(("adjusting for "..classSpec.." "..className), "info")
-	
-	for aPos = 1, #self.spec.textures do
-		DOTMonitor.printMessage("tracking "..self:GetAbilityTexture(aPos), "info")
-	end
-end
-
-Player.New = function(self)
-	local aPlayer = { -- Player Instance
-		info = {
-			class			= nil,
-			level 			= nil,
-			healthMax 		= nil
-		},
-		spec = {
-			name 		= nil,
-			id			= nil,
-			description = nil,
-			spells 		= nil,
-			spellTexture= nil
-		},
-		ready = false,
-		
-		-- Methods
-		Synchronize 		= self.Synchronize,
-		GetAbilityTexture 	= self.GetAbilityTexture,
-		GetAbilities		= self.GetAbilities,
-		GetAbility			= self.GetAbility,
-		ShowTrackingInfo	= self.ShowTrackingInfo
-	}
-	return aPlayer
-end
-
---]]
 
 
 -- @ HUD Methods Implementation
@@ -303,9 +288,19 @@ HUD.SetPreferences = function(self, ...)
 	}
 end
 
-HUD.SetIconBackground = function(self, position, spellName)
+HUD.GetIconsEnabled = function(self)
+	local active = {}
+	for aPos, icon in ipairs(self.icon) do
+		if anIcon.effect then
+			table.insert(active, icon)
+		end
+	end
+	return active
+end
+
+HUD.SetIconBackground = function(self, iconIndex, spellName)
 	local iconTexturePath = DOTMonitor.utility.getAbilityTexture(spellName)
-	local anIcon = self.icon[position]
+	local anIcon = self.icon[iconIndex]
 	
 	if not anIcon.texture then
 		anIcon.texture = anIcon:CreateTexture(nil, "BACKGROUND")
@@ -314,236 +309,199 @@ HUD.SetIconBackground = function(self, position, spellName)
 	anIcon.texture:SetAllPoints(anIcon)
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-DOTMonitor.HUD.SetPreferences = function(self, ...)
-	local preferences = (select(1,...)) or nil
-	local defaultPreferences = {
-		iconSize 	=   44,
-		yOffset 	= -126,
-		maxAlpha	=  .60
-	}
-	self.preferences = preferences or defaultPreferences;
-	--self.preferences = defaultPreferences
-end
-
-DOTMonitor.HUD.SetIconBackground = function(self, position, texturePath)
-	local anIcon = self.frame[position]
-	
-	if not anIcon.texture then
-		anIcon.texture = anIcon:CreateTexture(nil, "BACKGROUND")
-	end
-	anIcon.texture:SetTexture(texturePath)
-	anIcon.texture:SetAllPoints(anIcon)
-end
--- NOTE: Use only when all spell frames are ready
-DOTMonitor.HUD.IconFormalXOffset = function(self, iconIndex)
-	local iconSize 		= self.preferences.iconSize
-	local spellQuantity	= #self.player:GetAbilities() -- Here's the catch!
+HUD.GetFormalIconPosition = function(self, iconIndex)
+	local iconSize 		= self.settings.iconSize
+	local iconQuantity	= #self:GetIconsEnabled() -- Here's the catch!
 	-- Note the + () is due to adjusted to icon center point
-	local derivedOrigin = -((spellQuantity * iconSize)/2) + (iconSize/2) 
+	local derivedOrigin = -((iconQuantity * iconSize)/2) + (iconSize/2) 
 	local iconOffset 	= (iconSize * (iconIndex-1))
-	return derivedOrigin + iconOffset
+	return {x = (derivedOrigin + iconOffset), y = (self.settings.yOffset)}
 end
 
-DOTMonitor.HUD.SetIconPosition = function(self, iconIndex, position)
-	local pos = position or {x = self:IconFormalXOffset(iconIndex),
-							 y = self.preferences.yOffset}
-	self.frame[iconIndex]:SetPoint("CENTER", UIParent, "CENTER", pos.x, pos.y)
+HUD.SetIconPosition = function(self, iconIndex, position)
+	local pos = position or self:GetFormalIconPosition(iconIndex)
+	self.icon[iconIndex]:SetPoint("CENTER", UIParent, "CENTER", pos.x, pos.y)
 end
 
-DOTMonitor.HUD.FormalPosition = function(self)
-	for aPosition, aFrame in ipairs(self.frame) do
+HUD.FormalPosition = function(self)
+	for aPosition, anIcon in ipairs(self.icon) do
 		self:SetIconPosition(aPosition, nil)
 	end
 end
 
-DOTMonitor.HUD.SetIconAlpha = function(self, iconIndex, ...)
-	local alpha = (select(1,...)) or self.preferences.maxAlpha
-	self.frame[iconIndex]:SetAlpha(alpha)
+HUD.SetIconAlpha = function(self, iconIndex, ...)
+	local alpha = (select(1,...)) or self.settings.maxAlpha
+	self.icon[iconIndex]:SetAlpha(alpha)
 end
 
-DOTMonitor.HUD.SetIconDimensions = function(self, iconIndex, width, ...)
+HUD.SetIconDimensions = function(self, iconIndex, width, ...)
 	local w = width
 	local h = ((select(1,...)) and (select(1,...))) or w
-	self.frame[iconIndex]:SetWidth(w)
-	self.frame[iconIndex]:SetHeight(h)
+	self.icon[iconIndex]:SetWidth(w)
+	self.icon[iconIndex]:SetHeight(h)
 end
 
-DOTMonitor.HUD.GetIcons = function(self)
-	return self.frame
-end
-
-DOTMonitor.HUD.IconID = function(self, iconIndex, iconID)
-	if iconID then
-		self.frame[iconIndex].name = iconID
+HUD.IconEffect = function(self, iconIndex, ...)
+	if ... then
+		self.icon[iconIndex] = (select(1,...))
 	end
-
-	return self.frame[iconIndex].name
+	return self.icon[iconIndex]
 end
 
-DOTMonitor.HUD.EnableIcon = function(self, position, ready)
-	self.frame[position].enabled = ready
+HUD.IconMonitoring = function(self, iconIndex, anEffect)
+	self.icon[iconIndex].effect = anEffect or nil
+	self.icon[iconIndex]:SetScript("OnUpdate", (anEffect and DOTMonitor.scanner.debuffMonitor) or nil)
 end
 
--- DEBUFF TRACKING CODE!
-local debuffMonitor = function(self, elapsed)
-	if not self.enabled then return false end
-	
-	self.lastUpdate = self.lastUpdate and (self.lastUpdate + elapsed) or 0
-	if self.lastUpdate < 0.1 then return false end
-	
-	if not DOTMonitor.inspector.playerTargetingLivingEnemy() then
-		self:SetAlpha(0) 
+HUD.SetVisible = function(self, ...)
+	for aPos, anIcon in ipairs(self:GetIconsEnabled()) do
+		anIcon:SetAlpha(... and (select(1,...)) or 0)
+	end
+end
+
+HUD.Monitoring = function(self, enabled)
+	for aPos, anIcon in ipairs(self:GetIconsEnabled()) do
+		anIcon:SetScript("OnUpdate", (enabled and DOTMonitor.scanner.debuffMonitor) or nil)
+	end
+end
+
+HUD.SetEnabled = function(self, enabled, ...)
+	if enabled and self.ignoringEverything then
+		DOTMonitor.logMessage("Ignoring enable request...")
 		return false
 	end
-	
-	local duration, expiration, caster = DOTMonitor.inspector.checkUnitForDebuff("target",self.name)
-	
-	local spellIconSize = self.owner.preferences.iconSize
-	local spellMaxAlpha = self.owner.preferences.maxAlpha
-	
-	if caster == "player" then
-		local timeRemaining = (expiration - GetTime())
-		local timeFraction 	= (duration ~= 0) and (timeRemaining / duration) or 0
-
-		self:SetHeight(spellIconSize - (timeFraction * spellIconSize))
-		self:SetAlpha(spellMaxAlpha	- (timeFraction * spellMaxAlpha))
-	else
-		self:SetHeight(spellIconSize)
-		self:SetAlpha(spellMaxAlpha)
+	for aPos, icon in ipairs(self:GetIconsEnabled()) do
+		if enabled
+		then icon:Show()
+		else icon:Hide()
+		end
 	end
-	
-	self.lastUpdate = 0
-end
-
-DOTMonitor.HUD.SetMonitor = function(self, monitor)
-	for aPos, aFrame in ipairs(self.frame) do
-		aFrame:SetScript("OnUpdate", (monitor and debuffMonitor or nil))
+	if ... then 
+		self.ignoringEverything = (select(1,...))
 	end
 end
 
-DOTMonitor.HUD.CreateIcon = function(self, position, texture, spellID)
-	local iconIndex = (#self.frame + 1)
-	local iconSize 		= self.preferences.iconSize
-	local frameGlobalID = ("DOTM_HUD_ICON_"..iconIndex)
-	
+HUD.NewFrame = function(self, frameGlobalID, frameLayer)
 	local aFrame = CreateFrame("Frame", frameGlobalID, UIParent)
-	aFrame:SetFrameStrata("BACKGROUND")
-	aFrame.owner 	= self
+	aFrame:SetFrameStrata(frameLayer)
+	--aFrame.owner 	= self
 	
-	
-	-- Register Frames For MOVEMENT! (THERE NOW BE HAPPY PEOPLE!)
+	-- Register Frames For MOVEMENT! (HAPPY NOW, PEOPLE?!)
 	aFrame:SetScript("OnMouseDown", (function(self, button)
 		if button == "LeftButton" and not self.isMoving then
-			self:StartMoving(); 		self.isMoving = true;
+			self:StartMoving();
+			self.isMoving = true;
 		end
 	end))
 	
 	aFrame:SetScript("OnMouseUp", (function(self, button)
 		if button == "LeftButton" and self.isMoving then
-			self:StopMovingOrSizing(); 	self.isMoving = false;
+			self:StopMovingOrSizing();
+			self.isMoving = false;
 		end
 	end))
 	
 	aFrame:SetScript("OnHide", (function(self)
 		if (self.isMoving) then
-			self:StopMovingOrSizing(); 	self.isMoving = false;
+			self:StopMovingOrSizing();
+			self.isMoving = false;
 		end
 	end))
+	return aFrame
+end
+
+HUD.NewIcon = function(self, position, spell, effect)
+	local iconIndex = (#self.icon + 1)
+	local iconSize	= self.settings.iconSize
 	
-	-- Updater function
-	--aFrame:SetScript("OnUpdate", debuffMonitor)
+	if self.icon[iconIndex] then
+		DOTMonitor.printMessage("ERROR: OVERWRITING FRAME!", "alert")
+		return false
+	end
 	
-	table.insert(self.frame, aFrame)
+	self.icon[iconIndex] = self:NewFrame(("DOTM_HUD_ICON_"..iconIndex), "BACKGROUND")
 	
 	self:SetIconDimensions(iconIndex, iconSize)
 	self:SetIconBackground(iconIndex, texture)
 	self:SetIconPosition(iconIndex, position)
 	self:SetIconAlpha(iconIndex)
-	self:IconID(iconIndex, spellID)
+	self:IconMonitoring(iconIndex, effect)
 end
 
-DOTMonitor.HUD.SetVisible = function(self, visible)
-	local alpha = visible and self.preferences.maxAlpha or 0
-	for iconIndex = 1, #self.frame do
-		self:SetIconAlpha(iconIndex, alpha)
-	end
-end
-
-DOTMonitor.HUD.SetEnabled = function(self, enabled)
-	enabled = self.player.ready and enabled
-	for pos, aFrame in ipairs(self.frame) do
-		if enabled 
-		then aFrame:Show()
-		else aFrame:Hide()
-		end
-	end
-end
-
-DOTMonitor.HUD.SetMovable = function(self, movable)
+HUD.SetMovable = function(self, movable)
+	self:Monitoring(not movable)
 	self:SetEnabled(movable)
-	self:SetMonitor(not movable)
 	self:SetVisible(movable)
-	for aPos, aFrame in ipairs(self.frame) do
+	for aPos, aFrame in ipairs(self:GetIconsEnabled()) do
 		aFrame:SetMovable(movable)
 		aFrame:EnableMouse(movable)
 	end
 end
 
-DOTMonitor.HUD.AdjustIconsToSpec = function(self)
-	local player = self.player
-	local availableSlots, requiredSlots = #self:GetIcons(), #player:GetAbilities()
+HUD.SynchronizeWithPlayer = function(self, aPlayer)
+	self:SetEnabled(false, true)
 	
-	-- Create Frames If Needed
-	if requiredSlots > availableSlots then
-		local zeroPoint = {x=0, y=0}
-		for i = 1, (requiredSlots-availableSlots) do
-			self:CreateIcon(zeroPoint, "[N/A]", "[N/A]")
+	self:AdjustIconsToPlayer(aPlayer)
+	
+	self:SetEnabled(false, false)
+end
+
+HUD.AdjustIconsToPlayer = function(self, aPlayer)
+	if not aPlayer:Ready() then return false end
+	local availableSlots, requiredSlots = #self.icon, #aPlayer:GetAbilities()
+	
+	if availableSlots < requiredSlots then -- Create frames if needed
+		local zeroPoint = {x=0,y=0}
+		for i=0, (requiredSlots-availableSlots) do
+			self:NewIcon(zeroPoint, "\[N/A\]", "\[N/A\]")
 		end
 	end
 	
-	for aPos = 1, #self.frame do
+	for aPos = 1, #self.icon do
 		if aPos <= requiredSlots then
-			local spellName, textureSpellName = player:GetAbility(aPos)
-			self:IconID(aPos, spellName)
-			self:SetIconBackground(aPos, DOTMonitor.utility.getAbilityTexture(textureSpellName))
-			self:EnableIcon(aPos,true)
+			local spell, effect = aPlayer:GetAbility(aPos)
+			self:SetIconBackground(aPos, spell)
+			self:IconMonitoring(aPos, effect)
 		else
 			self:SetIconAlpha(aPos, 0)
-			self:EnableIcon(aPos,false)
+			self:IconMonitoring(aPos, nil)
 		end
 	end
 	self:SetMonitor(true)
 end
 
-DOTMonitor.HUD.Update = function(self)
-	self:SetEnabled(false)
+HUD.New = function(self, aPlayer, preferences)
+	local newHUD = {
+		icon 		= {},
+		settings	= {},
+		
+		-- Methods
+		SetPreferences 			= self.SetPreferences,
+		GetIconsEnabled 		= self.GetIconsEnabled,
+		SetIconBackground		= self.SetIconBackground,
+		GetFormalIconPosition 	= self.GetFormalIconPosition,
+		SetIconPosition			= self.SetIconPosition,
+		FormalPosition 			= self.FormalPosition,
+		SetIconAlpha 			= self.SetIconAlpha,
+		SetIconDimensions 		= self.SetIconDimensions,
+		IconEffect				= self.IconEffect,
+		IconMonitoring 			= self.IconMonitoring,
+		SetVisible				= self.SetVisible,
+		Monitoring				= self.Monitoring,
+		SetEnabled				= self.SetEnabled,
+		NewFrame				= self.NewFrame,
+		NewIcon					= self.NewIcon,
+		SetMovable				= self.SetMovable,
+		SynchronizeWithPlayer 	= self.SynchronizeWithPlayer,
+		AdjustIconsToPlayer 	= self.AdjustIconsToPlayer
+	}
 	
-	self.player = DOTMonitor.unit.player
-	self:AdjustIconsToSpec()
-	self:FormalPosition()
+	
+	newHUD:SetPreferences(preferences)
+	newHUD:SynchronizeWithPlayer(aPlayer)
+	newHUD:FormalPosition()
+	return newHUD
 end
 
-DOTMonitor.HUD.Initialize = function(self, player, preferences)
-	self.frame = {}
-	self.player = player
-	self:SetPreferences(preferences)
-	self:AdjustIconsToSpec()
-	self:FormalPosition()
-	
-	self:SetEnabled(false)
-end
+DOTMonitor.library.Player 	= Player
+DOTMonitor.library.HUD		= HUD

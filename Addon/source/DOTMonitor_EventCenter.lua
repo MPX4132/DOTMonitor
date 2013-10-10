@@ -1,5 +1,6 @@
 local DOTMonitor = getglobal("DOTMonitor") or {}
-local Player = DOTMonitor.PlayerClass
+local Player 	= DOTMonitor.library.Player:New()
+local HUD		= nil--DOTMonitor.library.HUD:New()
 
 DOTMonitorEventCenter = CreateFrame("Frame"); DOTMonitorEventCenter:SetAlpha(0);
 local DOTMonitorEventCenter_StartResponding = function()
@@ -19,31 +20,36 @@ end
 -- @ Responder Functions Implementation
 -- ================================================================================
 local DOTMonitorReaction_playerChangedTarget 	= function()
+	--[[
 	local targetName = "[NONE]"
 	if DOTMonitor.inspector.playerTargetingLivingEnemy() then
 		targetName = UnitName("target")
 		--DOTMonitor.unit.enemy:Synchronize()
 	end
 	DOTMonitor.logMessage("Target: "..targetName)
+	--]]
 end
 
 
 local DOTMonitorReaction_playerStartedFighting 	= function()
-	DOTMonitor.HUD:SetEnabled(true)
+	--DOTMonitor.HUD:SetEnabled(true)
 end
 local DOTMonitorReaction_playerStoppedFighting 	= function()
-	DOTMonitor.HUD:SetEnabled(false)
+	--DOTMonitor.HUD:SetEnabled(false)
 end
 
 
 local DOTMonitorReaction_playerAbilitiesPossiblyChanged = function()
+	--[[
 	DOTMonitor.unit.player:Synchronize()
 	DOTMonitor.HUD:Update()
 	DOTMonitor.unit.player:ShowTrackingInfo()
+	--]]
 end
 
 
 local DOTMonitorReaction_playerEnteringWorld 	= function()
+	--[[
 	DOTMonitor.unit = {	-- Start Players
 		player 	= Player:New()-- ,enemy	= Player:New()
 	}
@@ -62,6 +68,7 @@ local DOTMonitorReaction_playerEnteringWorld 	= function()
 	else
 		DOTMonitor.printMessage("requires a specialization!", "info")
 	end
+	--]]
 end
 
 
