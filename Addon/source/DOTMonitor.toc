@@ -4,9 +4,15 @@
 ## Notes: Monitor DOTs (Damage Over Time) effects on foes, once the DOTS end their duration, DOTMonior will show a picture of the DOT that should be refreshed.
 ## Version: 0.1.0
 ## SavedVariablesPerCharacter: DOTMONITOR_HUD_SETTINGS
-
 locale\language.enUS.lua
 
-DOTMonitor_Lib.lua
-DOTMonitor_EventCenter.lua
-DOTMonitor_Terminal.lua
+DOTMonitor.lua
+
+libraries\DOTM_Utilities.lua
+libraries\DOTM_Inspector.lua
+
+libraries\classes\Player.lua
+libraries\classes\HUD.lua
+
+DOTM_EventManager.lua
+DOTM_Terminal.lua

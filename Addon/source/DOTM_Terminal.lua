@@ -17,8 +17,6 @@ local DOTMonitorCommand_setDraggable = (function(canMove)
 end)
 
 
-
-
 -- @ Terminal Methods Implementation
 -- ================================================================================
 DOTMonitorTerminal 			= {} 	-- Main

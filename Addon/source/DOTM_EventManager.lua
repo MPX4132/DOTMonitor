@@ -9,7 +9,9 @@ DOTMonitor.unit = {
 	HUD		= HUD
 }
 
-DOTMonitorEventCenter = CreateFrame("Frame"); DOTMonitorEventCenter:SetAlpha(0);
+
+
+
 local DOTMonitorEventCenter_StartResponding = function()
 	-- initialization	
 	DOTMonitorEventCenter:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -28,7 +30,7 @@ end
 -- ================================================================================
 local DOTMonitorReaction_playerChangedTarget 	= function()
 	HUD:SetVisible(DOTMonitor.inspector.playerTargetingLivingEnemy())
-	DOTMonitor.logMessage("Target Changed: "..(UnitName("target") or "\[x\]"))
+	DOTMonitor.logMessage("Target Changed: "..(UnitName("target") or "\[x\]").."("..(DOTMonitor.inspector.playerTargetingLivingEnemy() and "LIVING" or "DEAD")..")")
 end
 
 
@@ -52,6 +54,7 @@ local DOTMonitorReaction_playerEnteringWorld 	= function()
 	HUD:FormalPosition()
 	DOTMonitorEventCenter_StartResponding()
 end
+-- ================================================================================
 
 
 
@@ -73,6 +76,9 @@ local DOTMonitorEventResponder = { -- Main Response Handeler
 
 -- @ Event Center Preparation Implementation
 -- ================================================================================
+DOTMonitorEventCenter = CreateFrame("Frame");
+DOTMonitorEventCenter:SetAlpha(0);
+
 DOTMonitorEventCenter:SetScript("OnEvent", (function(self, event, ...)
 	if DOTMonitorEventResponder[event] then
 		DOTMonitorEventResponder[event](...)
