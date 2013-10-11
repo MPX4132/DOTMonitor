@@ -1,14 +1,15 @@
 local DOTMonitor = getglobal("DOTMonitor") or {}
 
 local Player 	= DOTMonitor.library.Player:New()
-local HUD		= DOTMonitor.library.HUD:New(nil)
+local HUD		= DOTMonitor.library.HUD:New(DOTMONITOR_SETTINGS)
 
---Test vars:
-DOTMonitor.unit = {
-	player 	= Player,
-	HUD		= HUD
-}
+DOTMonitor.user = {player = Player}
+DOTMonitor.interface = HUD
 
+
+for aPos=1, 10 do
+	CreateFrame("Frame", ("DOTM_HUD_ICON_"..aPos), UIParent)
+end
 
 
 
@@ -29,30 +30,37 @@ end
 -- @ Responder Functions Implementation
 -- ================================================================================
 local DOTMonitorReaction_playerChangedTarget 	= function()
-	HUD:SetVisible(DOTMonitor.inspector.playerTargetingLivingEnemy())
-	DOTMonitor.logMessage("Target Changed: "..(UnitName("target") or "\[x\]").."("..(DOTMonitor.inspector.playerTargetingLivingEnemy() and "LIVING" or "DEAD")..")")
+	--if HUD:Permuting() then return false end
+	local aTarget 	= UnitName("target") or "\[No Target\]"
+	local status	= DOTMonitor.inspector.playerTargetingLivingEnemy() and "ALIVE" or "N/A"
+	
+	DOTMonitor.logMessage("Target Changed: "..aTarget.." ("..status..")")
 end
 
-
 local DOTMonitorReaction_playerStartedFighting 	= function()
+	if HUD:Permuting() then return false end
+	Player:InBattle(true)
 	HUD:SetEnabled(true)
 end
 local DOTMonitorReaction_playerStoppedFighting 	= function()
+	if HUD:Permuting() then return false end
+	Player:InBattle(false)
 	HUD:SetEnabled(false)
 end
-
 
 local DOTMonitorReaction_playerAbilitiesPossiblyChanged = function()
 	Player:Synchronize()
 	HUD:SetEnabled(false)
 end
 
-
 local DOTMonitorReaction_playerEnteringWorld 	= function()
 	Player:Delegate(HUD)
 	DOTMonitorReaction_playerAbilitiesPossiblyChanged()
-	HUD:FormalPosition()
 	DOTMonitorEventCenter_StartResponding()
+end
+
+local DOTMonitorReaction_playerLeavingWorld = function()
+	DOTMONITOR_SETTINGS = HUD:GetPreferences()
 end
 -- ================================================================================
 
@@ -70,7 +78,8 @@ local DOTMonitorEventResponder = { -- Main Response Handeler
 	["PLAYER_TALENT_UPDATE"] 	= DOTMonitorReaction_playerAbilitiesPossiblyChanged,
 	["PLAYER_LEVEL_UP"] 		= DOTMonitorReaction_playerAbilitiesPossiblyChanged,
 	
-	["PLAYER_ENTERING_WORLD"] 	= DOTMonitorReaction_playerEnteringWorld
+	["PLAYER_ENTERING_WORLD"] 	= DOTMonitorReaction_playerEnteringWorld,
+	["PLAYER_LEAVING_WORLD"]	= DOTMonitorReaction_playerLeavingWorld
 }
 
 

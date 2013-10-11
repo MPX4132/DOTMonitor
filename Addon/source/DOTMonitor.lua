@@ -4,12 +4,10 @@ DOTMonitor.scanner = {
 	debuffMonitor = (function(self, elapsed)
 		self.lastUpdate = self.lastUpdate and (self.lastUpdate + elapsed) or 0
 		if self.lastUpdate >= 0.1 then
-		--[[	
 			if not DOTMonitor.inspector.playerTargetingLivingEnemy() then
 				self:SetAlpha(0) 
 				return false
 			end
-			--]]
 	
 			local duration, expiration, caster = DOTMonitor.inspector.checkUnitForDebuff("target",self.effect)
 	

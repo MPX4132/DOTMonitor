@@ -43,13 +43,18 @@ Player.GetAbility = function(self, abilityType, position)
 	return playerAbilities.spell[position], playerAbilities.effect[position]
 end
 
+Player.InBattle = function(self, ...)
+	if type((select(1,...))) == "boolean" then
+		self.info.battling = (select(1,...))
+	end
+	--if self:Ready() and self.delegate then self.delegate:SetEnabled(self.info.battling) end
+	return self.info.battling
+end
+
 Player.ShowMonitoringInfo = function(self)
 	DOTMonitor.printMessage(("adjusted for "..self.info.spec.name.." "..self.info.class), "info")
-	for abilityTypePos, anAbilityType in ipairs(self.spec) do
-		DOTMonitor.printMessage((anAbilityType:gsub("^%l", string.upper)).." types being monitored:")
-		for aPos, aSpell in ipairs(anAbilityType) do
-			DOTMonitor.printMessage(("monitoring "..anAbility), "info")
-		end
+	for aPos, aSpell in ipairs(self.spec.debuff.spell) do
+		DOTMonitor.printMessage(("monitoring "..aSpell), "info")
 	end
 end
 
@@ -59,7 +64,8 @@ Player.New = function(self)
 			class			= nil,
 			spec			= nil,
 			level 			= nil,
-			healthMax 		= nil
+			healthMax 		= nil,
+			battling		= nil
 		},
 		spec = {
 			debuff = nil
@@ -72,6 +78,7 @@ Player.New = function(self)
 		Ready				= self.Ready,
 		GetAbilities		= self.GetAbilities,
 		GetAbility			= self.GetAbility,
+		InBattle			= self.InBattle,
 		ShowMonitoringInfo	= self.ShowMonitoringInfo
 	}
 end

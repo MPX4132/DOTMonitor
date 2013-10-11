@@ -45,9 +45,10 @@ DOTMonitor.inspector.playerTargetingEnemy = function()
 end
 
 DOTMonitor.inspector.playerTargetingLivingEnemy = function()
-	local playerIsAlive = DOTMonitor.inspector.unitIsAlive("player")
+	local targetExists 	= UnitName("target") or false
+	local targetIsAlive = DOTMonitor.inspector.unitIsAlive("player")
 	local targetIsEnemy = DOTMonitor.inspector.playerTargetingEnemy()
-	return (playerIsAlive and targetIsEnemy)
+	return (targetExists and targetIsAlive and targetIsEnemy)
 end
 
 DOTMonitor.inspector.checkUnitForDebuff = function(aUnit, debuff)
