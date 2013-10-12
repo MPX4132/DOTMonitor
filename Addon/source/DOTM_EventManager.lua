@@ -1,7 +1,9 @@
 local DOTMonitor = getglobal("DOTMonitor") or {}
 
 local Player 	= DOTMonitor.library.Player:New()
-local HUD		= DOTMonitor.library.HUD:New(DOTMONITOR_SETTINGS)
+local HUD		= DOTMonitor.library.HUD:New(nil)
+
+local userPref = nil
 
 DOTMonitor.user = {player = Player}
 DOTMonitor.interface = HUD
@@ -20,6 +22,7 @@ local DOTMonitorEventCenter_StartResponding = function()
 	DOTMonitorEventCenter:RegisterEvent("PLAYER_REGEN_ENABLED")
 	DOTMonitorEventCenter:RegisterEvent("PLAYER_TALENT_UPDATE")
 	DOTMonitorEventCenter:RegisterEvent("PLAYER_LEVEL_UP")
+	DOTMonitorEventCenter:RegisterEvent("PLAYER_LOGOUT")
 	
 	DOTMonitor.logMessage("initialized!")
 end
@@ -56,11 +59,21 @@ end
 local DOTMonitorReaction_playerEnteringWorld 	= function()
 	Player:Delegate(HUD)
 	DOTMonitorReaction_playerAbilitiesPossiblyChanged()
+	HUD:FormalPosition();
 	DOTMonitorEventCenter_StartResponding()
 end
 
-local DOTMonitorReaction_playerLeavingWorld = function()
-	DOTMONITOR_SETTINGS = HUD:GetPreferences()
+local DOTMonitorReaction_playerExiting = function()
+	--local DOTMonitorPreferences = _G["DOTMonitorPreference"];
+	userPref = HUD:GetPreferences()
+	
+	DOTMonitorPreferences = userPref
+end
+
+local DOTMonitorReaction_restorePreferences = function()
+	userPref = _G["DOTMonitorPreferences"];
+	HUD:SetPreferences(userPref)
+	Player:Synchronize()
 end
 -- ================================================================================
 
@@ -79,7 +92,9 @@ local DOTMonitorEventResponder = { -- Main Response Handeler
 	["PLAYER_LEVEL_UP"] 		= DOTMonitorReaction_playerAbilitiesPossiblyChanged,
 	
 	["PLAYER_ENTERING_WORLD"] 	= DOTMonitorReaction_playerEnteringWorld,
-	["PLAYER_LEAVING_WORLD"]	= DOTMonitorReaction_playerLeavingWorld
+	["PLAYER_LOGOUT"]			= DOTMonitorReaction_playerExiting,
+	
+	["ADDON_LOADED"]			= DOTMonitorReaction_restorePreferences
 }
 
 

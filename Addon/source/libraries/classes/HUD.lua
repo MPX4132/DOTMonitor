@@ -97,8 +97,11 @@ HUD.RestoreIconSize = function(self)
 end
 
 HUD.RestoreIconPosition = function(self)
-	DOTMonitor.logMessage("Restoring Icons!")
-	if not self.settings.iconPosition then return false end
+	DOTMonitor.logMessage("Attempting to restore icons!")
+	if not self.settings.iconPosition then
+		DOTMonitor.logMessage("Failed to restore, no data!")
+		return false
+	end
 	for anIndex, anIcon in ipairs(self.GetIconsEnabled()) do
 		local aPosition = self.settings.iconPosition["icon_"..aPos] or nil
 		self:SetIconPosition(anIndex, aPosition)
