@@ -9,7 +9,8 @@ HUD.SetPreferences = function(self, ...)
 	self.settings = (select(1, ...)) or {
 		iconSize 	=   44,
 		yOffset 	= -126,
-		maxAlpha	=  .60
+		maxAlpha	=  1,
+		persist 	= true
 	}
 end
 
@@ -39,12 +40,8 @@ HUD.SetIconPosition = function(self, iconIndex, position)
 end
 
 HUD.FormalPosition = function(self)
-	for aPosition, anIcon in ipairs(self.icon) do
-		if not anIcon:IsUserPlaced() then
-			self:SetIconPosition(aPosition, nil)
-		else
-			DOTMonitor.logMessage("Frame "..aPosition.." set to USER VALUE!")
-		end
+	for aPosition, anIcon in ipairs(self:GetIconsEnabled()) do
+		self:SetIconPosition(aPosition, nil)
 	end
 end
 
@@ -97,14 +94,21 @@ HUD.RestoreIconSize = function(self)
 end
 
 HUD.RestoreIconPosition = function(self)
-	DOTMonitor.logMessage("Attempting to restore icons!")
-	if not self.settings.iconPosition then
-		DOTMonitor.logMessage("Failed to restore, no data!")
-		return false
+	DOTMonitor.logMessage("Attempting to restore icons' position!")
+	for anIndex, anIcon in ipairs(self:GetIconsEnabled()) do		
+		if not anIcon:IsUserPlaced() then
+			DOTMonitor.logMessage("Icon "..anIndex.." is being positioned")
+			self:SetIconPosition(anIndex, nil)
+		else 
+			DOTMonitor.logMessage("Icon "..anIndex.." is USER PLACED!")
+		end
 	end
-	for anIndex, anIcon in ipairs(self.GetIconsEnabled()) do
-		local aPosition = self.settings.iconPosition["icon_"..aPos] or nil
-		self:SetIconPosition(anIndex, aPosition)
+end
+
+HUD.ResetSettings = function(self, reset)
+	self.settings.persist = not reset
+	if reset then
+		self:FormalPosition()
 	end
 end
 
@@ -139,7 +143,8 @@ HUD.SetEnabled = function(self, enabled)
 end
 
 HUD.NewFrame = function(self, frameGlobalID, frameLayer)
-	local aFrame = getglobal(frameGlobalID) or CreateFrame("Frame", frameGlobalID, UIParent)
+	local aFrame = CreateFrame("Frame", frameGlobalID, UIParent)
+	aFrame:SetMovable(true)
 	aFrame:SetFrameStrata(frameLayer)
 	
 	-- Register Frames For MOVEMENT! (HAPPY NOW, PEOPLE?!)
@@ -185,7 +190,6 @@ HUD.NewIcon = function(self, position, spell, effect)
 	
 	self:SetIconDimensions(iconIndex, iconSize)
 	self:SetIconBackground(iconIndex, texture)
-	--self:SetIconPosition(iconIndex, position)
 	self:SetIconAlpha(iconIndex)
 	self:IconMonitoring(iconIndex, effect)
 end
@@ -205,20 +209,33 @@ HUD.Unlock = function(self, movable)
 	end
 end
 
+HUD.InitializeWithMonitors = function(self, preferences)
+	if preferences then
+		DOTMonitor.logMessage("Alloc "..preferences.quantity.." monitors!")
+		local zeroPoint = {x=0,y=0}
+		for aPos=1, preferences.quantity do
+			self:NewIcon(zeroPoint, "\[N/A\]", "\[N/A\]")
+		end
+		self.settings.userPlaced = preferences.userPlaced
+	else
+		DOTMonitor.logMessage("No preferences!")
+	end
+end
+
 -- HUD Setting
 HUD.SynchronizeWithPlayer = function(self, aPlayer)
-	self:Unlock(false)
 	self:AdjustIconsToPlayer(aPlayer)
 	self:RestoreIconPosition()
+	self:Unlock(false)
 end
 
 -- HUD Setting
 HUD.AdjustIconsToPlayer = function(self, aPlayer)
+	DOTMonitor.logMessage("Adjusting Icons!")
 	if not aPlayer:Ready() then
-		DOTMonitor.logMessage("Player hasn't been initialized!")
+		DOTMonitor.logMessage("Failed to adjust icons, player not ready!")
 		return false
 	end
-	DOTMonitor.logMessage("Adjusting Icons!")
 	
 	local availableSlots, requiredSlots = #self.icon, #(aPlayer:GetAbilities("debuff")).spell
 	
@@ -254,9 +271,18 @@ HUD.RetrivePositions = function(self)
 	return positions
 end
 
+HUD.UserPlaced = function(self)
+	local userPositioned = {}
+	for aPos, anIcon in ipairs(self.icon) do
+		if anIcon:IsUserPlaced() then
+			userPositioned["icon_"..aPos] = true
+		end
+	end
+	return userPositioned
+end
+
 HUD.GetPreferences = function(self)
-	self.settings.iconPosition = self:RetrivePositions();
-	return self.settings
+	return self.settings.persist and {quantity=(#self.icon)} or false
 end
 
 HUD.New = function(self, preferences)
@@ -279,15 +305,18 @@ HUD.New = function(self, preferences)
 		SetVisible				= self.SetVisible,
 		RestoreIconSize			= self.RestoreIconSize,
 		RestoreIconPosition		= self.RestoreIconPosition,
+		ResetSettings			= self.ResetSettings,
 		Monitoring				= self.Monitoring,
 		SetEnabled				= self.SetEnabled,
 		Permuting				= self.Permuting,
 		NewFrame				= self.NewFrame,
 		NewIcon					= self.NewIcon,
 		Unlock					= self.Unlock,
+		InitializeWithMonitors 	= self.InitializeWithMonitors,
 		SynchronizeWithPlayer 	= self.SynchronizeWithPlayer,
 		AdjustIconsToPlayer 	= self.AdjustIconsToPlayer,
 		RetrivePositions		= self.RetrivePositions,
+		UserPlaced				= self.UserPlaced,
 		GetPreferences			= self.GetPreferences
 	}
 	

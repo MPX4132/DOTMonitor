@@ -7,24 +7,39 @@ local DOTMonitor = getglobal("DOTMonitor") or {}
 
 -- @ Terminal Functions Implementation
 -- ================================================================================
+local DOTMonitorCommand_getHelp = (function()
+	DOTMonitorTerminal:GetCommandHelp()
+	return DOTMonitorTerminal.separator
+end)
+
 local DOTMonitorCommand_setDraggable = (function(canMove)
 	local shouldMove = (canMove == "on") or (canMove == "yes")
-	local HUD		= DOTMonitor.interface
-	HUD:Unlock(shouldMove)
+	DOTMonitor.interface:Unlock(shouldMove)
 	return "HUD "..(shouldMove and "Unlocked" or "Locked")
 end)
 
+local DOTMonitorCommand_setPreferences = (function(shouldReset)
+	local HUD = DOTMonitor.interface
+	HUD:ResetSettings((shouldReset ~= nil) and (shouldReset == "clear" or shouldReset == "reset") or false)
+	return "Preferences will be "..(HUD.settings.persist and "kept" or "reset")
+end)
 
 -- @ Terminal Methods Implementation
 -- ================================================================================
-DOTMonitorTerminal 			= {} 	-- Main
-DOTMonitorTerminal.command 	= nil 	-- The Command
+DOTMonitorTerminal = {	-- Main
+	separator 	= "============================================",
+	command 	= nil	-- The Command
+}
 DOTMonitorTerminal.executables = {
-	["drag"] = DOTMonitorCommand_setDraggable
+	["help"] = DOTMonitorCommand_getHelp,
+	["drag"] = DOTMonitorCommand_setDraggable,
+	["pref"] = DOTMonitorCommand_setPreferences
 }
 
 DOTMonitorTerminal.commandHelp = {
-	["drag"] = "Lock/Unlock the HUD"
+	["help"] = "This help message",
+	["drag"] = "Lock/Unlock the HUD",
+	["pref"] = "Change HUD preferences"
 }
 
 
@@ -37,10 +52,12 @@ DOTMonitorTerminal.GetCommand = (function(self)
 end)
 
 DOTMonitorTerminal.GetCommandHelp = (function(self)
-	DOTMonitor.pringMessage("The following commands are recognized:")
-	for aPos, aCommand in ipairs(self.executables) do
-		return aPos .. " ->"..self.commandHelp[aPos]
+	DOTMonitor.printMessage(self.separator)
+	DOTMonitor.printMessage("The following commands are recognized:")
+	for aPos, aCommand in pairs(self.executables) do
+		DOTMonitor.printMessage(aPos .. " ->"..self.commandHelp[aPos])
 	end
+	return self.separator;
 end)
 
 DOTMonitorTerminal.HasFunction = (function(self, aFunction)
@@ -69,7 +86,7 @@ DOTMonitorTerminal.Execute = (function(self, aCommand)
 		result = self:GetCommandHelp()
 	end
 	
-	DOTMonitor.printMessage(result, executable and "info" or "alert")
+	DOTMonitor.printMessage(result, "info")
 end)
 
 

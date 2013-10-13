@@ -6,10 +6,20 @@ if not DOTMonitor.library then DOTMonitor.library = {} end
 local Player = {}; DOTMonitor.library.Player = Player;
 
 Player.Synchronize = function(self)
-	self.info = DOTMonitor.inspector.getPlayerInfo()
+
+	if not self.info.class then
+		self.info = DOTMonitor.inspector.getPlayerInfo()
+	else
+		local newInfo = DOTMonitor.inspector.getPlayerInfo()
+		if (self.info.spec.name ~= newInfo.spec.name) then
+			self.info = newInfo
+		else
+			return false
+		end
+	end
 	
 	if not self.info.spec then 
-		DOTMonitor.logMessage("Player wasn't initialized!")
+		DOTMonitor.logMessage("Player not ready!")
 		return nil;
 	end-- Player can't be tracked -> Don't Initialize
 	

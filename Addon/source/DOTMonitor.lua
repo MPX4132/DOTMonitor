@@ -1,4 +1,4 @@
-DOTMonitor = {debugMode = true} -- Main Addon
+DOTMonitor = {debugMode = false} -- Main Addon
 
 DOTMonitor.scanner = {
 	debuffMonitor = (function(self, elapsed)
