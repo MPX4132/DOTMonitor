@@ -39,11 +39,9 @@ Player.Delegate = function(self, ...)
 end
 
 Player.Ready = function(self)
-	--DOTMonitor.logMessage("spec name: "..self.info.spec.name)
-	--DOTMonitor.logMessage("spec is "..(self.spec and "ready" or "empty").." size: "..#self.spec)
 	return self.info.spec.name and self.spec and true or false
 end
---aPlayer:GetAbilities("debuff")
+
 Player.GetAbilities = function(self, abilityType)
 	return self.spec[abilityType]
 end
@@ -57,7 +55,6 @@ Player.InBattle = function(self, ...)
 	if type((select(1,...))) == "boolean" then
 		self.info.battling = (select(1,...))
 	end
-	--if self:Ready() and self.delegate then self.delegate:SetEnabled(self.info.battling) end
 	return self.info.battling
 end
 

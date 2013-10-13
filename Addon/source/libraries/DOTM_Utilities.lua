@@ -29,7 +29,6 @@ DOTMonitor.printMessage = (function(aMessage, ...)
 	DEFAULT_CHAT_FRAME:AddMessage(output, color.r, color.g, color.b)
 end)
 
--- logMessage( messageText ) -> IF debugMode enabled: prints messageText to DEFAULT_CHAT_FRAME
 DOTMonitor.logMessage = (function(aMessage)
 	if DOTMonitor.debugMode then
 		DEFAULT_CHAT_FRAME:AddMessage("\[DOTMonitor DEBUG\] "..aMessage, 1, 0, 0)
@@ -66,7 +65,13 @@ DOTMonitor.utility.getAbilitiesForPlayer = function(abilityType, aPlayer)
 	local abilityData = getglobal("DOTMonitor"..abilityType.."_"..GetLocale()) 
 					 or getglobal("DOTMonitor"..abilityType.."_enUS")
 	
-	return {effect = abilityData[pClass][pSpec], spell = abilityData[pClass].spellIconFor[pSpec]}
+	local abilities, effects = {}, {};
+	
+	for anAbility, anEffect in pairs(abilityData[pClass][pSpec]) do
+		table.insert(abilities, anAbility); table.insert(effects, anEffect);
+	end
+	
+	return {spell = abilities, effect = effects}
 end
 
 DOTMonitor.utility.frameEnabled = function(aFrame, enabled)
