@@ -11,7 +11,7 @@ Player.Synchronize = function(self)
 		self.info = DOTMonitor.inspector.getPlayerInfo()
 	else
 		local newInfo = DOTMonitor.inspector.getPlayerInfo()
-		if (self.info.spec.name ~= newInfo.spec.name) then
+		if (self.info.spec.name ~= newInfo.spec.name) and (self.info.level ~= newInfo.level) then
 			self.info = newInfo
 		else
 			return false
@@ -61,7 +61,7 @@ end
 Player.ShowMonitoringInfo = function(self)
 	DOTMonitor.printMessage(("adjusted for "..self.info.spec.name.." "..self.info.class), "info")
 	for aPos, aSpell in ipairs(self.spec.debuff.spell) do
-		DOTMonitor.printMessage(("monitoring "..aSpell), "info")
+		DOTMonitor.printMessage(("Tracking: "..aSpell))
 	end
 end
 

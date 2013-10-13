@@ -32,14 +32,14 @@ DOTMonitorTerminal = {	-- Main
 }
 DOTMonitorTerminal.executables = {
 	["help"] = DOTMonitorCommand_getHelp,
-	["drag"] = DOTMonitorCommand_setDraggable,
+	["move"] = DOTMonitorCommand_setDraggable,
 	["pref"] = DOTMonitorCommand_setPreferences
 }
 
 DOTMonitorTerminal.commandHelp = {
 	["help"] = "This help message",
-	["drag"] = "Lock/Unlock the HUD",
-	["pref"] = "Change HUD preferences"
+	["move"] = "Lock/Unlock the HUD (on/yes)",
+	["pref"] = "Reset HUD preferences (clear/reset)",
 }
 
 

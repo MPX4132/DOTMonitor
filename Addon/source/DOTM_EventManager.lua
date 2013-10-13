@@ -39,6 +39,7 @@ end
 local DOTMonitorReaction_playerEnteringWorld 	= function()
 	DOTMonitorReaction_playerAbilitiesPossiblyChanged()
 	DOTMonitorEventCenter_StartResponding()
+	DOTMonitor.printMessage("Ready", "epic")
 end
 
 local DOTMonitorReaction_playerExiting = function()
