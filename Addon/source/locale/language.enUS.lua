@@ -1,6 +1,17 @@
 -- The following specs/combos will be tracked by DOTMonitor
 DOTMonitorDebuffs_enUS = {
-	["Death_knight"] = {},
+	["Death_knight"] = {
+		["Blood"] = {
+			["Outbreak"] 		= {"Blood Plague", "Frost Fever"},
+			["Scarlet Fever"] 	= "Weakened Blows",
+		},
+		["Frost"] = {
+			["Outbreak"] 		= {"Blood Plague", "Frost Fever"},
+		},
+		["Unholy"] = {
+			["Outbreak"] 		= {"Blood Plague", "Frost Fever"},
+		}
+	},
 
 	["Druid"] = {
 		["Balance"] = {
