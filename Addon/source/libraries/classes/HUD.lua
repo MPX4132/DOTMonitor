@@ -19,9 +19,23 @@ HUD.SetIconBackground = function(self, iconIndex, spellName)
 	local anIcon = self.icon[iconIndex]
 	
 	if not anIcon.texture then
-		anIcon.texture = anIcon:CreateTexture(nil, "BACKGROUND")
+		anIcon.texture	= anIcon:CreateTexture(nil, "ARTWORK")
+		anIcon.border	= anIcon:CreateTexture(nil, "OVERLAY")
+		anIcon.highlight= anIcon:CreateTexture(nil, "HIGHLIGHT")
+		
+		anIcon.border:SetTexture("Interface\\AddOns\\DOTMonitor\\graphics\\icon_border_white")
+		anIcon.border:SetAllPoints(anIcon)
+		anIcon.highlight:SetTexture("Interface\\AddOns\\DOTMonitor\\graphics\\icon_gloss")
+		anIcon.highlight:SetAllPoints(anIcon)
+		--[[
+		anIcon:SetBackdrop( { 
+			  bgFile = "Interface\\AddOns\\DOTMonitor\\graphics\\icon_border", 
+			  edgeFile = "", tile = false, tileSize = 0, edgeSize = 4, 
+			  insets = { left = 0, right = 0, top = 0, bottom = 0 }
+		});
+		--]]
 	end
-	anIcon.texture:SetTexture(iconTexturePath)
+	SetPortraitToTexture(anIcon.texture, iconTexturePath)
 	anIcon.texture:SetAllPoints(anIcon)
 end
 
@@ -182,7 +196,6 @@ HUD.NewIcon = function(self, position, spell, effect)
 	end
 	
 	self.icon[iconIndex] = self:NewFrame(("DOTM_HUD_ICON_"..iconIndex), "BACKGROUND")
-	
 	self.icon[iconIndex].settings = {
 		iconSize = self.settings.iconSize,
 		maxAlpha = self.settings.maxAlpha
