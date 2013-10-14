@@ -19,17 +19,18 @@ HUD.SetIconBackground = function(self, iconIndex, spellName)
 	local anIcon = self.icon[iconIndex]
 	
 	if not anIcon.texture then
-		anIcon.texture	= anIcon:CreateTexture(nil, "ARTWORK")
-		anIcon.border	= anIcon:CreateTexture(nil, "OVERLAY")
-		anIcon.highlight= anIcon:CreateTexture(nil, "HIGHLIGHT")
+		anIcon.texture		= anIcon:CreateTexture(nil, "ARTWORK")
+		anIcon.texture:SetAllPoints(anIcon)
 		
+		anIcon.border		= anIcon:CreateTexture(nil, "OVERLAY")
 		anIcon.border:SetTexture("Interface\\AddOns\\DOTMonitor\\graphics\\icon_border_white")
 		anIcon.border:SetAllPoints(anIcon)
+		
+		anIcon.highlight	= anIcon:CreateTexture(nil, "HIGHLIGHT")
 		anIcon.highlight:SetTexture("Interface\\AddOns\\DOTMonitor\\graphics\\icon_gloss")
 		anIcon.highlight:SetAllPoints(anIcon)
 	end
 	SetPortraitToTexture(anIcon.texture, iconTexturePath)
-	anIcon.texture:SetAllPoints(anIcon)
 end
 
 HUD.GetFormalIconPosition = function(self, iconIndex)

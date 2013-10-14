@@ -11,7 +11,7 @@ Player.Synchronize = function(self)
 		self.info = DOTMonitor.inspector.getPlayerInfo()
 	else
 		local newInfo = DOTMonitor.inspector.getPlayerInfo()
-		if (self.info.spec.name ~= newInfo.spec.name) and (self.info.level ~= newInfo.level) then
+		if (self.info.spec.name ~= newInfo.spec.name) or (self.info.level ~= newInfo.level) then
 			self.info = newInfo
 		else
 			return false
