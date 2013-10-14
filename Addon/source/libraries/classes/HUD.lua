@@ -27,13 +27,6 @@ HUD.SetIconBackground = function(self, iconIndex, spellName)
 		anIcon.border:SetAllPoints(anIcon)
 		anIcon.highlight:SetTexture("Interface\\AddOns\\DOTMonitor\\graphics\\icon_gloss")
 		anIcon.highlight:SetAllPoints(anIcon)
-		--[[
-		anIcon:SetBackdrop( { 
-			  bgFile = "Interface\\AddOns\\DOTMonitor\\graphics\\icon_border", 
-			  edgeFile = "", tile = false, tileSize = 0, edgeSize = 4, 
-			  insets = { left = 0, right = 0, top = 0, bottom = 0 }
-		});
-		--]]
 	end
 	SetPortraitToTexture(anIcon.texture, iconTexturePath)
 	anIcon.texture:SetAllPoints(anIcon)
