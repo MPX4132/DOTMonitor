@@ -1,7 +1,7 @@
 DOTMonitor = {debugMode = false} -- Main Addon
 
 local iconIntensity = function(magnitude)
-	BorderTheme = {"Interface\\AddOns\\DOTMonitor\\graphics\\icon_border_gray", "Interface\\AddOns\\DOTMonitor\\graphics\\icon_border_white"}
+	BorderTheme = {"Interface\\AddOns\\DOTMonitor\\graphics\\icon_border_white", "Interface\\AddOns\\DOTMonitor\\graphics\\icon_border_effect_over"}
 	return BorderTheme[((magnitude >= 0.95 and 2) or 1)]
 end
 

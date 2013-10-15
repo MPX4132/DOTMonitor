@@ -23,11 +23,11 @@ HUD.SetIconBackground = function(self, iconIndex, spellName)
 		anIcon.texture:SetAllPoints(anIcon)
 		
 		anIcon.border		= anIcon:CreateTexture(nil, "OVERLAY")
-		anIcon.border:SetTexture("Interface\\AddOns\\DOTMonitor\\graphics\\icon_border_white")
+		anIcon.border:SetTexture("Interface\\AddOns\\DOTMonitor\\graphics\\icon_border_effect_over")
 		anIcon.border:SetAllPoints(anIcon)
 		
 		anIcon.highlight	= anIcon:CreateTexture(nil, "HIGHLIGHT")
-		anIcon.highlight:SetTexture("Interface\\AddOns\\DOTMonitor\\graphics\\icon_gloss")
+		anIcon.highlight:SetTexture("Interface\\AddOns\\DOTMonitor\\graphics\\icon_directional_arrows")
 		anIcon.highlight:SetAllPoints(anIcon)
 	end
 	SetPortraitToTexture(anIcon.texture, iconTexturePath)
