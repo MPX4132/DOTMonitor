@@ -23,7 +23,7 @@ HUD.SetIconBackground = function(self, iconIndex, spellName)
 		anIcon.texture:SetAllPoints(anIcon)
 		
 		anIcon.border		= anIcon:CreateTexture(nil, "OVERLAY")
-		anIcon.border:SetTexture("Interface\\AddOns\\DOTMonitor\\graphics\\icon_border_gloss_orange")
+		anIcon.border:SetTexture("Interface\\AddOns\\DOTMonitor\\graphics\\icon_border_white")
 		anIcon.border:SetAllPoints(anIcon)
 		
 		anIcon.highlight	= anIcon:CreateTexture(nil, "HIGHLIGHT")
