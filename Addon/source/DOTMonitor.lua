@@ -36,6 +36,7 @@ DOTMonitor.scanner = {
 				self:SetHeight(spellIconSize)
 				self:SetWidth(spellIconSize)
 				self:SetAlpha(spellMaxAlpha)
+				self.border:SetTexture(iconIntensity(1))
 			end
 	
 			self.lastUpdate = 0
