@@ -101,6 +101,12 @@ HUD.RestoreIconSize = function(self)
 	end
 end
 
+HUD.RestoreIconStyle = function(self)
+	for aPos, anIcon in pairs(self:GetIconsEnabled()) do
+		anIcon.border:SetTexture(DOTMonitor.utility.iconIntensity(0))
+	end
+end
+
 HUD.RestoreIconPosition = function(self)
 	DOTMonitor.logMessage("Attempting to restore icons' position!")
 	for anIndex, anIcon in ipairs(self:GetIconsEnabled()) do		
@@ -207,6 +213,9 @@ HUD.Unlock = function(self, movable)
 	self:RestoreIconSize()
 	self:Permuting(movable)
 	self:Monitoring(not movable)
+	
+	self:RestoreIconStyle()
+	
 	self:SetEnabled(movable)
 	self:SetVisible(movable and 1 or 0)
 	
@@ -311,6 +320,7 @@ HUD.New = function(self, preferences)
 		IconMonitoring 			= self.IconMonitoring,
 		SetVisible				= self.SetVisible,
 		RestoreIconSize			= self.RestoreIconSize,
+		RestoreIconStyle		= self.RestoreIconStyle,
 		RestoreIconPosition		= self.RestoreIconPosition,
 		ResetSettings			= self.ResetSettings,
 		Monitoring				= self.Monitoring,

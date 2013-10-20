@@ -1,10 +1,5 @@
 DOTMonitor = {debugMode = false} -- Main Addon
 
-local iconIntensity = function(magnitude)
-	BorderTheme = {"Interface\\AddOns\\DOTMonitor\\graphics\\icon_border_white", "Interface\\AddOns\\DOTMonitor\\graphics\\icon_border_effect_over"}
-	return BorderTheme[((magnitude >= 0.95 and 2) or 1)]
-end
-
 DOTMonitor.scanner = {
 	debuffMonitor = (function(self, elapsed)
 		self.lastUpdate = self.lastUpdate and (self.lastUpdate + elapsed) or 0
@@ -31,12 +26,12 @@ DOTMonitor.scanner = {
 				
 				
 				
-				self.border:SetTexture(iconIntensity(alphaMagnitude))
+				self.border:SetTexture(DOTMonitor.utility.iconIntensity(alphaMagnitude))
 			else
 				self:SetHeight(spellIconSize)
 				self:SetWidth(spellIconSize)
 				self:SetAlpha(spellMaxAlpha)
-				self.border:SetTexture(iconIntensity(1))
+				self.border:SetTexture(DOTMonitor.utility.iconIntensity(1))
 			end
 	
 			self.lastUpdate = 0
