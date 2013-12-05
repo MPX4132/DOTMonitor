@@ -13,7 +13,9 @@ local EffectMonitor = {}; -- EffectMonitor Class
 --		< bol: shown	- true to enable updating, false otherwise
 --		> obj 			- returns {maxAlpha, iconWidth, iconHeight}
 function EffectMonitor:BaseStyle(shown)
-	return {alpha = (shown and self.settings.maxAlpha) or 0, width = self.settings.iconWidth, height = self.settings.iconHeight};
+	return {alpha = (shown and self.settings.maxAlpha) or 0,
+			 width = self.settings.iconWidth,
+			 height = self.settings.iconHeight};
 end
 
 --	Enable(on) 		-> void
@@ -23,7 +25,7 @@ function EffectMonitor:Enable(on)
 end
 
 --	ShowCondition() -> bol
---		> int: int 	- true if the target meets condition, false otherwise
+--		> bol 		- true if the target meets condition, false otherwise
 function EffectMonitor:ShowCondition()
 	return self:Effect() and self.settings.showCondition(self:Effect());
 end
@@ -71,22 +73,14 @@ end
 --	Effect(effect) 		-> str
 -- 		< obj | str: 	- either an obj containing a set of effects or a string denoting the effect name
 --		> str			- the effect name (localized)
-function EffectMonitor:Effect(effect)
-	return (type(effect) == "object") and effect[1] or effect;
-end
-
-
---[[
+-- NOTICE: I'm using ... as the arguments to be lenient and not require any args
 function EffectMonitor:Effect(...)
-	if ... then
-		self.effect = (select(1,...)) or false;
-	end
-	return self.effect;
+	self.effect = (type(...) == "undefined") and self.effect or (select(1, ...));
+	return (type(self.effect) ~= "table") and self.effect or self.effect[1];
 end
---]]
 
 --	EffectScanner() 	-> void
---		> obj			- returns duration, expiration, caster source
+--		> obj			- returns (duration, expiration, source)
 function EffectMonitor:EffectScanner()
 	return self.settings.effectScanner(self:Effect(), self.settings.target);
 end
@@ -108,19 +102,6 @@ function EffectMonitor:EffectMagnitude()
 	return style;
 end
 
-
---[[
-	Requires:
-		(BOOL) 			settings.showCondition()	// React to EffectMagnitude otherwise set to 1
-		(int,int,str) 	settings.effectScanner()	// Get effect info (duration, expiration, caster)
-		int: settings.updateInterval
-		str: settings.target
-		int: settings.maxAlpha
-		int: settings.iconWidth
-		int: settings.iconHeight
-
---]]
-
 -- New(frameID, settings)	-> Obj:EffectMonitor
 --		< str: frameID		- Denotes the frame ID
 --		< arr: settings		- Denotes the settings for the effect monitor object
@@ -130,11 +111,13 @@ end
 --			- int: iconWidth		- icon width
 -- 			- int: iconHeight		- icon height
 --			- fun: showCondition(effect)			-> bol
+--				< str		- string denoting the effect name, localized
+--				> bol 		- true if the target meets condition, false otherwise
 --			- fun: effectScanner(effect, target) 	-> arr
 --				< str: effect	- the effect name, id (localized)
 --				< str: target	- the target (player or target)
 --				> arr			- returns {duration, expiration, caster source}
-function EffectMonitor:New(frameID, settings)
+function EffectMonitor:New(frameID, settings, effect)
 	local newMonitor = CreateFrame("Frame", frameID, UIParent);
 	newMonitor:SetFrameStrata("BACKGROUND");
 
@@ -159,6 +142,8 @@ function EffectMonitor:New(frameID, settings)
 			self.isMoving = false;
 		end
 	end))
+
+	newMonitor:Effect(effect);
 
 	newMonitor.status = {
 		totalElapsed = 0
