@@ -3,17 +3,18 @@ local playerTargetingThreat = DOTMonitor.inspector.playerTargetingLivingEnemy();
 local EffectMonitor = {}; -- EffectMonitor Class
 
 
+
+
 -- ================================================================
 -- Class Methods' logic
 -- ================================================================
 
 --	BaseStyle(shown)	-> void
 --		< bol: shown	- true to enable updating, false otherwise
---		> arr: 			- returns {maxAlpha, iconWidth, iconHeight}
+--		> obj 			- returns {maxAlpha, iconWidth, iconHeight}
 function EffectMonitor:BaseStyle(shown)
 	return {alpha = (shown and self.settings.maxAlpha) or 0, width = self.settings.iconWidth, height = self.settings.iconHeight};
 end
-
 
 --	Enable(on) 		-> void
 --		< bol: on	- true to enable updating, false otherwise
@@ -50,8 +51,8 @@ function EffectMonitor:NeedsUpdate(elapsed)
 	return (self:ElapsedTime(elapsed) >= self.settings.updateInterval);
 end
 
---	Update(elapsed) 		-> void
---		< int:elapsed 	- time elapsed since the last update to total
+--	Update(elapsed) 	-> void
+--		< int: elapsed 	- time elapsed since the last update to total
 function EffectMonitor:Update(elapsed)
 	local readyForUpdate = (self:NeedsUpdate(elapsed) and self:ShowCondition()) or false;
 	local style = readyForUpdate and self:EffectMagnitude() or self:BaseStyle(false);
@@ -67,21 +68,31 @@ end
 -- Effect Scanner logic
 -- ================================================================
 
+--	Effect(effect) 		-> str
+-- 		< obj | str: 	- either an obj containing a set of effects or a string denoting the effect name
+--		> str			- the effect name (localized)
+function EffectMonitor:Effect(effect)
+	return (type(effect) == "object") and effect[1] or effect;
+end
+
+
+--[[
 function EffectMonitor:Effect(...)
 	if ... then
 		self.effect = (select(1,...)) or false;
 	end
 	return self.effect;
 end
+--]]
 
 --	EffectScanner() 	-> void
---		> arr			- returns duration, expiration, caster source
+--		> obj			- returns duration, expiration, caster source
 function EffectMonitor:EffectScanner()
-	return self.settings.effectScanner(self.settings.target, self:Effect());
+	return self.settings.effectScanner(self:Effect(), self.settings.target);
 end
 
 --	EffectMagnitude() 	-> void
---		> arr			- returns duration, expiration, caster source
+--		> obj			- returns a style {alpha, width, height}
 function EffectMonitor:EffectMagnitude()
 	local effectDuration, effectExpiration, effectCaster = self:EffectScanner();
 	local style = self:BaseStyle(true);
@@ -109,6 +120,20 @@ end
 		int: settings.iconHeight
 
 --]]
+
+-- New(frameID, settings)	-> Obj:EffectMonitor
+--		< str: frameID		- Denotes the frame ID
+--		< arr: settings		- Denotes the settings for the effect monitor object
+--			- int: updateInterval	- the time interval for max elapsed time before next cycle
+--			- str: target			- the target, player or target
+--			- int: maxAlpha			- the maximum alpha (opacity)
+--			- int: iconWidth		- icon width
+-- 			- int: iconHeight		- icon height
+--			- fun: showCondition(effect)			-> bol
+--			- fun: effectScanner(effect, target) 	-> arr
+--				< str: effect	- the effect name, id (localized)
+--				< str: target	- the target (player or target)
+--				> arr			- returns {duration, expiration, caster source}
 function EffectMonitor:New(frameID, settings)
 	local newMonitor = CreateFrame("Frame", frameID, UIParent);
 	newMonitor:SetFrameStrata("BACKGROUND");
