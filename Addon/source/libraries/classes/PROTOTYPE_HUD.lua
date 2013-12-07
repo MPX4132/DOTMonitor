@@ -1,4 +1,4 @@
-local DOTMonitor = getglobal("DOTMonitor") or {}
+local DOTMonitor = _G["DOTMonitor"] or {}
 if not DOTMonitor.library then DOTMonitor.library = {} end
 
 -- @ HUD Methods Implementation
@@ -238,12 +238,8 @@ HUD.InitializeWithMonitors = function(self, preferences)
 	end
 end
 
-HUD.PlayerDidSynchronize = function(self, aPlayer)
-	self:SynchronizeWithPlayer(aPlayer)
-end
-
 -- HUD Setting
-HUD.SynchronizeWithPlayer = function(self, aPlayer)
+HUD.PlayerDidSynchronize = function(self, aPlayer)
 	self:AdjustIconsToPlayer(aPlayer)
 	self:RestoreIconPosition()
 	self:Unlock(false)
@@ -336,7 +332,6 @@ HUD.New = function(self, preferences)
 		Unlock					= self.Unlock,
 		InitializeWithMonitors 	= self.InitializeWithMonitors,
 		PlayerDidSynchronize	= self.PlayerDidSynchronize,
-		SynchronizeWithPlayer 	= self.SynchronizeWithPlayer,
 		AdjustIconsToPlayer 	= self.AdjustIconsToPlayer,
 		RetrivePositions		= self.RetrivePositions,
 		UserPlaced				= self.UserPlaced,

@@ -3,7 +3,7 @@ if not DOTMonitor.library then DOTMonitor.library = {} end
 
 -- @ Player Methods Implementation
 -- ================================================================================
-local Player = {}
+local Player = {}; DOTMonitor.library.Player = Player;
 
 -- 	Spec()		-> tbl | bol
 --		> bol	- Returns the spec, otherwise false if no spec found

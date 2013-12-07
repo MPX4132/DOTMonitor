@@ -1,4 +1,4 @@
-local DOTMonitor = getglobal("DOTMonitor") or {}
+local DOTMonitor = _G["DOTMonitor"] or {}
 
 -- ///////////////////////////////////////////////////////////////////////////////////////
 -- Print Functions
@@ -12,20 +12,20 @@ DOTMonitor.printMessage = (function(aMessage, ...)
 		["custom"] 	= {r = 1,	g = 1,	b = 1}
 	}
 	local colorType = "info";
-	
+
 	if (...) then
 		local r, g, b = ...
 		if type(r) == "number" and type(g) == "number" and type(b) == "number" then
 			colorType = "custom";
-			colorScheme[colorType] 	= {r=r,g=g,b=b}; 
+			colorScheme[colorType] 	= {r=r,g=g,b=b};
 		elseif type(r) == "string" then
 			colorType = r
 		end
 	end
-	
+
 	local color 	= colorScheme[colorType]
 	local output 	= (type((select(1,...))) == "string") and ("\[DOTMonitor "..aMessage.."]") or ("\[DOTMonitor] "..aMessage)
-	
+
 	DEFAULT_CHAT_FRAME:AddMessage(output, color.r, color.g, color.b)
 end)
 
@@ -62,20 +62,19 @@ DOTMonitor.utility.getAbilitiesForPlayer = function(abilityType, aPlayer)
 	local pClass, pSpec = aPlayer.info.class, aPlayer.info.spec.name
 	abilityType = abilityType:gsub("^%l", string.upper)
 	DOTMonitor.logMessage("Retriving "..abilityType.." for "..pSpec.." "..pClass)
-	local abilityData = getglobal("DOTMonitor"..abilityType.."_"..GetLocale()) 
-					 or getglobal("DOTMonitor"..abilityType.."_enUS")
-	
-	local abilities, effects = {}, {};
-	
+	local abilityData = _G["DOTMonitor"..abilityType.."_"..GetLocale()]
+					 or _G["DOTMonitor"..abilityType.."_enUS"]
+
+	local playerAbilities = {};
 	for anAbility, anEffect in pairs(abilityData[pClass][pSpec]) do
-		table.insert(abilities, anAbility); table.insert(effects, anEffect);
+		table.insert(playerAbilities, {spell = anAbility, effect = anEffect})
 	end
-	
-	return {spell = abilities, effect = effects}
+
+	return playerAbilities
 end
 
 DOTMonitor.utility.frameEnabled = function(aFrame, enabled)
-	if enabled 
+	if enabled
 	then aFrame:Show()
 	else aFrame:Hide()
 	end

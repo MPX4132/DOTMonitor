@@ -1,4 +1,5 @@
-local DOTMonitor = getglobal("DOTMonitor") or {}
+local DOTMonitor = _G["DOTMonitor"] or {}
+
 
 local Player 	= DOTMonitor.library.Player:New()
 local HUD		= DOTMonitor.library.HUD:New(nil)
@@ -13,7 +14,7 @@ local DOTMonitorEventCenter_StartResponding = function() -- initialization
 	DOTMonitorEventCenter:RegisterEvent("PLAYER_TALENT_UPDATE")
 	DOTMonitorEventCenter:RegisterEvent("PLAYER_LEVEL_UP")
 	DOTMonitorEventCenter:RegisterEvent("PLAYER_LOGOUT")
-	
+
 	DOTMonitor.logMessage("initialized!")
 end
 
@@ -49,7 +50,7 @@ end
 
 local DOTMonitorReaction_restorePreferences = function(addon)
 	if addon ~= "DOTMonitor" then return false end
-	
+
 	local pref = _G["DOTMonitorPreferences"]
 	HUD:InitializeWithMonitors(pref);
 	Player:Delegate(HUD)
@@ -64,13 +65,13 @@ end
 local DOTMonitorEventResponder = { -- Main Response Handeler
 	["PLAYER_REGEN_DISABLED"] 	= DOTMonitorReaction_playerStartedFighting,
 	["PLAYER_REGEN_ENABLED"] 	= DOTMonitorReaction_playerStoppedFighting,
-	
+
 	["PLAYER_TALENT_UPDATE"] 	= DOTMonitorReaction_playerAbilitiesPossiblyChanged,
 	["PLAYER_LEVEL_UP"] 		= DOTMonitorReaction_playerAbilitiesPossiblyChanged,
-	
+
 	["PLAYER_ENTERING_WORLD"] 	= DOTMonitorReaction_playerEnteringWorld,
 	["PLAYER_LOGOUT"]			= DOTMonitorReaction_playerExiting,
-	
+
 	["ADDON_LOADED"]			= DOTMonitorReaction_restorePreferences
 }
 

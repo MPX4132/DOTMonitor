@@ -1,4 +1,4 @@
-local DOTMonitor = getglobal("DOTMonitor") or {}
+local DOTMonitor = _G["DOTMonitor"] or {}
 
 -- @ Inspector Library Implementation
 -- ================================================================================
@@ -14,7 +14,7 @@ end
 
 DOTMonitor.inspector.getSpecInfo = function()
 	local specInfo = {id = nil, name = nil, description = nil}
-	
+
 	if not DOTMonitor.inspector.canMonitorPlayer() then return false end
 	specInfo.id, specInfo.name, specInfo.description = select(1,GetSpecializationInfo(GetSpecialization()))
 	specInfo.name = specInfo.name:gsub(" ", "_") -- Death Knights -> Death_Knights
@@ -23,14 +23,14 @@ end
 
 DOTMonitor.inspector.getPossibleAbilities = function(allAbilities)
 	local availableAbilities = {spell = {}, effect = {}}
-	
+
 	for atIndex, anAbility in ipairs(allAbilities.spell) do
 		DOTMonitor.logMessage("Testing "..anAbility)
 		if DOTMonitor.utility.getSpellID(anAbility) then
 			table.insert(availableAbilities.spell, anAbility)
 			table.insert(availableAbilities.effect, allAbilities.effect[atIndex])
 		else
-			DOTMonitor.logMessage("Not Supported: "..anAbility) 
+			DOTMonitor.logMessage("Not Supported: "..anAbility)
 		end
 	end
 	return availableAbilities
@@ -54,7 +54,7 @@ end
 DOTMonitor.inspector.checkUnitForDebuff = function(aUnit, debuff)
 	local duration, expiration, caster = nil, nil, nil;
 	local singleDebuff = type(debuff) == "string"
-	if singleDebuff then 
+	if singleDebuff then
 		duration, expiration, caster = select(6, UnitDebuff(aUnit, debuff))
 	else
 		for aPosition, aDebuff in ipairs(debuff) do
