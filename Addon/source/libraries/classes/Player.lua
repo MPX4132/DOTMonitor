@@ -13,8 +13,9 @@ end
 
 --	Ready()		-> bol
 --		> bol	- Returns if there exists a spec, otherwise false
-function Player:Ready()
-	return type(self:Spec()) ~= "undefined";
+function Player:Loaded()
+	--return type(self:Spec()) ~= "undefined";
+	return type(self:Spec()) == "table";
 end
 
 --	Delegate(...)		-> tbl | bol
@@ -28,7 +29,7 @@ end
 
 --	NofityDelegate()	-> void
 function Player:NotifyDelegate()
-	if self:Ready() and self:Delegate() then
+	if self:Loaded() and self:Delegate() then
 		self.delegate:PlayerDidSynchronize(self);
 	end
 end
@@ -88,7 +89,7 @@ function Player:New()
 
 		-- Saving Methods for instances
 	newPlayer.Spec 				= self.Spec;
-	newPlayer.Ready				= self.Ready;
+	newPlayer.Loaded			= self.Loaded;
 	newPlayer.Delegate			= self.Delegate;
 	newPlayer.NotifyDelegate	= self.NotifyDelegate;
 	newPlayer.GetAbilities 		= self.GetAbilities;
