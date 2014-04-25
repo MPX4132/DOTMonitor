@@ -181,11 +181,13 @@ end
 -- >>> WARNING: READ BELOW <<<
 function Player:New(subject)
 	local newPlayer = {
-		["subject"] = subject,
+		["subject"] 	= subject,
 
-		["IsPlayer"]= self.IsPlayer,
+		-- Link static class members to instance
+		["IsPlayer"]	= self.IsPlayer,
 		["Level"] 	= self.Level,
 		["Class"] 	= self.Class,
+		["SupportsSpec"] = self.SupportsSpec,
 		["HasSpec"]	= self.HasSpec,
 		["Spec"] 	= self.Spec,
 		["GetInfo"]	= self.GetInfo,
@@ -194,7 +196,7 @@ function Player:New(subject)
 
 	newPlayer.resource 	= {};
 	newPlayer.class 	= {};
-	newPlayer.class.name = UnitClass(self.subject);
+	newPlayer.class.name 	= UnitClass(self.subject);
 
 	newPlayer.eventCenter = CreateFrame("Frame", ("DOTM_PLAYER_"..subject), UIParent);
 	newPlayer.eventCenter:SetAlpha(0);
