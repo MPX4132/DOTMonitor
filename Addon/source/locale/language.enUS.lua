@@ -1,5 +1,5 @@
--- The following specs/combos will be tracked by DOTMonitor
-DOTMonitorDebuffs_enUS = {
+-- The following spec/debuff combos will be monitored by DOTMonitor
+DOTMonitor_Debuffs_enUS = {
 	["Death_knight"] = {
 		["Blood"] = {
 			["Outbreak"] 		= {"Blood Plague", "Frost Fever"},
@@ -29,22 +29,19 @@ DOTMonitorDebuffs_enUS = {
 		},
 		["Restoration"] = {}
 	},
-	
+
 	["Hunter"] = {
 		["Beast_Mastery"] = {
-			["Hunter's Mark"] 	= "Hunter's Mark",
 			["Serpent Sting"]	= "Serpent Sting",
 		},
 		["Marksmanship"] = {
-			["Hunter's Mark"] 	= "Hunter's Mark",
 			["Serpent Sting"]	= "Serpent Sting",
 		},
 		["Survival"] = {
-			["Hunter's Mark"] 	= "Hunter's Mark",
 			["Serpent Sting"]  	= "Serpent Sting",
 		}
 	},
-	
+
 	["Mage"] = {
 		["Arcane"] = {
 			["Nether Tempest"] 	= "Nether Tempest",
@@ -59,7 +56,7 @@ DOTMonitorDebuffs_enUS = {
 			["Living Bomb"] 	= "Living Bomb",
 		}
 	},
-	
+
 	["Monk"] = {
 		["Brewmaster"] = {
 			["Blackout Kick"] 	= "Blackout Kick",
@@ -74,7 +71,7 @@ DOTMonitorDebuffs_enUS = {
 		 	["Blackout Kick"] 	= "Blackout Kick",
 		}
 	},
-	
+
 	["Paladin"] = {
 		["Holy"] = {},
 		["Protection"] = {
@@ -85,7 +82,7 @@ DOTMonitorDebuffs_enUS = {
 			["Judgments of the Bold"] 	= "Physical Vulnerability",
 		}
 	},
-	
+
 	["Priest"] = {
 		["Dicipline"] = {},
 		["Holy"] = {},
@@ -94,7 +91,7 @@ DOTMonitorDebuffs_enUS = {
 			["Vampiric Touch"] 		= "Vampiric Touch",
 		}
 	},
-	
+
 	["Rouge"] = {
 		["Assassination"] = {
 			["Expose Armor"] 	= "Weakened Armor",
@@ -106,7 +103,7 @@ DOTMonitorDebuffs_enUS = {
 			["Expose Armor"] 	= "Weakened Armor",
 		}
 	},
-	
+
 	["Shaman"] = {
 		["Elemental"] = {
 			["Flame Shock"] 	= "Flame Shock",
@@ -118,8 +115,8 @@ DOTMonitorDebuffs_enUS = {
 		},
 		["Restoration"] = {}
 	},
-	
-	["Warlock"] = { -- Best Class Ever... :D
+
+	["Warlock"] = {
 		["Affliction"] = {
 			["Agony"] 					= "Agony",
 			["Corruption"]				= "Corruption",
@@ -139,7 +136,7 @@ DOTMonitorDebuffs_enUS = {
 			["Curse of the Elements"]	= "Curse of the Elements"
 		}
 	},
-	
+
 	["Warrior"] = {
 		["Arms"] = {
 			["Thunder Clap"]		= "Weakened Blows",

@@ -1,18 +1,19 @@
 ## Interface: 50400
 ## Title: DOTMonitor
 ## Author: MPX-4132
-## Notes: Monitor for damage over time (DOT) effects on enemies; once the DOTs span their duration, DOTMonior displays an icon of the DOT that should be casted on the target.
-## Version: 0.1.2
-## SavedVariablesPerCharacter: DOTMonitorPreferences
-locale\language.enUS.lua
+## Notes: Monitor for DOT effects on enemies; once the DOTs span their duration, DOTMonior displays an icon of the DOT that should be casted on the target.
+## Version: 0.2.0
+
+Locale\language.enUS.lua
+
+Framework\Foundation\Terminal.lua
+Framework\Foundation\Console.lua
+Framework\Foundation\EventManager.lua
+Framework\Foundation\Table.lua
+Framework\Foundation\Foundation.lua
+Framework\UIKit\Icon.lua
+Framework\WOWKit\Spell.lua
+Framework\WOWKit\Player.lua
+Framework\WOWKit\SpellMonitor.lua
 
 DOTMonitor.lua
-
-libraries\DOTM_Utilities.lua
-libraries\DOTM_Inspector.lua
-
-libraries\classes\Player.lua
-libraries\classes\PROTOTYPE_HUD.lua
-
-DOTM_EventManager.lua
-DOTM_Terminal.lua
