@@ -20,9 +20,9 @@ function Terminal:SetOutputStream(os)
 	self.outputStream = os
 end
 
-function Terminal:Output(aMessage)
+function Terminal:Output(aMessage, ...)
 	if type(self.outputStream) ~= "nil" then
-		self.outputStream:AddMessage(aMessage)
+		self.outputStream:AddMessage(aMessage, ...)
 	else
 		DEFAULT_CHAT_FRAME:AddMessage(aMessage)
 	end
@@ -58,8 +58,8 @@ function Terminal:Commands()
 end
 
 function Terminal:CommandsInfo()
-	self:Output("\n\n")
-   	self:Output("Commands: ")
+	--self:Output("\n\n")
+   	self:Output("Command Set", "info")
 	for aCommand, aMessage in pairs(self.descriptors) do
 		self:Output(aCommand .. " -> " .. aMessage)
 	end

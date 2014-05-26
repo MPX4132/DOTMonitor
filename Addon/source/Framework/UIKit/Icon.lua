@@ -14,7 +14,7 @@ end
 
 function Icon:Draggable(draggable, ...)
 	local isDraggable = draggable ~= false
-	self:SetMovable(isDraggable)
+	self:SetMovable(isDraggable) -- For StartMoving() to work, otherwise error
 	self:EnableMouse(isDraggable)
     self:RegisterForDrag(draggable, ...)
 end
@@ -131,6 +131,7 @@ function Icon:New(ID, backgroundPath)
 	self.instance = self.instance + 1
 	local frameGlobalID = ID or string.format("MPXWOWKit_Icon_Instance_%d", Icon.instance)
 	local icon = CreateFrame("Frame", frameGlobalID, UIParent)
+	icon:SetMovable(true)
 
 	icon:SetScript("OnUpdate", (function(self, elapsed)
 		self.lastUpdate = self.lastUpdate and (self.lastUpdate + elapsed) or 0
@@ -161,7 +162,7 @@ function Icon:New(ID, backgroundPath)
 	icon.delegate = nil
 	icon.callback 		= {}
 	icon.updateThrottle = 0.250
-	icon.SetDelegate		= Icon.SetDelegate
+	icon.SetDelegate	= Icon.SetDelegate
 	icon.Round 			= Icon.Round
 	icon.Draggable		= Icon.Draggable
 	icon.SetPosition	= Icon.SetPosition
@@ -186,9 +187,11 @@ function Icon:New(ID, backgroundPath)
 		icon:SetBackground(backgroundPath)
 	end
 
-	icon:SetWidth(32)
-	icon:SetHeight(32)
-	icon:SetPoint("Center", 0, 0)
+	if not icon:IsUserPlaced() then
+		icon:SetWidth(32)
+		icon:SetHeight(32)
+		icon:SetPoint("Center", 0, 0)
+	end
 
 	return icon
 end

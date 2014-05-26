@@ -24,7 +24,7 @@ function DOTMonitor:SyncToPlayer(player)
 
 	self.console:Print("Adjusted for " .. tostring(self.player), "info")
 	for atIndex, aDebuff in ipairs(self.player:GetDebuff()) do
-		local aMonitor = self.monitorManager:GetMonitor(atIndex)
+		local aMonitor = self.manager:GetMonitor(atIndex)
 		self.console:Print("Tracking " .. aMonitor:TrackSpell(aDebuff))
 	end
 end
@@ -36,9 +36,9 @@ function DOTMonitor:HUDRun(run)
 			meetsShowCriteria = UnitExists("target") and (UnitIsEnemy("player", "target")
 													  or  UnitCanAttack("player", "target"))
 		end
-		self.monitorManager:EnableMonitors(meetsShowCriteria, #self.player:GetDebuff())
+		self.manager:EnableMonitors(meetsShowCriteria, #self.player:GetDebuff())
 	else
-		self.monitorManager:EnableMonitors(false)
+		self.manager:EnableMonitors(false)
 	end
 end
 
@@ -65,22 +65,21 @@ function DOTMonitor:New()
 
 	local commands = {
 		lock = function(self, arguments)
-			self.monitorManager:EnableDragging(false)
+			self.manager:LockMonitors(true)
 			return "HUD Locked"
 		end,
 		unlock = function(self, arguments)
-			self.monitorManager:EnableDragging(true)
+			self.manager:LockMonitors(false)
 			return "HUD Unlocked"
 		end,
 		reload = function(self, arguments)
-
 			return "Done Loading"
 		end
 	}
 
 	local info = {
-		lock = "Locks the HUD",
-		unlock = "Unlocks the HUD",
+		lock 	= "Locks the monitor icons",
+		unlock 	= "Unlocks the monitor icons",
 	}
 
 	dotMonitor.terminal:SetExecutables(commands, info)
@@ -103,8 +102,12 @@ function DOTMonitor:New()
 	dotMonitor.eventListener:AddActionForEvent((function(self, addon)
 		if addon ~= "DOTMonitor" then return end
 		local preferences = _G["DOTMonitorPreferences"]
-		dotMonitor.monitorManager = SpellMonitorManager:Restore(preferences, "DOTMonitor")
+		self.manager = SpellMonitorManager:Restore(preferences, "DOTMonitor")
 	end), "ADDON_LOADED")
+	dotMonitor.eventListener:AddActionForEvent((function(self, addon)
+		_G["DOTMonitorPreferences"] = _G["DOTMonitorPreferences"] or {}
+		self.manager:SaveTo(_G["DOTMonitorPreferences"])
+	end), "PLAYER_LOGOUT")
 
 	return dotMonitor
 end

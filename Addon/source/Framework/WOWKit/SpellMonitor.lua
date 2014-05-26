@@ -25,10 +25,12 @@ function SpellMonitor:SetAlpha(alpha)
 end
 
 function SpellMonitor:Draggable(mouseButton)
-	local unlock = mouseButton ~= nil and mouseButton
-	self:Monitor(not unlock)
-	self:Enable(unlock)
-	self.icon:Draggable(unlock and mouseButton)
+	mouseButton = (mouseButton == nil 	and "LeftButton")
+			   or (mouseButton ~= false and mouseButton)
+
+	self:Monitor(not mouseButton)
+	self:Enable(mouseButton)
+	self.icon:Draggable(mouseButton)
 end
 
 function SpellMonitor:Enable(enable)
@@ -39,8 +41,8 @@ function SpellMonitor:Enable(enable)
 end
 
 function SpellMonitor:Monitor(monitor)
-	self.monitoring = monitor
-	if not monitor then
+	self.monitoring = (monitor == nil) or (monitor ~= false)
+	if not self.monitoring then
 		self:Reset()
 	end
 end
@@ -51,23 +53,27 @@ function SpellMonitor:Reset()
 end
 
 function SpellMonitor:Update()
-	if not UnitExists(self.target) or UnitIsDead(self.target) then return end
-	local duration, expiration, caster = self.spell:TimeOnUnit(self.target)
+	if UnitExists(self.target) and not UnitIsDead(self.target) then
+		local duration, expiration, caster = self.spell:TimeOnUnit(self.target)
 
-	if caster == "player" then
-		local timeRemaining 	= (expiration - GetTime())
-		local timeFraction 		= (duration ~= 0) and (timeRemaining / duration) or 0
-		local sizeMagnitude 	= self.size.width - (timeFraction * self.size.width)
-		local alphaMagnitude 	= 1 - timeFraction
+		if caster == "player" then
+			local timeRemaining 	= (expiration - GetTime())
+			local timeFraction 		= (duration ~= 0) and (timeRemaining / duration) or 0
+			local sizeMagnitude 	= self.size.width - (timeFraction * self.size.width)
+			local alphaMagnitude 	= 1 - timeFraction
 
-		self.icon:SetHeight(sizeMagnitude)
-		self.icon:SetWidth(sizeMagnitude)
-		self.icon:SetAlpha(alphaMagnitude)
-
+			self.icon:SetHeight(sizeMagnitude)
+			self.icon:SetWidth(sizeMagnitude)
+			self.icon:SetAlpha(alphaMagnitude)
+		else
+			self.icon:SetHeight(self.size.width)
+			self.icon:SetWidth(self.size.width)
+			self.icon:SetAlpha(1)
+		end
 	else
-		self.icon:SetHeight(self.size.width)
-		self.icon:SetWidth(self.size.width)
-		self.icon:SetAlpha(1)
+		self.icon:SetHeight(0)
+		self.icon:SetWidth(0)
+		self.icon:SetAlpha(0)
 	end
 end
 
@@ -84,8 +90,8 @@ function SpellMonitor:IconMake(GlobalID, delegate)
 
  	icon:Hide()
  	icon:Round(true)
- 	icon:SetWidth(32)
- 	icon:SetHeight(32)
+ 	icon:SetWidth(44)
+ 	icon:SetHeight(44)
 	icon:SetDelegate(delegate)
 	icon:ThrottleUpdateByTime(0.100)
 
@@ -100,8 +106,8 @@ local SpellMonitorDefault = {
 	target 		= "target",
 	monitoring 	= true,
 	size = {
-		width = 32,
-		height = 32
+		width = 44,
+		height = 44
 	},
 	TrackSpell 	= SpellMonitor.TrackSpell,
 	SetTarget	= SpellMonitor.SetTarget,

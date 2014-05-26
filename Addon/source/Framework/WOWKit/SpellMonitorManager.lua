@@ -22,9 +22,7 @@ function SpellMonitorManager:AssureMonitors(aSize)
 end
 
 function SpellMonitorManager:EnableMonitors(enable, count)
-
 	local monitorsToEnable = count or #self.monitor
-
 	for i, aMonitor in ipairs(self.monitor) do
 		if i <= monitorsToEnable then
 			aMonitor:Monitor(enable)
@@ -35,22 +33,25 @@ function SpellMonitorManager:EnableMonitors(enable, count)
 	end
 end
 
-function SpellMonitorManager:EnableDragging(draggable)
-	self:LockMonitors(not draggable)
-end
-
 function SpellMonitorManager:LockMonitors(lock)
 	for i, aMonitor in ipairs(self.monitor) do
 		aMonitor:Draggable((lock ~= nil and (not lock)) and "LeftButton")
 	end
 end
 
-function SpellMonitorManager:Save(settings)
-	settings["spellManagerSettings"] = {
+function SpellMonitorManager:SaveTo(settings)
+	settings["spellManager"] = {
 		ID = self.ID,
 		monitorCount = #self.monitor,
 	}
-	self:EnableDragging("LeftButton")
+	--self:LockMonitors(false)
+	for i, aMonitor in ipairs(self.monitor) do
+		--aMonitor.icon:SetAlpha(0)
+		aMonitor:Monitor(false)
+		aMonitor:Enable(true)
+		aMonitor.icon:SetMovable(true)
+		aMonitor.icon:SetUserPlaced(true)
+	end
 end
 
 local SpellMonitorManagerDefault = {
@@ -59,9 +60,8 @@ local SpellMonitorManagerDefault = {
 	GetMonitor		= SpellMonitorManager.GetMonitor,
 	AssureMonitors 	= SpellMonitorManager.AssureMonitors,
 	EnableMonitors	= SpellMonitorManager.EnableMonitors,
-	EnableDragging	= SpellMonitorManager.EnableDragging,
 	LockMonitors	= SpellMonitorManager.LockMonitors,
-	Save			= SpellMonitorManager.Save,
+	SaveTo			= SpellMonitorManager.SaveTo,
 }
 
 function SpellMonitorManager:New(ID)
@@ -75,9 +75,9 @@ function SpellMonitorManager:New(ID)
 end
 
 function SpellMonitorManager:Restore(settings, backupID)
-	local preferences = settings and settings["spellManagerSettings"]
-	local spellMonitorManager = self:New(settings and preferences.ID or backupID) -- Default ID
-	return spellMonitorManager:AssureMonitors(settings and preferences.monitorCount)
+	local preferences = settings and settings["spellManager"]
+	local spellMonitorManager = self:New(preferences and preferences.ID or backupID) -- Default ID
+	return spellMonitorManager:AssureMonitors(preferences and preferences.monitorCount)
 end
 
 
