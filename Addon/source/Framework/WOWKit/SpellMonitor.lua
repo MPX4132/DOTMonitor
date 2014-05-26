@@ -11,6 +11,7 @@ local SpellMonitor = {} -- Local Namespace
 function SpellMonitor:TrackSpell(spell)
 	self.spell = spell
 	self.icon:SetSpell(spell)
+	return spell and tostring(spell) or "Nothing Appropriate"
 end
 
 function SpellMonitor:SetTarget(unit)
@@ -21,6 +22,13 @@ function SpellMonitor:SetAlpha(alpha)
 	alpha = alpha or 1
 	self.alpha = alpha
 	self.icon:SetAlpha(alpha < 0 and 0 or alpha > 1 and 1 or alpha)
+end
+
+function SpellMonitor:Draggable(mouseButton)
+	local unlock = mouseButton ~= nil and mouseButton
+	self:Monitor(not unlock)
+	self:Enable(unlock)
+	self.icon:Draggable(unlock and mouseButton)
 end
 
 function SpellMonitor:Enable(enable)
@@ -71,8 +79,8 @@ function SpellMonitor:SetSize(width, height)
 	self.icon:SetHeight(self.size.height)
 end
 
-function SpellMonitor:IconMake(delegate)
- 	local icon = Icon:New(nil)
+function SpellMonitor:IconMake(GlobalID, delegate)
+ 	local icon = Icon:New(GlobalID)
 
  	icon:Hide()
  	icon:Round(true)
@@ -98,6 +106,7 @@ local SpellMonitorDefault = {
 	TrackSpell 	= SpellMonitor.TrackSpell,
 	SetTarget	= SpellMonitor.SetTarget,
 	SetAlpha	= SpellMonitor.SetAlpha,
+	Draggable	= SpellMonitor.Draggable,
 	Enable		= SpellMonitor.Enable,
 	Monitor		= SpellMonitor.Monitor,
 	Reset		= SpellMonitor.Reset,
@@ -105,11 +114,12 @@ local SpellMonitorDefault = {
 	SetSize		= SpellMonitor.SetSize
 }
 
-function SpellMonitor:New(spell)
+function SpellMonitor:New(ID, spell)
 	local spellMonitor = {}
 	setmetatable(spellMonitor, {__index = SpellMonitorDefault})
 
-	spellMonitor.icon = self:IconMake(spellMonitor)
+	spellMonitor.ID = ID
+	spellMonitor.icon = self:IconMake(ID, spellMonitor)
 
 	spellMonitor.icon:OnUpdate((function(self, elapsed)
 		if self.monitoring then self:Update() end

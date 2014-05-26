@@ -41,7 +41,7 @@ end
 function Player:UpdateDebuffs()
 	local allDebuffs 	= _G["DOTMonitor_Debuffs_"..GetLocale()] or _G["DOTMonitor_Debuffs_enUS"]
 
-	local specDebuffs 	= Table:New(allDebuffs[self:Class():gsub(" ", "_")][self:Spec():gsub(" ", "_")])
+	local specDebuffs 	= self:HasSpec() and Table:New(allDebuffs[self:Class():gsub(" ", "_")][self:Spec():gsub(" ", "_")]) or Table:New({})
 	local debuffSpell	= specDebuffs:Keys()
 	local debuffEffect	= specDebuffs:Values(debuffSpell)
 

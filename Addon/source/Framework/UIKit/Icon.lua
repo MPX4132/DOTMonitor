@@ -3,7 +3,7 @@
 -- Simple frame icon for WOW
 --
 
-local Icon = {}
+local Icon = {instance = 0}
 
 function Icon:Round(round)
 	self.isRound = round
@@ -127,8 +127,10 @@ function Icon:SetDelegate(delegate)
 	self.delegate = delegate
 end
 
-function Icon:New(backgroundPath)
-	local icon = CreateFrame("Frame")
+function Icon:New(ID, backgroundPath)
+	self.instance = self.instance + 1
+	local frameGlobalID = ID or string.format("MPXWOWKit_Icon_Instance_%d", Icon.instance)
+	local icon = CreateFrame("Frame", frameGlobalID, UIParent)
 
 	icon:SetScript("OnUpdate", (function(self, elapsed)
 		self.lastUpdate = self.lastUpdate and (self.lastUpdate + elapsed) or 0
