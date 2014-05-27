@@ -3,8 +3,9 @@
 	Simple spell monitoring class for the World of Warcraft environment.
 --]]
 
-local Icon 		= _G["MPXUIKit_Icon"]
-local Spell		= _G["MPXWOWKit_Spell"]
+local Icon 			= _G["MPXUIKit_Icon"]
+local Spell			= _G["MPXWOWKit_Spell"]
+local TextureSprite = _G["MPXUIKit_TextureSprite"]
 
 local SpellMonitor = {} -- Local Namespace
 
@@ -56,6 +57,7 @@ function SpellMonitor:Update()
 	if UnitExists(self.target) and not UnitIsDead(self.target) then
 		local duration, expiration, caster = self.spell:TimeOnUnit(self.target)
 
+		-- DOT Monitor
 		if caster == "player" then
 			local timeRemaining 	= (expiration - GetTime())
 			local timeFraction 		= (duration ~= 0) and (timeRemaining / duration) or 0
@@ -69,6 +71,15 @@ function SpellMonitor:Update()
 			self.icon:SetHeight(self.size.width)
 			self.icon:SetWidth(self.size.width)
 			self.icon:SetAlpha(1)
+		end
+
+		-- CD Monitor
+		local cdStart, cdDuration, cdEnabled = self.spell:GetCooldown()
+		if cdStart > 0 and cdDuration > 0 then
+			self.icon.sprite:SetPercentage(100-((cdStart + cdDuration - GetTime()) / cdDuration) * 100)
+		--elseif duration == 0 then
+		else
+			self.icon.sprite:SetPercentage(100)
 		end
 	else
 		self.icon:SetHeight(0)
@@ -97,6 +108,13 @@ function SpellMonitor:IconMake(GlobalID, delegate)
 
 	icon:SetBorder("Interface\\AddOns\\DOTMonitor\\Graphics\\IconBorder")
 	icon:SetHighlight("Interface\\AddOns\\DOTMonitor\\Graphics\\IconOverlayDrag")
+
+	icon.sprite = TextureSprite:New(icon)
+   	icon.sprite:SetAllPoints()
+   	icon.sprite:SetAlpha(0.60)
+
+   	icon.sprite:SetSpriteSheetConfig("Interface\\AddOns\\DOTMonitor\\Graphics\\CircleLoadMask", 512, 256)
+   	icon.sprite:SetSpriteImageConfig(20, 64, 64)
 
 	return icon
 end

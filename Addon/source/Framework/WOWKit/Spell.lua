@@ -33,6 +33,10 @@ function Spell:CastTime()
 	return self.castTime
 end
 
+function Spell:GetCooldown()
+	return GetSpellCooldown(self.id or self.name);
+end
+
 function Spell:IsHarmful()
 	--return IsHarmfulSpell(self.name) and true or false
 	return true -- The function above is bullshit, it's faulty
@@ -122,6 +126,7 @@ local SpellDefault = {
 	IsReady				= Spell.IsReady,
 	IsInstant			= Spell.IsInstant,
 	CastTime			= Spell.CastTime,
+	GetCooldown			= Spell.GetCooldown,
 	IsHarmful			= Spell.IsHarmful,
 	IsHelpful			= Spell.IsHelpful,
 	IsMisc				= Spell.IsMisc,

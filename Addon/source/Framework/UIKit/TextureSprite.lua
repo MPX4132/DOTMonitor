@@ -26,7 +26,7 @@ function TextureSprite:SetSpriteSheetConfig(source, width, height)
 end
 
 function TextureSprite:SetPercentage(percent)
-    self:SetSprite(math.floor(percent / 100 * self.image.count))
+    self:SetSprite(math.floor((percent+5) / 100 * self.image.count))
 end
 
 function TextureSprite:SetSprite(imageIndex)
@@ -49,7 +49,7 @@ end
 
 function TextureSprite:New(frame)
     local sprite = frame:CreateTexture(nil, "ARTWORK")
-
+	sprite:SetDrawLayer("ARTWORK", 7)
 	sprite.SetConfiguration 	= TextureSprite.SetConfiguration
 	sprite.SetSpriteImageConfig	= TextureSprite.SetSpriteImageConfig
 	sprite.SetSpriteSheetConfig	= TextureSprite.SetSpriteSheetConfig
