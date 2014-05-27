@@ -126,8 +126,8 @@ DOTMonitor_Debuffs_enUS = {
 		},
 		["Demonology"] = {
 			["Corruption"] 				= "Corruption",
-			["Metamorphosis: Doom"] 	= "Doom",
 			["Curse of the Elements"] 	= {"Curse of the Elements", "Curse of Enfeeblement"},
+			["Metamorphosis: Doom"] 	= "Doom",
 			["Curse of Enfeeblement"] 	= {"Curse of Enfeeblement", "Curse of the Elements"},
 			["Hand of Gul'dan"] 		= {"Shadowflame", "Chaos Wave"}
 		},

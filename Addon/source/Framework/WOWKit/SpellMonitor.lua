@@ -1,7 +1,7 @@
---[[
-	SpellMonitor 0.1V
-	Simple spell monitoring class for the World of Warcraft environment.
---]]
+-- =======================================================================================
+--	SpellMonitor 0.1V
+--	Simple spell monitoring class for the World of Warcraft environment.
+-- =======================================================================================
 
 local Icon 			= _G["MPXUIKit_Icon"]
 local Spell			= _G["MPXWOWKit_Spell"]
@@ -56,26 +56,27 @@ end
 
 function SpellMonitor:Update()
 	if UnitExists(self.target) and not UnitIsDead(self.target) then
-		local duration, expiration, caster = self.spell:TimeOnUnit(self.target)
 
 		-- DOT Monitor
+		local duration, expiration, caster = self.spell:TimeOnUnit(self.target)
+		local iconWidth 	= self.size.width
+		local iconHeight 	= self.size.height
+		local iconAlpha		= 1
+		-- local iconBorder	= "IconBorderMarked"
+
 		if caster == "player" then
-			local timeRemaining 	= (expiration - GetTime())
-			local timeFraction 		= (duration ~= 0) and (timeRemaining / duration) or 0
-			local sizeMagnitude 	= self.size.width - (timeFraction * self.size.width)
-			local alphaMagnitude 	= 1 - timeFraction
-
-			self.icon:SetBorder("Interface\\AddOns\\DOTMonitor\\Graphics\\" .. ((alphaMagnitude > 0.90) and "IconBorderMarked"  or "IconBorder"))
-
-			self.icon:SetHeight(sizeMagnitude)
-			self.icon:SetWidth(sizeMagnitude)
-			self.icon:SetAlpha(alphaMagnitude)
-		else
-			self.icon:SetBorder("Interface\\AddOns\\DOTMonitor\\Graphics\\IconBorderMarked")
-			self.icon:SetHeight(self.size.width)
-			self.icon:SetWidth(self.size.width)
-			self.icon:SetAlpha(1)
+			local percent = (duration ~= 0) and ((expiration - GetTime()) / duration) or 0
+			iconWidth 	= iconWidth 	- (percent * iconWidth)
+			iconHeight 	= iconHeight 	- (percent * iconHeight)
+			iconAlpha 	= 1 - percent
 		end
+
+		self.icon:SetBorder("Interface\\AddOns\\DOTMonitor\\Graphics\\" .. (((UnitPower("player") < self.spell.cost) and "IconBorderDark")
+																		or ((iconAlpha >= 0.90) and "IconBorderMarked"  or "IconBorder")))
+		self.icon:SetWidth(iconWidth)
+		self.icon:SetHeight(iconHeight)
+		self.icon:SetAlpha(iconAlpha)
+
 
 		-- CD Monitor
 		local cdStart, cdDuration, cdEnabled = self.spell:GetCooldown()
