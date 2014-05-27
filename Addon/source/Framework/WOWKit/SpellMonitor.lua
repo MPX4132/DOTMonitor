@@ -32,6 +32,7 @@ function SpellMonitor:Draggable(mouseButton)
 	self:Monitor(not mouseButton)
 	self:Enable(mouseButton)
 	self.icon:Draggable(mouseButton)
+	self.icon.sprite:SetAlpha((not mouseButton) and 0.60 or 0)
 end
 
 function SpellMonitor:Enable(enable)
@@ -64,10 +65,13 @@ function SpellMonitor:Update()
 			local sizeMagnitude 	= self.size.width - (timeFraction * self.size.width)
 			local alphaMagnitude 	= 1 - timeFraction
 
+			self.icon:SetBorder("Interface\\AddOns\\DOTMonitor\\Graphics\\" .. ((alphaMagnitude > 0.90) and "IconBorderMarked"  or "IconBorder"))
+
 			self.icon:SetHeight(sizeMagnitude)
 			self.icon:SetWidth(sizeMagnitude)
 			self.icon:SetAlpha(alphaMagnitude)
 		else
+			self.icon:SetBorder("Interface\\AddOns\\DOTMonitor\\Graphics\\IconBorderMarked")
 			self.icon:SetHeight(self.size.width)
 			self.icon:SetWidth(self.size.width)
 			self.icon:SetAlpha(1)
