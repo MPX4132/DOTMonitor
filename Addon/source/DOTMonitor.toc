@@ -13,6 +13,7 @@ Framework\Foundation\EventManager.lua
 Framework\Foundation\Table.lua
 Framework\Foundation\Foundation.lua
 Framework\UIKit\Icon.lua
+Framework\UIKit\TextureSprite.lua
 Framework\WOWKit\Spell.lua
 Framework\WOWKit\SpellMonitor.lua
 Framework\WOWKit\SpellMonitorManager.lua

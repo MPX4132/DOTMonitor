@@ -127,10 +127,10 @@ function Icon:SetDelegate(delegate)
 	self.delegate = delegate
 end
 
-function Icon:New(ID, backgroundPath)
+function Icon:New(ID, backgroundPath, parentFrame)
 	self.instance = self.instance + 1
 	local frameGlobalID = ID or string.format("MPXWOWKit_Icon_Instance_%d", Icon.instance)
-	local icon = CreateFrame("Frame", frameGlobalID, UIParent)
+	local icon = CreateFrame("Frame", frameGlobalID, parentFrame or UIParent)
 	icon:SetMovable(true)
 
 	icon:SetScript("OnUpdate", (function(self, elapsed)
