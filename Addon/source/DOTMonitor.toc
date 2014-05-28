@@ -7,6 +7,7 @@
 
 Locale\language.enUS.lua
 
+Framework\Foundation\Database.lua
 Framework\Foundation\Terminal.lua
 Framework\Foundation\Console.lua
 Framework\Foundation\EventManager.lua

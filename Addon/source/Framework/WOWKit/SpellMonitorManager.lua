@@ -39,8 +39,8 @@ function SpellMonitorManager:LockMonitors(lock)
 	end
 end
 
-function SpellMonitorManager:SaveTo(settings)
-	settings["spellManager"] = {
+function SpellMonitorManager:SaveTo(database)
+	database.manager = {
 		ID = self.ID,
 		monitorCount = #self.monitor,
 	}
@@ -74,8 +74,8 @@ function SpellMonitorManager:New(ID)
 	return spellMonitorManager
 end
 
-function SpellMonitorManager:Restore(settings, backupID)
-	local preferences = settings and settings["spellManager"]
+function SpellMonitorManager:Restore(database, backupID)
+	local preferences = database and database.manager
 	local spellMonitorManager = self:New(preferences and preferences.ID or backupID) -- Default ID
 	return spellMonitorManager:AssureMonitors(preferences and preferences.monitorCount)
 end

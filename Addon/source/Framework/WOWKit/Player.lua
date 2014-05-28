@@ -46,7 +46,7 @@ function Player:UpdateDebuffs()
 	local debuffEffect	= specDebuffs:Values(debuffSpell)
 
 	self.debuff = {} -- Clear it
-	for i = 0, specDebuffs:Count() do
+	for i = 1, specDebuffs:Count() do
 		local spell = Spell:New(debuffSpell[i], debuffEffect[i])
 		if spell:IsReady() then
 			table.insert(self.debuff, spell)
