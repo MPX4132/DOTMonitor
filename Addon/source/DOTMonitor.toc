@@ -1,7 +1,7 @@
-## Interface: 50400
+## Interface: 50408
 ## Title: DOTMonitor
 ## Author: MPX-4132
-## Notes: Monitor for DOT effects on enemies; once the DOTs span their duration, DOTMonior displays an icon of the DOT that should be casted on the target.
+## Notes: Monitor for DOT effects on enemies; as the DOTs span their duration, DOTMonior displays an icon of the DOT that should be casted on the target by slowly fading in relative to how urgent it is to cast it.
 ## Version: 0.2.0
 ## SavedVariablesPerCharacter: DOTMonitorPreferences
 
