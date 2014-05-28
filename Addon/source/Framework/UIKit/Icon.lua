@@ -24,7 +24,17 @@ function Icon:SetPosition(x, y)
 end
 
 function Icon:SetCenter(x, y)
-	self:SetPoint("CENTER", WorldFrame, "CENTER", x, y)
+	self:SetPoint("CENTER", self:GetParent(), "CENTER", x, y)
+end
+
+function Icon:GetCenterRelativeToPoint(point)
+	for n = 1, self:GetNumPoints() do
+		local point, relativeTo, relativePoint, xOffset, yOffset = self:GetPoint(n)
+		if relativePoint == "CENTER" then
+			return xOffset, yOffset
+		end
+	end
+	return 0, 0 -- For now
 end
 
 function Icon:SetBackground(texturePath)
@@ -167,6 +177,7 @@ function Icon:New(ID, backgroundPath, parentFrame)
 	icon.Draggable		= Icon.Draggable
 	icon.SetPosition	= Icon.SetPosition
 	icon.SetCenter		= Icon.SetCenter
+	icon.GetCenterRelativeToPoint = Icon.GetCenterRelativeToPoint
 	icon.SetBackground	= Icon.SetBackground
 	icon.SetBorder		= Icon.SetBorder
 	icon.SetHighlight	= Icon.SetHighlight

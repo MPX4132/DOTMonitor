@@ -15,7 +15,7 @@ function DOTMonitor:SyncToPlayer(player)
 	self.enabled = self.player and self.player:HasSpec()
 
 	if not self.enabled then
-		local reason = (self.player:Level() < 10) and "low level" or (not self:HasSpec() and "no spec") or "not loaded"
+		local reason = (((self.player:Level() < 10) and "low level") or (not self:HasSpec() and "no spec") or "not loaded")
 		self.terminal.outputStream:Print("Player not ready due to " .. reason)
 		return false
 	end
@@ -40,6 +40,18 @@ function DOTMonitor:ShowCondition() -- Default show condition
 								or   UnitCanAttack("player", "target"))
 end
 
+function DOTMonitor:HUDAutoLayout()
+	local f = function(x) return ((13 / 1) * math.pow(x, 2) - 180) end
+	local position 	= {}
+	local count	 	= #self.player:GetDebuff()
+	local padding 	= 80
+	local start		= -(padding * (count - 1)) / 2
+	for x = 1, count do
+		position[x] = {x = start + (padding * (x-1)), y = f(x - (1+(count/2)) + 0.5)}
+	end
+	return position
+end
+
 function DOTMonitor:HUDRun(run)
 	self.terminal.outputStream:Log("Attempting to run HUD")
 	if self.enabled then
@@ -58,7 +70,7 @@ function DOTMonitor:SaveSpecSetup()
 		self.database.layout[spec] = self.database.layout[spec] or {}
 
 		for anIndex, aMonitor in ipairs(self.manager.monitor) do
-			local iconX, iconY = aMonitor.icon:GetCenter()
+			local iconX, iconY = aMonitor.icon:GetCenterRelativeToPoint("CENTER")
 			self.database.layout[spec][anIndex] = {x = iconX, y = iconY}
 		end
 	end
@@ -67,11 +79,10 @@ end
 function DOTMonitor:LoadSpecSetup()
 	if self.enabled then
 		local spec = self.player:Spec()
---		local monitorsToPosition = #self.manager.monitor > self.preferences
-		for i, position in ipairs(self.database.layout[spec] or {}) do
+		for i, position in ipairs(self.database.layout[spec] or self:HUDAutoLayout()) do
 			local icon = self.manager.monitor[i].icon
 			if icon then
-				icon:SetPoint("CENTER", icon:GetParent(), "BOTTOMLEFT", position.x, position.y)
+				icon:SetCenter(position.x, position.y)
 			end
 		end
 	end
@@ -79,11 +90,8 @@ end
 
 function DOTMonitor:ResetHUD()
 	if self.enabled then
-		for atIndex, aDebuff in ipairs(self.player:GetDebuff()) do
-			local aMonitor = self.manager:GetMonitor(atIndex)
-			aMonitor.icon:SetPoint("CENTER", 0, 0)
---			self.terminal.outputStream:Print("Tracking " .. aMonitor:TrackSpell(aDebuff))
-		end
+		self.database.layout[self.player:Spec()] = nil
+		self:LoadSpecSetup()
 		return "HUD Reset!"
 	else
 		return "HUD is disabled!"
@@ -98,6 +106,7 @@ local DOTMonitorDefault = {
 	SyncToPlayer 	= DOTMonitor.SyncToPlayer,
 	SetShowCondition = DOTMonitor.SetShowCondition,
 	ShowCondition	= DOTMonitor.ShowCondition,
+	HUDAutoLayout	= DOTMonitor.HUDAutoLayout,
 	EnableMonitors 	= DOTMonitor.EnableMonitors,
 	StopMonitors 	= DOTMonitor.StopMonitors,
 	StartMonitors 	= DOTMonitor.StartMonitors,
@@ -165,6 +174,7 @@ function DOTMonitor:New(databaseID)
 	-- Restoration
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self:SyncToPlayer(Player:New()) -- Default player is "Player"
+		self:LoadSpecSetup()
 		self.terminal.outputStream:Print(self.enabled and "Ready" or "Pending", "epic")
 	end), "PLAYER_ENTERING_WORLD")
 	dotMonitor.eventListener:AddActionForEvent((function(self, addon)
