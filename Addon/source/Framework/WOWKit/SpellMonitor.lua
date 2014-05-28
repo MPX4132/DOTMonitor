@@ -31,6 +31,7 @@ function SpellMonitor:Draggable(mouseButton)
 
 	self:Monitor(not mouseButton)
 	self:Enable(mouseButton)
+	self.icon:SetBorder("Interface\\AddOns\\DOTMonitor\\Graphics\\IconBorder")
 	self.icon:Draggable(mouseButton)
 	self.icon.sprite:SetAlpha((not mouseButton) and 0.60 or 0)
 end

@@ -2,6 +2,7 @@
 -- Terminal V0.1
 -- Simple I/O terminal for WOW
 --
+local Console = _G["MPXFoundation_Console"]
 
 local Terminal = {} -- Local Namespace
 
@@ -105,6 +106,7 @@ function Terminal:New(delegate, name, ...)
 	terminal.delegate = delegate
 	terminal.name = name
 	terminal:RegisterInvoker(...)
+	terminal:SetOutputStream(Console:New(name))
 	return terminal
 end
 

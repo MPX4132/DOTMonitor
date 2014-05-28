@@ -9,35 +9,45 @@ local DOTMonitor = {} -- Local Namespace
 local debugging  = false
 
 function DOTMonitor:SyncToPlayer(player)
-	self.console:Log("Syncing Player")
+	self.terminal.outputStream:Log("Syncing Player")
 	self.player = player or self.player
 
 	self.enabled = self.player and self.player:HasSpec()
 
 	if not self.enabled then
 		local reason = (self.player:Level() < 10) and "low level" or (not self:HasSpec() and "no spec") or "not loaded"
-		self.console:Print("Player not ready due to " .. reason)
+		self.terminal.outputStream:Print("Player not ready due to " .. reason)
 		return false
 	end
 
 	self.player:Sync()
 
-	self.console:Print("Adjusted for " .. tostring(self.player), "info")
+	self.terminal.outputStream:Print("Adjusted for " .. tostring(self.player), "info")
 	for atIndex, aDebuff in ipairs(self.player:GetDebuff()) do
 		local aMonitor = self.manager:GetMonitor(atIndex)
-		self.console:Print("Tracking " .. aMonitor:TrackSpell(aDebuff))
+		self.terminal.outputStream:Print("Tracking " .. aMonitor:TrackSpell(aDebuff))
 	end
 end
 
+function DOTMonitor:SetShowCondition(condition)
+	if type(condition) == "function" then
+		self.ShowCondition = condition
+	end
+end
+
+function DOTMonitor:ShowCondition() -- Default show condition
+	return UnitExists("target") and (UnitIsEnemy("player", "target")
+								or   UnitCanAttack("player", "target"))
+end
+
 function DOTMonitor:HUDRun(run)
+	self.terminal.outputStream:Log("Attempting to run HUD")
 	if self.enabled then
-		local meetsShowCriteria = false
-		if run then
-			meetsShowCriteria = UnitExists("target") and (UnitIsEnemy("player", "target")
-													  or  UnitCanAttack("player", "target"))
-		end
+		self.terminal.outputStream:Log("Running HUD")
 		self.manager:EnableMonitors(meetsShowCriteria, #self.player:GetDebuff())
+		self.manager:EnableMonitors(run and self:ShowCondition() or false, #self.player:GetDebuff())
 	else
+		self.terminal.outputStream:Log("Unable to run HUD")
 		self.manager:EnableMonitors(false)
 	end
 end
@@ -72,7 +82,7 @@ function DOTMonitor:ResetHUD()
 		for atIndex, aDebuff in ipairs(self.player:GetDebuff()) do
 			local aMonitor = self.manager:GetMonitor(atIndex)
 			aMonitor.icon:SetPoint("CENTER", 0, 0)
---			self.console:Print("Tracking " .. aMonitor:TrackSpell(aDebuff))
+--			self.terminal.outputStream:Print("Tracking " .. aMonitor:TrackSpell(aDebuff))
 		end
 		return "HUD Reset!"
 	else
@@ -86,6 +96,8 @@ local DOTMonitorDefault = {
 	locked 	= true,
 	enabled = false,
 	SyncToPlayer 	= DOTMonitor.SyncToPlayer,
+	SetShowCondition = DOTMonitor.SetShowCondition,
+	ShowCondition	= DOTMonitor.ShowCondition,
 	EnableMonitors 	= DOTMonitor.EnableMonitors,
 	StopMonitors 	= DOTMonitor.StopMonitors,
 	StartMonitors 	= DOTMonitor.StartMonitors,
@@ -99,28 +111,25 @@ function DOTMonitor:New(databaseID)
 	local dotMonitor = {databaseID = databaseID}
 	setmetatable(dotMonitor, {__index = DOTMonitorDefault})
 
-
+	-- Terminal and Console instantiation
 	dotMonitor.terminal	= Foundation.Terminal:New(dotMonitor, "DOTMonitor", {"dotmonitor", "dmon"})
-	dotMonitor.console 	= Foundation.Console:New("DOTMonitor")
-	dotMonitor.terminal:SetOutputStream(dotMonitor.console)
-	dotMonitor.console:EnableLog(debugging)
+	dotMonitor.terminal.outputStream:EnableLog(debugging)
 
+
+	-- Terminal Setup
 	local commands = {
 		lock = function(self, arguments)
-			self.manager:LockMonitors(true)
+			self.manager:LockMonitors(true) -- Want to lock everything
 			self:SaveSpecSetup()
 			return "HUD Locked"
 		end,
 		unlock = function(self, arguments)
-			self.manager:LockMonitors(false)
+			self.manager:LockMonitors(false, #self.player:GetDebuff())
 			return "HUD Unlocked"
 		end,
 		reset = function(self, arguments)
 			return self:ResetHUD()
 		end,
-		reload = function(self, arguments)
-			return "Done Loading"
-		end
 	}
 
 	local info = {
@@ -132,6 +141,7 @@ function DOTMonitor:New(databaseID)
 	dotMonitor.terminal:SetExecutables(commands, info)
 
 
+	-- Player In / Out of Combat
 	dotMonitor.eventListener = Foundation.EventManager:New(dotMonitor)
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self:HUDRun(true)
@@ -146,6 +156,7 @@ function DOTMonitor:New(databaseID)
 		self:SyncToPlayer(nil)
 	end), "PLAYER_LEVEL_UP")
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
+		self.manager:LockMonitors(true) -- Want to lock everything
 		self:SyncToPlayer(nil)
 		self:LoadSpecSetup()
 	end), "ACTIVE_TALENT_GROUP_CHANGED")
@@ -154,21 +165,20 @@ function DOTMonitor:New(databaseID)
 	-- Restoration
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self:SyncToPlayer(Player:New()) -- Default player is "Player"
-		--self:LoadSpecSetup()
-		self.console:Print(self.enabled and "Ready" or "Pending", "epic")
+		self.terminal.outputStream:Print(self.enabled and "Ready" or "Pending", "epic")
 	end), "PLAYER_ENTERING_WORLD")
 	dotMonitor.eventListener:AddActionForEvent((function(self, addon)
 		if addon ~= "DOTMonitor" then return end
-		--local preferences = _G["DOTMonitorPreferences"]
-		self.database = Foundation.Database:New(self.databaseID, {layout = {}})
-		self.manager = SpellMonitorManager:Restore(self.database, "DOTMonitor")
+		-- Attempt to reload the database, otherwise the backup database passed in is used
+		self.database 	= Foundation.Database:New(self.databaseID, {layout = {}})
+		self.manager 	= SpellMonitorManager:Restore(self.database, "DOTMonitor")
 	end), "ADDON_LOADED")
 
 
 	-- Saving
 	dotMonitor.eventListener:AddActionForEvent((function(self, addon)
 		self.manager:SaveTo(self.database)
-		self.database:Save()
+		self.database:Serialize()
 	end), "PLAYER_LOGOUT")
 
 	return dotMonitor

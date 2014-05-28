@@ -33,8 +33,9 @@ function SpellMonitorManager:EnableMonitors(enable, count)
 	end
 end
 
-function SpellMonitorManager:LockMonitors(lock)
+function SpellMonitorManager:LockMonitors(lock, count)
 	for i, aMonitor in ipairs(self.monitor) do
+		if count and i > count then break end
 		aMonitor:Draggable((lock ~= nil and (not lock)) and "LeftButton")
 	end
 end

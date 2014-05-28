@@ -6,7 +6,7 @@
 local Database = {} -- Local Namespace
 
 
-function Database:Save()
+function Database:Serialize()
 	_G[self.ID] = self -- Store to global
 end
 
@@ -16,8 +16,8 @@ function Database:Reset()
 end
 
 local DatabaseDefault = {
-	Save	= Database.Save,
-	Reset	= Database.Reset
+	Serialize	= Database.Serialize,
+	Reset		= Database.Reset,
 }
 
 function Database:New(ID, backupDatabase)
