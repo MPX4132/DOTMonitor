@@ -92,9 +92,16 @@ function DOTMonitor:New()
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self:HUDRun(false)
 	end), "PLAYER_REGEN_ENABLED")
+
+	-- Player Updates
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self:SyncToPlayer(nil)
 	end), "PLAYER_LEVEL_UP")
+	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
+		self:SyncToPlayer(nil)
+	end), "ACTIVE_TALENT_GROUP_CHANGED")
+
+	-- Restoration
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self:SyncToPlayer(Player:New()) -- Default player is "Player"
 		self.console:Print(self.player:HasSpec() and "Ready" or "Pending", "epic")
@@ -104,6 +111,8 @@ function DOTMonitor:New()
 		local preferences = _G["DOTMonitorPreferences"]
 		self.manager = SpellMonitorManager:Restore(preferences, "DOTMonitor")
 	end), "ADDON_LOADED")
+
+	-- Saving
 	dotMonitor.eventListener:AddActionForEvent((function(self, addon)
 		_G["DOTMonitorPreferences"] = _G["DOTMonitorPreferences"] or {}
 		self.manager:SaveTo(_G["DOTMonitorPreferences"])
