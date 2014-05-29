@@ -15,8 +15,12 @@ function DOTMonitor:SyncToPlayer(player)
 	self.enabled = self.player and self.player:HasSpec()
 
 	if not self.enabled then
-		local reason = (((self.player:Level() < 10) and "low level") or (not self:HasSpec() and "no spec") or "not loaded")
-		self.terminal.outputStream:Print("Player not ready due to " .. reason)
+		if self.player then
+			local reason = (self.player:Level() < 10 and "low level") or (not self:HasSpec() and "no spec")
+			self.terminal.outputStream:Print("Player not ready due to " .. reason)
+		else
+			self.terminal.outputStream:Log("Player Unavailable!")
+		end
 		return false
 	end
 
