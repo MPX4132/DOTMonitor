@@ -184,7 +184,7 @@ function DOTMonitor:New(databaseID)
 	dotMonitor.eventListener:AddActionForEvent((function(self, addon)
 		if addon ~= "DOTMonitor" then return end
 		-- Attempt to reload the database, otherwise the backup database passed in is used
-		self.database 	= Foundation.Database:New(self.databaseID, {layout = {}})
+		self.database 	= Foundation.Database:New(self.databaseID, "0.2.0", {layout = {}})
 		self.manager 	= SpellMonitorManager:Restore(self.database, "DOTMonitor")
 	end), "ADDON_LOADED")
 
