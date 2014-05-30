@@ -33,17 +33,6 @@ function DOTMonitor:SyncToPlayer(player)
 	end
 end
 
-function DOTMonitor:SetShowCondition(condition)
-	if type(condition) == "function" then
-		self.ShowCondition = condition
-	end
-end
-
-function DOTMonitor:ShowCondition() -- Default show condition
-	return UnitExists("target") and (UnitIsEnemy("player", "target")
-								or   UnitCanAttack("player", "target"))
-end
-
 function DOTMonitor:HUDAutoLayout()
 	local f = function(x) return ((13 / 1) * math.pow(x, 2) - 180) end
 	local position 	= {}
@@ -60,8 +49,7 @@ function DOTMonitor:HUDRun(run)
 	self.terminal.outputStream:Log("Attempting to run HUD")
 	if self.enabled then
 		self.terminal.outputStream:Log("Running HUD")
-		self.manager:EnableMonitors(meetsShowCriteria, #self.player:GetDebuff())
-		self.manager:EnableMonitors(run and self:ShowCondition() or false, #self.player:GetDebuff())
+		self.manager:EnableMonitors(run, #self.player:GetDebuff())
 	else
 		self.terminal.outputStream:Log("Unable to run HUD")
 		self.manager:EnableMonitors(false)
@@ -108,8 +96,6 @@ local DOTMonitorDefault = {
 	locked 	= true,
 	enabled = false,
 	SyncToPlayer 	= DOTMonitor.SyncToPlayer,
-	SetShowCondition = DOTMonitor.SetShowCondition,
-	ShowCondition	= DOTMonitor.ShowCondition,
 	HUDAutoLayout	= DOTMonitor.HUDAutoLayout,
 	EnableMonitors 	= DOTMonitor.EnableMonitors,
 	StopMonitors 	= DOTMonitor.StopMonitors,

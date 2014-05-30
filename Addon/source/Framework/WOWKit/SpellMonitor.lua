@@ -55,9 +55,20 @@ function SpellMonitor:Reset()
 	self:SetAlpha()
 end
 
-function SpellMonitor:Update()
-	if UnitExists(self.target) and not UnitIsDead(self.target) then
+function SpellMonitor:SetShowCondition(condition)
+	if type(condition) == "function" then
+		self.ShowCondition = condition
+	end
+end
 
+function SpellMonitor:ShowCondition()
+	return (not UnitIsDead(self.target))
+			and (UnitIsEnemy("player", self.target)
+			 or  UnitCanAttack("player", self.target))
+end
+
+function SpellMonitor:Update()
+	if UnitExists(self.target) and self:ShowCondition() then
 		-- DOT Monitor
 		local duration, expiration, caster = self.spell:TimeOnUnit(self.target)
 		local iconWidth 	= self.size.width
@@ -133,15 +144,17 @@ local SpellMonitorDefault = {
 		width = 44,
 		height = 44
 	},
-	TrackSpell 	= SpellMonitor.TrackSpell,
-	SetTarget	= SpellMonitor.SetTarget,
-	SetAlpha	= SpellMonitor.SetAlpha,
-	Draggable	= SpellMonitor.Draggable,
-	Enable		= SpellMonitor.Enable,
-	Monitor		= SpellMonitor.Monitor,
-	Reset		= SpellMonitor.Reset,
-	Update		= SpellMonitor.Update,
-	SetSize		= SpellMonitor.SetSize
+	TrackSpell 			= SpellMonitor.TrackSpell,
+	SetTarget			= SpellMonitor.SetTarget,
+	SetAlpha			= SpellMonitor.SetAlpha,
+	Draggable			= SpellMonitor.Draggable,
+	Enable				= SpellMonitor.Enable,
+	Monitor				= SpellMonitor.Monitor,
+	Reset				= SpellMonitor.Reset,
+	SetShowCondition	= SpellMonitor.SetShowCondition,
+	ShowCondition 		= SpellMonitor.ShowCondition,
+	Update				= SpellMonitor.Update,
+	SetSize				= SpellMonitor.SetSize,
 }
 
 function SpellMonitor:New(ID, spell)
