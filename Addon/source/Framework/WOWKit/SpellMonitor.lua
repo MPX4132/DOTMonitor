@@ -29,7 +29,7 @@ end
 
 function SpellMonitor:SetHeight(height)
 	self.size.height 	= height 	or self.size.height
-	self.icon:SetWidth(self.size.height)
+	self.icon:SetHeight(self.size.height)
 
 end
 
@@ -68,16 +68,31 @@ function SpellMonitor:Draggable(mouseButton)
 	self.icon:SetBorder("Interface\\AddOns\\DOTMonitor\\Graphics\\IconBorder")
 	self.icon:Draggable(mouseButton)
 	self.icon.sprite:SetAlpha((not mouseButton) and 0.60 or 0)
+
+	-- Reset
+	self:Reset()
+end
+
+function SpellMonitor:Reset()
+	self:SetSize() -- Resets size
+	self.icon.digitalMeter:SetAlpha(self.updating and 1 or 0)
+	self.icon.digitalCooldown:SetAlpha(self.updating and 1 or 0)
+	self.icon:SetAlpha(1)
+	--[[
+	if not self.updating then
+		self.icon:SetAlpha(1)
+	end
+	--]]
 end
 
 function SpellMonitor:DigitalMeter(enabled)
 	local digitalMeter = self.icon.digitalMeter
-	digitalMeter[(((enabled ~= nil) or (enabled ~= false)) and "Show" or "Hide")](digitalMeter)
+	digitalMeter[(((enabled == nil) or (enabled ~= false)) and "Show" or "Hide")](digitalMeter)
 end
 
 function SpellMonitor:DigitalCooldown(enabled)
 	local digitalCooldown = self.icon.digitalCooldown
-	digitalCooldown[(((enabled ~= nil) or (enabled ~= false)) and "Show" or "Hide")](digitalCooldown)
+	digitalCooldown[(((enabled == nil) or (enabled ~= false)) and "Show" or "Hide")](digitalCooldown)
 end
 
 function SpellMonitor:SetShowCondition(condition)
@@ -199,6 +214,7 @@ local SpellMonitorDefault = {
 	SetTarget 			= SpellMonitor.SetTarget,
 	TrackSpell			= SpellMonitor.TrackSpell,
 	Draggable			= SpellMonitor.Draggable,
+	Reset				= SpellMonitor.Reset,
 	DigitalMeter		= SpellMonitor.DigitalMeter,
 	DigitalCooldown		= SpellMonitor.DigitalCooldown,
 	SetShowCondition	= SpellMonitor.SetShowCondition,

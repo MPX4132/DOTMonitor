@@ -92,8 +92,8 @@ function DOTMonitor:LoadSpecSetup()
 			end
 		end
 
-		self.manager:ShowEffectTimers(self.database.label.timers)
-		self.manager:ShowCooldownTimers(self.database.label.cooldowns)
+		self.manager:ShowEffectTimers(self.database.label.timers or false)
+		self.manager:ShowCooldownTimers(self.database.label.cooldowns or false)
 	end
 end
 
@@ -145,29 +145,29 @@ function DOTMonitor:New(databaseID)
 			self.manager:LockMonitors(false, #self.player:GetDebuff())
 			return "HUD Unlocked"
 		end,
-		timers = function(self, arguments)
-			if arguments == "show" then
-				self.manager:ShowEffectTimers(true)
-				self.database.label.timers = true
-				return "Showing Timers"
-			elseif arguments == "hide" then
-				self.manager:ShowEffectTimers(false)
-				self.database.label.timers = nil
-				return "Timers Disabled"
-			end
-			return "Usage: /dmon timers [hide | show]"
-		end,
-		cooldowns = function(self, arguments)
-			if arguments == "show" then
+		show = function(self, arguments)
+			if arguments == "cooldowns" then
 				self.manager:ShowCooldownTimers(true)
 				self.database.label.cooldowns = true
-				return "Showing Cooldowns"
-			elseif arguments == "hide" then
+				return "Cooldowns now visible"
+			elseif arguments == "timers" then
+				self.manager:ShowEffectTimers(true)
+				self.database.label.timers = true
+				return "Timers now visible"
+			end
+			return "Show what?"
+		end,
+		hide = function(self, arguments)
+			if arguments == "cooldowns" then
 				self.manager:ShowCooldownTimers(false)
 				self.database.label.cooldowns = nil
-				return "Cooldowns Disabled"
+				return "Cooldowns now hidden"
+			elseif arguments == "timers" then
+				self.manager:ShowEffectTimers(false)
+				self.database.label.timers = nil
+				return "Timers now hidden"
 			end
-			return "Usage: /dmon cooldowns [hide | show]"
+			return "Hide what?"
 		end,
 		reset = function(self, arguments)
 			return self:ResetHUD()
@@ -177,8 +177,8 @@ function DOTMonitor:New(databaseID)
 	local info = {
 		lock 	= "Locks the monitor icons",
 		unlock 	= "Unlocks the monitor icons",
-		timers 	= "Shows a digital monitor timer",
-		cooldowns = "Shows a digital monitor cooldown",
+		show 	= "Show either cooldowns or timers",
+		hide	= "Hide either cooldowns or timers",
 		reset	= "Resets DOTMonitor's HUD",
 	}
 
@@ -216,8 +216,7 @@ function DOTMonitor:New(databaseID)
 		if addon ~= "DOTMonitor" then return end
 		-- Attempt to reload the database, otherwise the backup database passed in is used
 		self.database 	= Foundation.Database:New(self.databaseID, "0.2.2", {layout = {}, label = {}})
-		self.manager 	= SpellMonitorManager:Restore(self.database, "DOTMonitor")
-		self.manager:SetDelegate(self)
+		self.manager 	= SpellMonitorManager:Restore(self.database, "DOTMonitor", self)
 	end), "ADDON_LOADED")
 
 

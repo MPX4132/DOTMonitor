@@ -18,6 +18,7 @@ function SpellMonitorManager:AssureMonitors(aSize)
 			self.monitor[anIndex] = self.monitor[anIndex] or SpellMonitor:New((self.ID .. "_SPELLMONITOR" .. anIndex))
 		end
 	end
+	self:SetDelegate() -- Assure delegate
 	return self
 end
 
@@ -42,21 +43,20 @@ end
 
 function SpellMonitorManager:ShowEffectTimers(show)
 	for i, aMonitor in ipairs(self.monitor) do
-		local timer = aMonitor.icon.digitalMeter
-		timer[(show and "Show" or "Hide")](timer)
+		aMonitor:DigitalMeter(show)
 	end
 end
 
 function SpellMonitorManager:ShowCooldownTimers(show)
 	for i, aMonitor in ipairs(self.monitor) do
-		local timer = aMonitor.icon.digitalCooldown
-		timer[(show and "Show" or "Hide")](timer)
+		aMonitor:DigitalCooldown(show)
 	end
 end
 
 function SpellMonitorManager:SetDelegate(delegate)
-	for i, aMonitor in ipairs(self.monitor) do
-		aMonitor:AddDelegateForUpdate(delegate)
+	self.delegate = delegate or self.delegate
+	for i, aMonitor in ipairs(self.delegate and self.monitor or {}) do
+		aMonitor:AddDelegateForUpdate(self.delegate)
 	end
 end
 
@@ -87,19 +87,20 @@ local SpellMonitorManagerDefault = {
 	SaveTo			= SpellMonitorManager.SaveTo,
 }
 
-function SpellMonitorManager:New(ID)
+function SpellMonitorManager:New(ID, delegate)
 	local spellMonitorManager = {}
 	setmetatable(spellMonitorManager, {__index = SpellMonitorManagerDefault})
 
-	spellMonitorManager.ID = ID or spellMonitorManager.ID
-	spellMonitorManager.monitor = {} -- Monitor List
+	spellMonitorManager.ID 			= ID or spellMonitorManager.ID
+	spellMonitorManager.delegate 	= delegate
+	spellMonitorManager.monitor 	= {} -- Monitor List
 
 	return spellMonitorManager
 end
 
-function SpellMonitorManager:Restore(database, backupID)
+function SpellMonitorManager:Restore(database, backupID, delegate)
 	local preferences = database and database.manager
-	local spellMonitorManager = self:New(preferences and preferences.ID or backupID) -- Default ID
+	local spellMonitorManager = self:New((preferences and preferences.ID or backupID), delegate) -- Default ID
 	return spellMonitorManager:AssureMonitors(preferences and preferences.monitorCount)
 end
 
