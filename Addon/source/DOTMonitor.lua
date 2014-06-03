@@ -33,6 +33,20 @@ function DOTMonitor:SyncToPlayer(player)
 	end
 end
 
+function DOTMonitor:Update(monitor, effectDuration, effectExpiration, effectCaster, cooldownStart, cooldownDuration, cooldownEnabled)
+	local iconAlpha	= 1
+
+	if effectCaster == "player" then
+		iconAlpha = 1 - ((effectDuration ~= 0) and ((effectExpiration - GetTime()) / effectDuration) or 0)
+	end
+
+	monitor.icon:SetBorder("Interface\\AddOns\\DOTMonitor\\Graphics\\" .. (((UnitPower("player") < monitor.spell.cost) and "IconBorderDark")
+																	or ((iconAlpha >= 0.90) and "IconBorderMarked"  or "IconBorder")))
+	monitor:Scale(iconAlpha)
+	monitor:SetAlpha(iconAlpha)
+	monitor.icon.digitalCooldown:SetAlpha(iconAlpha > 0.50 and 1 or 0)
+end
+
 function DOTMonitor:HUDAutoLayout()
 	local f = function(x) return ((13 / 1) * math.pow(x, 2) - 180) end
 	local position 	= {}
@@ -72,11 +86,14 @@ function DOTMonitor:LoadSpecSetup()
 	if self.enabled then
 		local spec = self.player:Spec()
 		for i, position in ipairs(self.database.layout[spec] or self:HUDAutoLayout()) do
-			local icon = self.manager.monitor[i].icon
-			if icon then
-				icon:SetCenter(position.x, position.y)
+			local monitor = self.manager.monitor[i]
+			if monitor then
+				monitor.icon:SetCenter(position.x, position.y)
 			end
 		end
+
+		self.manager:ShowEffectTimers(self.database.meter.timers)
+		self.manager:ShowCooldownTimers(self.database.meter.cooldowns)
 	end
 end
 
@@ -96,6 +113,7 @@ local DOTMonitorDefault = {
 	locked 	= true,
 	enabled = false,
 	SyncToPlayer 	= DOTMonitor.SyncToPlayer,
+	Update			= DOTMonitor.Update,
 	HUDAutoLayout	= DOTMonitor.HUDAutoLayout,
 	EnableMonitors 	= DOTMonitor.EnableMonitors,
 	StopMonitors 	= DOTMonitor.StopMonitors,
@@ -126,6 +144,30 @@ function DOTMonitor:New(databaseID)
 			self.manager:LockMonitors(false, #self.player:GetDebuff())
 			return "HUD Unlocked"
 		end,
+		timers = function(self, arguments)
+			if arguments == "show" then
+				self.manager:ShowEffectTimers(true)
+				self.database.meter.timers = true
+				return "Showing Timers"
+			elseif arguments == "hide" then
+				self.manager:ShowEffectTimers(false)
+				self.database.meter.timers = nil
+				return "Timers Disabled"
+			end
+			return "Usage: /dmon timers [hide | show]"
+		end,
+		cooldowns = function(self, arguments)
+			if arguments == "show" then
+				self.manager:ShowCooldownTimers(true)
+				self.database.meter.cooldowns = true
+				return "Showing Cooldowns"
+			elseif arguments == "hide" then
+				self.manager:ShowCooldownTimers(false)
+				self.database.meter.cooldowns = nil
+				return "Cooldowns Disabled"
+			end
+			return "Usage: /dmon cooldowns [hide | show]"
+		end,
 		reset = function(self, arguments)
 			return self:ResetHUD()
 		end,
@@ -134,6 +176,8 @@ function DOTMonitor:New(databaseID)
 	local info = {
 		lock 	= "Locks the monitor icons",
 		unlock 	= "Unlocks the monitor icons",
+		timers 	= "Shows a digital monitor timer",
+		cooldowns = "Shows a digital monitor cooldown",
 		reset	= "Resets DOTMonitor's HUD",
 	}
 
@@ -170,8 +214,9 @@ function DOTMonitor:New(databaseID)
 	dotMonitor.eventListener:AddActionForEvent((function(self, addon)
 		if addon ~= "DOTMonitor" then return end
 		-- Attempt to reload the database, otherwise the backup database passed in is used
-		self.database 	= Foundation.Database:New(self.databaseID, "0.2.0", {layout = {}})
+		self.database 	= Foundation.Database:New(self.databaseID, "0.2.2", {layout = {}, meter = {}})
 		self.manager 	= SpellMonitorManager:Restore(self.database, "DOTMonitor")
+		self.manager:SetDelegate(self)
 	end), "ADDON_LOADED")
 
 

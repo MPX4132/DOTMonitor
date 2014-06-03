@@ -25,10 +25,10 @@ function SpellMonitorManager:EnableMonitors(enable, count)
 	local monitorsToEnable = count or #self.monitor
 	for i, aMonitor in ipairs(self.monitor) do
 		if i <= monitorsToEnable then
-			aMonitor:Monitor(enable)
-			aMonitor:Enable(enable)
+			aMonitor:Update(enable)
+			aMonitor[(enable and "Show" or "Hide")](aMonitor)
 		else
-			aMonitor:Enable(false)
+			aMonitor:Hide()
 		end
 	end
 end
@@ -40,16 +40,35 @@ function SpellMonitorManager:LockMonitors(lock, count)
 	end
 end
 
+function SpellMonitorManager:ShowEffectTimers(show)
+	for i, aMonitor in ipairs(self.monitor) do
+		local timer = aMonitor.icon.digitalMeter
+		timer[(show and "Show" or "Hide")](timer)
+	end
+end
+
+function SpellMonitorManager:ShowCooldownTimers(show)
+	for i, aMonitor in ipairs(self.monitor) do
+		local timer = aMonitor.icon.digitalCooldown
+		timer[(show and "Show" or "Hide")](timer)
+	end
+end
+
+function SpellMonitorManager:SetDelegate(delegate)
+	for i, aMonitor in ipairs(self.monitor) do
+		aMonitor:AddDelegateForUpdate(delegate)
+	end
+end
+
 function SpellMonitorManager:SaveTo(database)
 	database.manager = {
 		ID = self.ID,
 		monitorCount = #self.monitor,
 	}
-	--self:LockMonitors(false)
+
 	for i, aMonitor in ipairs(self.monitor) do
-		--aMonitor.icon:SetAlpha(0)
-		aMonitor:Monitor(false)
-		aMonitor:Enable(true)
+		aMonitor:Update(false)
+		aMonitor:Show()
 		aMonitor.icon:SetMovable(true)
 		aMonitor.icon:SetUserPlaced(true)
 	end
@@ -62,6 +81,9 @@ local SpellMonitorManagerDefault = {
 	AssureMonitors 	= SpellMonitorManager.AssureMonitors,
 	EnableMonitors	= SpellMonitorManager.EnableMonitors,
 	LockMonitors	= SpellMonitorManager.LockMonitors,
+	ShowEffectTimers = SpellMonitorManager.ShowEffectTimers,
+	ShowCooldownTimers = SpellMonitorManager.ShowCooldownTimers,
+	SetDelegate		= SpellMonitorManager.SetDelegate,
 	SaveTo			= SpellMonitorManager.SaveTo,
 }
 
