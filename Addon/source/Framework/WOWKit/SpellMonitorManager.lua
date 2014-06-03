@@ -1,7 +1,7 @@
---
--- SpellMonitorManager V0.1
+-- =======================================================================================
+-- SpellMonitorManager V0.2
 -- Simple SpellMonitor management system for WOW
---
+-- =======================================================================================
 
 local SpellMonitor = _G["MPXWOWKit_SpellMonitor"]
 

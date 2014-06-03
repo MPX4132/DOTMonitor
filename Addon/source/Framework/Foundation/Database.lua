@@ -1,7 +1,7 @@
---
--- Database V0.1
+-- =======================================================================================
+-- Database V0.2
 -- A simple database with session persistence for WOW
---
+-- =======================================================================================
 
 local Database = {} -- Local Namespace
 
@@ -21,33 +21,19 @@ local DatabaseDefault = {
 }
 
 function Database:New(ID, version, backupDatabase)
-	--[[
-	local database = _G[ID] or backupDatabase or {ID = ID}
-	setmetatable(database, {__index = DatabaseDefault})
-
-	if backupDatabase then
-		database.ID = ID
-	end
-
---	database:Save()
-
-	return database
-	--]]
 	local newDatabase = nil
-	local oldDatabase = _G[ID]
+	local oldDatabase = _G[ID] -- Attempt to load old database
 
-	if 	oldDatabase
-	and oldDatabase.version
+	if oldDatabase
 	and type(oldDatabase.version) 	== type(version)
-	and oldDatabase.version 		== version
-	then newDatabase = oldDatabase
-	elseif backupDatabase
-	then newDatabase = backupDatabase
-	else newDatabase = {} -- A real new database
+	and oldDatabase.version 		== version then
+		newDatabase = oldDatabase
+	else
+		newDatabase = backupDatabase or {} -- Either backup or a whole new Database
 	end
 
-	newDatabase.ID 		= ID
-	newDatabase.version = version
+	newDatabase["ID"] 		= ID
+	newDatabase["version"] 	= version
 
 	setmetatable(newDatabase, {__index = DatabaseDefault})
 

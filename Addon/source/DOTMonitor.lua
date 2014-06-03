@@ -60,9 +60,9 @@ function DOTMonitor:HUDAutoLayout()
 end
 
 function DOTMonitor:HUDRun(run)
-	self.terminal.outputStream:Log("Attempting to run HUD")
+	self.terminal.outputStream:Log("Attempting to change HUD")
 	if self.enabled then
-		self.terminal.outputStream:Log("Running HUD")
+		self.terminal.outputStream:Log(run and "Running HUD" or "Stopping HUD")
 		self.manager:EnableMonitors(run, #self.player:GetDebuff())
 	else
 		self.terminal.outputStream:Log("Unable to run HUD")
@@ -92,14 +92,15 @@ function DOTMonitor:LoadSpecSetup()
 			end
 		end
 
-		self.manager:ShowEffectTimers(self.database.meter.timers)
-		self.manager:ShowCooldownTimers(self.database.meter.cooldowns)
+		self.manager:ShowEffectTimers(self.database.label.timers)
+		self.manager:ShowCooldownTimers(self.database.label.cooldowns)
 	end
 end
 
 function DOTMonitor:ResetHUD()
 	if self.enabled then
 		self.database.layout[self.player:Spec()] = nil
+		self.database.label = {} -- clear it
 		self:LoadSpecSetup()
 		return "HUD Reset!"
 	else
@@ -147,11 +148,11 @@ function DOTMonitor:New(databaseID)
 		timers = function(self, arguments)
 			if arguments == "show" then
 				self.manager:ShowEffectTimers(true)
-				self.database.meter.timers = true
+				self.database.label.timers = true
 				return "Showing Timers"
 			elseif arguments == "hide" then
 				self.manager:ShowEffectTimers(false)
-				self.database.meter.timers = nil
+				self.database.label.timers = nil
 				return "Timers Disabled"
 			end
 			return "Usage: /dmon timers [hide | show]"
@@ -159,11 +160,11 @@ function DOTMonitor:New(databaseID)
 		cooldowns = function(self, arguments)
 			if arguments == "show" then
 				self.manager:ShowCooldownTimers(true)
-				self.database.meter.cooldowns = true
+				self.database.label.cooldowns = true
 				return "Showing Cooldowns"
 			elseif arguments == "hide" then
 				self.manager:ShowCooldownTimers(false)
-				self.database.meter.cooldowns = nil
+				self.database.label.cooldowns = nil
 				return "Cooldowns Disabled"
 			end
 			return "Usage: /dmon cooldowns [hide | show]"
@@ -214,7 +215,7 @@ function DOTMonitor:New(databaseID)
 	dotMonitor.eventListener:AddActionForEvent((function(self, addon)
 		if addon ~= "DOTMonitor" then return end
 		-- Attempt to reload the database, otherwise the backup database passed in is used
-		self.database 	= Foundation.Database:New(self.databaseID, "0.2.2", {layout = {}, meter = {}})
+		self.database 	= Foundation.Database:New(self.databaseID, "0.2.2", {layout = {}, label = {}})
 		self.manager 	= SpellMonitorManager:Restore(self.database, "DOTMonitor")
 		self.manager:SetDelegate(self)
 	end), "ADDON_LOADED")
