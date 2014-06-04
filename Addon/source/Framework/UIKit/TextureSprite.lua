@@ -26,7 +26,7 @@ function TextureSprite:SetSpriteSheetConfig(source, width, height)
 end
 
 function TextureSprite:SetPercentage(percent)
-    self:SetSprite(math.floor((percent+5) / 100 * self.image.count))
+    self:SetSprite(math.floor(percent / 100 * self.image.count)+1)
 end
 
 function TextureSprite:SetSprite(imageIndex)
