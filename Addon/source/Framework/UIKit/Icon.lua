@@ -41,7 +41,12 @@ function Icon:SetBackground(texturePath)
 	self.texturePath = texturePath or self.texturePath
 	if not self.texture then
 		self.texture = self:CreateTexture(nil, "ARTWORK")
-		self.texture:SetAllPoints(self)
+		-- To keep the stupid ugly circle cout under my borders
+		self.texture:SetPoint("CENTER", 0, 0)
+		self.texture:SetPoint("TOP", 0, -1)
+		self.texture:SetPoint("BOTTOM", 0, 1)
+		self.texture:SetPoint("LEFT", 1, 0)
+		self.texture:SetPoint("RIGHT", -1, 0)
 	end
 
 	if self.isRound then
@@ -59,13 +64,7 @@ function Icon:SetBorder(texturePath)
 	end
 
 	if not self.borderPath then return end
-
-	-- WEIRD FREAKING QUIRK HERE WITH THAT FUNCTION!!!
-	--if self.isRound then
-	--	SetPortraitToTexture(self.border, self.borderPath)
-	--else
-		self.border:SetTexture(self.borderPath)
-	--end
+	self.border:SetTexture(self.borderPath)
 end
 
 function Icon:SetHighlight(texturePath)
@@ -76,13 +75,7 @@ function Icon:SetHighlight(texturePath)
 	end
 
 	if not self.highlightPath then return end
-
-	-- WEIRD FREAKING QUIRK HERE WITH THAT FUNCTION!!!
-	--if self.isRound then
-	--	SetPortraitToTexture(self.highlight, self.highlightPath)
-	--else
-		self.highlight:SetTexture(self.highlightPath)
-	--end
+	self.highlight:SetTexture(self.highlightPath)
 end
 
 function Icon:SetSpell(spell)
