@@ -12,7 +12,8 @@ end
 function Spell:Set(ID, effect)
 	if type(ID) == "string" then
 		local link = self:Link(ID)
-		ID = link:match("spell:(%d+)")
+		ID = link and link:match("spell:(%d+)") or false
+		if not ID then return end
 	end
 
 	self.id 	= ID

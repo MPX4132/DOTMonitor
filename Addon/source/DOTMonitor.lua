@@ -198,7 +198,12 @@ function DOTMonitor:New(databaseID)
 	-- Player Updates
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self:SyncToPlayer(nil)
+		self:LoadSpecSetup()
 	end), "PLAYER_LEVEL_UP")
+	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
+		self:SyncToPlayer(nil)
+		self:LoadSpecSetup()
+	end), "PLAYER_TALENT_UPDATE")
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self.manager:LockMonitors(true) -- Want to lock everything
 		self:SyncToPlayer(nil)

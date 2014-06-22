@@ -17,7 +17,11 @@ function Player:Level()
 end
 
 function Player:Class()
-	return self.class;
+	return self.class
+end
+
+function Player:RealClass()
+	return self.realClass
 end
 
 function Player:SupportsSpec()
@@ -39,9 +43,9 @@ function Player:Spec()
 end
 
 function Player:UpdateDebuffs()
-	local allDebuffs 	= _G["DOTMonitor_Debuffs_"..GetLocale()] or _G["DOTMonitor_Debuffs_enUS"]
+	local classDebuffs 	= _G["DOTMonitor_Debuffs"] and _G["DOTMonitor_Debuffs"][self:RealClass()] or {}
+	local specDebuffs	= self:HasSpec() and Table:New(classDebuffs[(self:SpecID())] or {})
 
-	local specDebuffs 	= self:HasSpec() and Table:New(allDebuffs[self:Class():gsub(" ", "_")][self:Spec():gsub(" ", "_")]) or Table:New({})
 	local debuffSpell	= specDebuffs:Keys()
 	local debuffEffect	= specDebuffs:Values(debuffSpell)
 
@@ -100,6 +104,7 @@ local PlayerDefault = {
 	IsPlayer 		= Player.IsPlayer,
 	Level			= Player.Level,
 	Class			= Player.Class,
+	RealClass		= Player.RealClass,
 	SupportsSpec	= Player.SupportsSpec,
 	HasSpec			= Player.HasSpec,
 	SpecID			= Player.SpecID,
@@ -125,7 +130,8 @@ function Player:New(unit)
 	setmetatable(player, {__index = PlayerDefault, __tostring = playerAbout})
 
 	player.subject 	= unit
-	player.class 	= UnitClass(player.subject):gsub("^%l", string.upper) -- Doesn't change
+	player.class, player.realClass = UnitClassBase(player.subject)
+	player.class = player.class:gsub("^%l", string.upper) -- Doesn't change
 
 	return player:Sync()
 end
