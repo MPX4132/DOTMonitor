@@ -19,6 +19,9 @@ if GetLocale() == "esES" then
 	DOTMonitorLocalization["Timers now visible"] 	= "Temporizadores ahora visibles"
 	DOTMonitorLocalization["Timers now hidden"]		= "Temporizadores ahora ocultos"
 
+	DOTMonitorLocalization["Invalid Command: \"%s\""] = "Comando no válido: \"%s\""
+	DOTMonitorLocalization["Valid Commands are:"]	= "Comandos válidos son:"
+
 	DOTMonitorLocalization["Usage: show (cooldowns | timers)"] = "Uso: muestra (tiempo de reutilización | temporizadores)"
 	DOTMonitorLocalization["Usage: hide (cooldowns | timers)"] = "Uso: oculta (tiempo de reutilización | temporizadores)"
 

@@ -154,44 +154,77 @@ function DOTMonitor:New(databaseID)
 
 
 	-- Terminal Setup
-	local commands = {
-		[dotMonitor.localize("lock")] = function(self, arguments)
-			self.manager:LockMonitors(true) -- Want to lock everything
-			self:SaveSpecSetup()
-			return self.localize("HUD Locked")
-		end,
-		[dotMonitor.localize("unlock")] = function(self, arguments)
-			self.manager:LockMonitors(false, #self.player:GetDebuff())
-			return self.localize("HUD Unlocked")
-		end,
-		[dotMonitor.localize("show")] = function(self, arguments)
-			if arguments == self.localize("cooldowns") then
-				self.manager:ShowCooldownTimers(true)
-				self.database.label.cooldowns = true
-				return self.localize("Cooldowns now visible")
-			elseif arguments == self.localize("timers") then
-				self.manager:ShowEffectTimers(true)
-				self.database.label.timers = true
-				return self.localize("Timers now visible")
-			end
-			return self.localize("Usage: show (cooldowns | timers)")
-		end,
-		[dotMonitor.localize("hide")] = function(self, arguments)
-			if arguments == self.localize("cooldowns") then
-				self.manager:ShowCooldownTimers(false)
-				self.database.label.cooldowns = nil
-				return self.localize("Cooldowns now hidden")
-			elseif arguments == self.localize("timers") then
-				self.manager:ShowEffectTimers(false)
-				self.database.label.timers = nil
-				return self.localize("Timers now hidden")
-			end
-			return self.localize("Usage: hide (cooldowns | timers)")
-		end,
-		[dotMonitor.localize("reset")] = function(self, arguments)
-			return self:ResetHUD()
-		end,
-	}
+	local command = {} -- Terminal functions holder
+	-- Lock Command ======================================================================
+	command[dotMonitor.localize("lock")] = function(self, arguments)
+		self.manager:LockMonitors(true) -- Want to lock everything
+		self:SaveSpecSetup()
+		return self.localize("HUD Locked")
+	end
+	-- -----------------------------------------------------------------------------------
+
+	-- Unlock Command ====================================================================
+	command[dotMonitor.localize("unlock")] = function(self, arguments)
+		self.manager:LockMonitors(false, #self.player:GetDebuff())
+		return self.localize("HUD Unlocked")
+	end
+	-- -----------------------------------------------------------------------------------
+
+	-- Show Command ======================================================================
+	command[dotMonitor.localize("show")] = function(self, arguments)
+		if arguments == self.localize("cooldowns") then
+			self.manager:ShowCooldownTimers(true)
+			self.database.label.cooldowns = true
+			return self.localize("Cooldowns now visible")
+		elseif arguments == self.localize("timers") then
+			self.manager:ShowEffectTimers(true)
+			self.database.label.timers = true
+			return self.localize("Timers now visible")
+		end
+
+		-- No matching argument, show some help
+		if arguments then
+			self.terminal.outputStream:Print(string.format(self.localize("Invalid Command: \"%s\""), arguments), "warning")
+		end
+
+		self.terminal.outputStream:Print(self.localize("Valid Commands are:"))
+		self.terminal.outputStream:Print("> " .. self.localize("cooldowns"))
+		self.terminal.outputStream:Print("> " .. self.localize("timers"))
+
+		return self.localize("Usage: show (cooldowns | timers)")
+	end
+	-- -----------------------------------------------------------------------------------
+
+	-- Hide Command ======================================================================
+	command[dotMonitor.localize("hide")] = function(self, arguments)
+		if arguments == self.localize("cooldowns") then
+			self.manager:ShowCooldownTimers(false)
+			self.database.label.cooldowns = nil
+			return self.localize("Cooldowns now hidden")
+		elseif arguments == self.localize("timers") then
+			self.manager:ShowEffectTimers(false)
+			self.database.label.timers = nil
+			return self.localize("Timers now hidden")
+		end
+
+		-- No matching argument, show some help
+		if arguments then
+			self.terminal.outputStream:Print(string.format(self.localize("Invalid Command: \"%s\""), arguments), "warning")
+		end
+
+		self.terminal.outputStream:Print(self.localize("Valid Commands are:"))
+		self.terminal.outputStream:Print("> " .. self.localize("cooldowns"))
+		self.terminal.outputStream:Print("> " .. self.localize("timers"))
+
+		return self.localize("Usage: hide (cooldowns | timers)")
+	end
+	-- -----------------------------------------------------------------------------------
+
+	-- Reset Command =====================================================================
+	command[dotMonitor.localize("reset")] = function(self, arguments)
+		return self:ResetHUD()
+	end
+	-- -----------------------------------------------------------------------------------
 
 	local info = {
 		[dotMonitor.localize("lock")] 	= dotMonitor.localize("Locks the monitor icons"),
@@ -201,7 +234,7 @@ function DOTMonitor:New(databaseID)
 		[dotMonitor.localize("reset")]	= dotMonitor.localize("Resets the HUD"),
 	}
 
-	dotMonitor.terminal:SetExecutables(commands, info)
+	dotMonitor.terminal:SetExecutables(command, info)
 
 
 	-- Player In / Out of Combat

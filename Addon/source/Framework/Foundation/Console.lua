@@ -47,6 +47,14 @@ function Console:EnableLog(show)
 	end
 end
 
+function Console:Translator(aMessage, ...)
+	self:Print(self.localizer and self.localizer[aMessage] or aMessage, ...)
+end
+
+function Console:SetLocaleDatabase(database)
+	self.localizer = database
+end
+
 function Console:SetOutputStream(outputStream)
 	if type(outputStream) == "table" and type(outputStream["AddMessage"]) == "function" then
 		self.outputStream = outputStream
@@ -70,12 +78,13 @@ local ConsoleDefault = {
 	AddMessage		= Console.AddMessage,
 	Log				= Console.Log,
 	EnableLog		= Console.EnableLog,
+	Translator		= Console.Translator,
 	SetOutputStream = Console.SetOutputStream
 }
 
 function Console:New(identifier)
 	local console = {}
-	setmetatable(console, {__index = ConsoleDefault})
+	setmetatable(console, {__index = ConsoleDefault, __call = self.Translator})
 
 	console.identifier = identifier
 	return console
