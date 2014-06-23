@@ -44,7 +44,7 @@ end
 
 function Player:UpdateDebuffs()
 	local classDebuffs 	= _G["DOTMonitor_Debuffs"] and _G["DOTMonitor_Debuffs"][self:RealClass()] or {}
-	local specDebuffs	= self:HasSpec() and Table:New(classDebuffs[(self:SpecID())] or {})
+	local specDebuffs	= Table:New(self:HasSpec() and classDebuffs[self:SpecID()] or {})
 
 	local debuffSpell	= specDebuffs:Keys()
 	local debuffEffect	= specDebuffs:Values(debuffSpell)

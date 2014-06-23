@@ -61,6 +61,8 @@ local ConsoleDefault = {
 		["info"] 	= {r = 0,	g = 1,	b = 1},	-- This one is required
 		["epic"] 	= {r = .8,	g = .2,	b = 1},
 		["alert"] 	= {r = 1,	g = 0,	b = 0},
+		["critical"]= {r = 1,	g = 0,	b = 0},
+		["warning"] = {r = 1, 	g = .25,b = 0},
 		["custom"] 	= {r = 1,	g = 1,	b = 1}
 	},
 	ParseColor 		= Console.ParseColor,

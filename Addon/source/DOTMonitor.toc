@@ -5,19 +5,12 @@
 ## Notes: Monitor for DOT effects on enemies; as the DOTs span their duration, DOTMonior displays an icon of the DOT that should be casted on the target by slowly fading in relative to how urgent it is to cast it.
 ## SavedVariablesPerCharacter: DOTMonitorPreferences
 
+Locale\Localization.xml
+
 Spells\Debuffs.lua
 
-Framework\Foundation\Database.lua
-Framework\Foundation\Console.lua
-Framework\Foundation\Terminal.lua
-Framework\Foundation\EventManager.lua
-Framework\Foundation\Table.lua
-Framework\Foundation\Foundation.lua
-Framework\UIKit\Icon.lua
-Framework\UIKit\TextureSprite.lua
-Framework\WOWKit\Spell.lua
-Framework\WOWKit\SpellMonitor.lua
-Framework\WOWKit\SpellMonitorManager.lua
-Framework\WOWKit\Player.lua
+Framework\Foundation\Foundation.xml
+Framework\UIKit\UIKit.xml
+Framework\WOWKit\WOWKit.xml
 
 DOTMonitor.lua
