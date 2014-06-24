@@ -9,7 +9,7 @@ DOTMonitor_Debuffs = {
 			-- "Plague Strike"	: "Blood Plague"
 			[45462]	= 55078,
 			-- "Scarlet Fever"	: "Weakened Blows"
-			[81132] = 115798,
+			-- [81132] = 115798,
 		},
 		[251] = { 	-- "Frost"
 			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
@@ -143,12 +143,12 @@ DOTMonitor_Debuffs = {
 			-- "Breath of Fire"	: "Breath of Fire"
 			[115181] 	= 115181,
 		},
-		[269] = { 	-- "Mistweaver"
-		},
-		[270] = { 	-- "Windwalker"
+		[269] = { 	-- "Windwalker"
 			-- "Rising Sun Kick": "Mortal Wounds"
 			[107428] = 115804,
-		}
+		},
+		[270] = { 	-- "Mistweaver"
+		},
 	},
 
 	["PALADIN"] = {
