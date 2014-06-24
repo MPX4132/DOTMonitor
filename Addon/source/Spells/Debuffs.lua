@@ -84,6 +84,8 @@ DOTMonitor_Debuffs = {
 			[1978]	= 1978,
 			-- "Widow Venom"	: "Widow Venom"
 			[82654] = 82654,
+			-- "Hunter's Mark" 	: "Hunter's Mark"
+			--[1130] = 1130,
 			-- "Glaive Toss" 	: "Glaive Toss"
 			[117050] = 117050,
 		},
@@ -109,34 +111,26 @@ DOTMonitor_Debuffs = {
 
 	["MAGE"] = {
 		[62] = { 	-- "Arcane"
-			-- "Nether Tempest"	: "Nether Tempest"
-			[114923] = 114923,
-			-- "Frost Bomb"		: "Frost Bomb"
-			[113092] = 113092,
-			-- "Living Bomb" 	: "Living Bomb"
-			[44461] = 44461,
+			-- "Mage Bomb"		: "Mage Bomb"
+			[125430] = {114923, 113092, 44461}
 		},
 		[63] = { 	-- "Fire"
 			-- "Pyroblast" 		: "Pyroblast"
 			[11366] = 11366,
-			-- "Combustion"		: "Combustion"
-			[11129]	= 11129,
-			-- "Nether Tempest"	: "Nether Tempest"
-			[114923] = 114923,
-			-- "Frost Bomb"		: "Frost Bomb"
-			[113092] = 113092,
-			-- "Living Bomb" 	: "Living Bomb"
-			[44461] = 44461,
+			-- "Mastery: Ignite": "Ignite"
+			[12846] = 12654,
+			-- "Combustion"		: "Combustion Impact"
+			[11129]	= 118271,
+			-- "Dragon's Breath": "Dragon's Breath"
+			[31661] = 29964,
+			-- "Mage Bomb"		: "Mage Bomb"
+			[125430] = {114923, 113092, 44461}
 		},
 		[64] = { 	-- "Frost"
 			-- "Frozen Orb"		: "Frozen Orb"
 			[84714] = 84714,
-			-- "Nether Tempest"	: "Nether Tempest"
-			[114923] = 114923,
-			-- "Frost Bomb"		: "Frost Bomb"
-			[113092] = 113092,
-			-- "Living Bomb" 	: "Living Bomb"
-			[44461] = 44461,
+			-- "Mage Bomb"		: "Mage Bomb"
+			[125430] = {114923, 113092, 44461}
 		}
 	},
 

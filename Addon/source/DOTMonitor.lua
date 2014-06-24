@@ -32,7 +32,7 @@ function DOTMonitor:SyncToPlayer(player)
 	if not self.enabled then
 		if self.player then
 			local msg = (self.player:Level() < 10 and self.localize("Player not ready due to low level"))
-						   or (not self:HasSpec() and self.localize("Player not ready due to no spec"))
+						   or (not self.player:HasSpec() and self.localize("Player not ready due to no spec"))
 			self.terminal.outputStream:Print(msg, "warning")
 		else
 			self.terminal.outputStream:Log(self.localize("Player Unavailable!"))

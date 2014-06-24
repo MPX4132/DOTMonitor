@@ -23,7 +23,7 @@ function Spell:Set(ID, effect)
 end
 
 function Spell:IsReady()
-	return self.name ~= nil
+	return self.name ~= nil and IsSpellKnown(self.id)
 end
 
 function Spell:IsInstant()
