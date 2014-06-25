@@ -21,7 +21,7 @@ local Player 				= _G["MPXWOWKit_Player"]
 
 
 local DOTMonitor = {} -- Local Namespace
-local debugging  = false
+local debugging  = true
 
 function DOTMonitor:SyncToPlayer(player)
 	self.terminal.outputStream:Log("Syncing Player")
@@ -81,7 +81,7 @@ function DOTMonitor:HUDRun(run)
 		self.terminal.outputStream:Log(run and "Running HUD" or "Stopping HUD")
 		self.manager:EnableMonitors(run, #self.player:GetDebuff())
 	else
-		self.terminal.outputStream:Log("Unable to run HUD")
+		self.terminal.outputStream:Log("HUD Disabled, Ignoring")
 		self.manager:EnableMonitors(false)
 	end
 end
@@ -249,14 +249,25 @@ function DOTMonitor:New(databaseID)
 
 	-- Player Updates
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
-		self:SyncToPlayer(nil)
-		self:LoadSpecSetup()
-	end), "PLAYER_LEVEL_UP")
+		self.terminal.outputStream:Log("Handling Player Leveled Up:")
+		if self.player and self.player:Level() >= 10 then
+			self:SyncToPlayer(nil)
+			self:LoadSpecSetup()
+		else -- skip if the player isn't available or player the level is below 10
+			self.terminal.outputStream:Log("Skipped: Player not ready")
+		end
+	end), "PLAYER_LEVEL_UP") -- New spells are available from this point
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
-		self:SyncToPlayer(nil)
-		self:LoadSpecSetup()
-	end), "PLAYER_TALENT_UPDATE")
+		self.terminal.outputStream:Log("Handling Player Talent Update:")
+		if self.player and self.player:Level() >= 10 then
+			self:SyncToPlayer(nil)
+			self:LoadSpecSetup()
+		else -- skip if the player isn't available or player the level is below 10
+			self.terminal.outputStream:Log("Skipped: Player not ready")
+		end
+	end), "PLAYER_TALENT_UPDATE") -- Fires on level up, weird...
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
+		self.terminal.outputStream:Log("Handling Player Talent Group Change:")
 		self.manager:LockMonitors(true) -- Want to lock everything
 		self:SyncToPlayer(nil)
 		self:LoadSpecSetup()
