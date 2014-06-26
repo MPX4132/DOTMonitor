@@ -23,7 +23,8 @@ function Spell:Set(ID, effect)
 end
 
 function Spell:IsReady()
-	return self.name ~= nil and IsSpellKnown(self.id)
+	-- IsSpellKnown is notorious for giving out false info
+	return self.name ~= nil -- and IsSpellKnown(self.id)
 end
 
 function Spell:IsInstant()
@@ -101,6 +102,10 @@ function Spell:InRange(unit)
 	return IsSpellInRange(self.name, unit or "target")
 end
 
+function Spell:Equals(spell)
+	return self.id == spell.id
+end
+
 function Spell:Link(ID)
 	return GetSpellLink(ID or self.id)
 end
@@ -140,6 +145,7 @@ local SpellDefault = {
 	AffectingUnit 		= Spell.AffectingUnit,
 	TimeOnUnit			= Spell.TimeOnUnit,
 	InRange				= Spell.InRange,
+	Equals				= Spell.Equals,
 	Link				= Spell.Link,
 	GetName				= Spell.GetName
 
@@ -151,7 +157,7 @@ end
 
 function Spell:New(ID, effect)
 	local spell = {}
-	setmetatable(spell, {__index = SpellDefault, __tostring = spellName})
+	setmetatable(spell, {__index = SpellDefault, __tostring = spellName, __eq = self.Equals})
 
 	if ID then
 		spell:Set(ID, effect)

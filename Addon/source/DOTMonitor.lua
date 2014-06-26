@@ -21,7 +21,7 @@ local Player 				= _G["MPXWOWKit_Player"]
 
 
 local DOTMonitor = {} -- Local Namespace
-local debugging  = true
+local debugging  = false
 
 function DOTMonitor:SyncToPlayer(player)
 	self.terminal.outputStream:Log("Syncing Player")
@@ -228,9 +228,9 @@ function DOTMonitor:New(databaseID)
 
 	local info = {
 		[dotMonitor.localize("lock")] 	= dotMonitor.localize("Locks the monitor icons"),
-		[dotMonitor.localize("unlock")] 	= dotMonitor.localize("Unlocks the monitor icons"),
+		[dotMonitor.localize("unlock")] = dotMonitor.localize("Unlocks the monitor icons"),
 		[dotMonitor.localize("show")] 	= dotMonitor.localize("Show either cooldowns or timers"),
-		[dotMonitor.localize("hide")]		= dotMonitor.localize("Hide either cooldowns or timers"),
+		[dotMonitor.localize("hide")]	= dotMonitor.localize("Hide either cooldowns or timers"),
 		[dotMonitor.localize("reset")]	= dotMonitor.localize("Resets the HUD"),
 	}
 
@@ -276,6 +276,7 @@ function DOTMonitor:New(databaseID)
 
 	-- Restoration
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
+		self.terminal.outputStream:Log("Handling Player Entering World:")
 		self:SyncToPlayer(Player:New()) -- Default player is "Player"
 		self:LoadSpecSetup()
 		self.terminal.outputStream:Print(self.enabled and self.localize("Ready") or self.localize("Pending"), "epic")

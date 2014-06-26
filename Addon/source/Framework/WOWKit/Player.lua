@@ -43,6 +43,8 @@ function Player:Spec()
 end
 
 function Player:UpdateDebuffs()
+	local pastDebuffs 	= Table:New(self.debuff or {})	-- To detect changes
+
 	local classDebuffs 	= _G["DOTMonitor_Debuffs"] and _G["DOTMonitor_Debuffs"][self:RealClass()] or {}
 	local specDebuffs	= Table:New(self:HasSpec() and classDebuffs[self:SpecID()] or {})
 
@@ -56,6 +58,8 @@ function Player:UpdateDebuffs()
 			table.insert(self.debuff, spell)
 		end
 	end
+
+	return pastDebuffs ~= Table:New(self.debuff)	-- True if there was a debuff update
 end
 
 function Player:GetDebuff(index)
@@ -92,9 +96,7 @@ function Player:Subject(unit)
 end
 
 function Player:Sync()
-	-- Load Debuffs
-	self:UpdateDebuffs()
-	return self
+	return self, self:UpdateDebuffs()
 end
 
 local PlayerDefault = {

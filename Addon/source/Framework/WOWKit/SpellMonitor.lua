@@ -78,11 +78,6 @@ function SpellMonitor:Reset()
 	self.icon.digitalMeter:SetAlpha(self.updating and 1 or 0)
 	self.icon.digitalCooldown:SetAlpha(self.updating and 1 or 0)
 	self.icon:SetAlpha(1)
-	--[[
-	if not self.updating then
-		self.icon:SetAlpha(1)
-	end
-	--]]
 end
 
 function SpellMonitor:DigitalMeter(enabled)
@@ -108,6 +103,7 @@ function SpellMonitor:ShowCondition()
 end
 
 function SpellMonitor:UpdateIcon(elapsed)
+	if not self.spell then return false end
 	local effectDuration, effectExpiration, effectCaster 	= self.spell:TimeOnUnit(self.target)
 	local cooldownStart, cooldownDuration, cooldownEnabled 	= self.spell:GetCooldown()
 

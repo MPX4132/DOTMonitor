@@ -29,6 +29,19 @@ function Table:Values(keys)
 	return values
 end
 
+function Table:Equals(tbl)
+	if self:Count() ~= tbl:Count() then
+		return false
+	end
+
+	for k, v in pairs(self) do
+		if not tbl[k] or tbl[k] ~= v then
+			return false
+		end
+	end
+	return true
+end
+
 local TableDefault = {
 	Count 	= Table.Count,
 	Keys 	= Table.Keys,
@@ -37,7 +50,7 @@ local TableDefault = {
 
 function Table:New(t)
 	local newTable = t or {}
-	setmetatable(newTable, {__index = TableDefault})
+	setmetatable(newTable, {__index = TableDefault, __eq = self.Equals})
 
 	return newTable
 end
