@@ -24,7 +24,10 @@ end
 
 function Spell:IsReady()
 	-- IsSpellKnown is notorious for giving out false info
-	return self.name ~= nil -- and IsSpellKnown(self.id)
+	-- return self.name ~= nil and IsSpellKnown(self.id)
+
+	-- Using hack to see if anything's returned from spell info
+	return GetSpellInfo(self.name) ~= nil
 end
 
 function Spell:IsInstant()

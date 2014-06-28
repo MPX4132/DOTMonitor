@@ -248,6 +248,7 @@ function DOTMonitor:New(databaseID)
 
 
 	-- Player Updates
+	--[[
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self.terminal.outputStream:Log("Handling Player Leveled Up:")
 		if self.player and self.player:Level() >= 10 then
@@ -266,12 +267,23 @@ function DOTMonitor:New(databaseID)
 			self.terminal.outputStream:Log("Skipped: Player not ready")
 		end
 	end), "PLAYER_TALENT_UPDATE") -- Fires on level up, weird...
+	--]]
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self.terminal.outputStream:Log("Handling Player Talent Group Change:")
 		self.manager:LockMonitors(true) -- Want to lock everything
-		self:SyncToPlayer(nil)
-		self:LoadSpecSetup()
+		--self:SyncToPlayer(nil)
+		--self:LoadSpecSetup()
 	end), "ACTIVE_TALENT_GROUP_CHANGED")
+
+	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
+		self.terminal.outputStream:Log("Handling Learned Spell In Tab:")
+		if self.player and self.player:Level() >= 10 then
+			self:SyncToPlayer(nil)
+			self:LoadSpecSetup()
+		else -- skip if the player isn't available or player the level is below 10
+			self.terminal.outputStream:Log("Skipped: Player not ready")
+		end
+	end), "LEARNED_SPELL_IN_TAB")
 
 
 	-- Restoration
