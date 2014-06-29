@@ -1,9 +1,9 @@
 if GetLocale() == "esMX" then
 	DOTMonitorLocalization = DOTMonitorLocalization or {}
 
-	DOTMonitorLocalization["Player Unavailable!"] 	= "¡Jugador No Disponible!"
-	DOTMonitorLocalization["Player not ready due to low level"] = "Jugador no está listo debido a su bajo nivel"
-	DOTMonitorLocalization["Player not ready due to no spec"] = "Jugador no está listo debido a ninguna especialización"
+	DOTMonitorLocalization["player Unavailable!"] 	= "¡jugador No Disponible!"
+	DOTMonitorLocalization["player not ready due to low level"] = "jugador no está listo debido a su bajo nivel"
+	DOTMonitorLocalization["player not ready due to no spec"] = "jugador no está listo debido a ninguna especialización"
 
 	DOTMonitorLocalization["adjusted for"] 			= "ajustado para"
 	DOTMonitorLocalization["Tracking"]				= "Rastreando"

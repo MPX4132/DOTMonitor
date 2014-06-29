@@ -56,11 +56,11 @@ end
 function DOTMonitor:PrintFault(fault)
 	if not fault then
 		if self.player then
-			local msg = self.player:SupportsSpec() 	and self.localize("Player not ready due to low level")
-													or  self.localize("Player not ready due to no spec")
-			self.terminal.outputStream:Print(msg, "warning")
+			local msg = self.player:SupportsSpec() 	and self.localize("player not ready due to low level")
+													or  self.localize("player not ready due to no spec")
+			self.terminal.outputStream:Print(msg, "critical")
 		else
-			self.terminal.outputStream:Log(self.localize("Player Unavailable!"), "warning")
+			self.terminal.outputStream:Log(self.localize("player Unavailable!"), "critical")
 		end
 	else
 		self.terminal.outputStream:Log(self.localize(fault), "warning")
@@ -275,26 +275,9 @@ function DOTMonitor:New(databaseID)
 	-- Player Updates
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self.terminal.outputStream:Log("Handling Learned Spell In Tab:")
-		--self.manager:LockMonitors(true)
 		self:SyncToPlayer(nil)
 		self:LoadSpecSetup()
-	end), "SPELLS_CHANGED")-- "LEARNED_SPELL_IN_TAB")
-	--[[
-	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
-		self.terminal.outputStream:Log("Handling Player Leveled Up:")
-		if 	 self.enabled
-		then self:PrintSpells()
-		else self:PrintFault()
-		end
-	end), "PLAYER_LEVEL_UP")
-	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
-		self.terminal.outputStream:Log("Handling Player Talent Group Change:")
-		self.manager:LockMonitors(true) -- Want to lock everything
-		self:SyncToPlayer(nil)
-		self:LoadSpecSetup()
-		self:PrintSpells()				-- Show Spells
-	end), "ACTIVE_TALENT_GROUP_CHANGED")
-	--]]
+	end), "SPELLS_CHANGED")
 
 
 	-- Restoration
@@ -303,7 +286,12 @@ function DOTMonitor:New(databaseID)
 		self:SyncToPlayer(Player:New()) -- Default player is "Player"
 		self:LoadSpecSetup()
 		self:PrintSpells()
-		self.terminal.outputStream:Print(self.enabled and self.localize("ready") or self.localize("Pending"), "epic")
+		if self.enabled then
+			self.terminal.outputStream:Print(self.localize("ready"), "epic")
+		else
+			self:PrintFault()
+			self.terminal.outputStream:Print(self.localize("pending"), "epic")
+		end
 	end), "PLAYER_ENTERING_WORLD")
 
 	dotMonitor.eventListener:AddActionForEvent((function(self, addon)
