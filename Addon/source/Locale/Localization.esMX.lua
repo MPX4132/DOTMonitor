@@ -5,8 +5,8 @@ if GetLocale() == "esMX" then
 	DOTMonitorLocalization["Player not ready due to low level"] = "Jugador no está listo debido a su bajo nivel"
 	DOTMonitorLocalization["Player not ready due to no spec"] = "Jugador no está listo debido a ninguna especialización"
 
-	DOTMonitorLocalization["Adjusted for"] 			= "Ajustado para"
-	DOTMonitorLocalization["Tracking"]				= "Monitoreando"
+	DOTMonitorLocalization["adjusted for"] 			= "ajustado para"
+	DOTMonitorLocalization["Tracking"]				= "Rastreando"
 
 	DOTMonitorLocalization["HUD Reset!"]			= "HUD Restablecido"
 	DOTMonitorLocalization["HUD is disabled!"]		= "¡HUD esta deshabilitado!"
@@ -25,8 +25,8 @@ if GetLocale() == "esMX" then
 	DOTMonitorLocalization["Usage: show (cooldowns | timers)"] = "Uso: muestra (tiempo de reutilización | temporizadores)"
 	DOTMonitorLocalization["Usage: hide (cooldowns | timers)"] = "Uso: oculta (tiempo de reutilización | temporizadores)"
 
-	DOTMonitorLocalization["Ready"] 				= "Listo"
-	DOTMonitorLocalization["Pending"]				= "Pendiente"
+	DOTMonitorLocalization["ready"] 				= "listo"
+	DOTMonitorLocalization["pending"]				= "pendiente"
 
 	-- ================================================================
 	DOTMonitorLocalization["lock"]					= "bloquea"

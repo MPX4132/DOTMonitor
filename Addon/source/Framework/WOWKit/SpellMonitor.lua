@@ -58,6 +58,10 @@ function SpellMonitor:TrackSpell(spell)
 	return spell and tostring(spell) or "Nothing Appropriate"
 end
 
+function SpellMonitor:GetSpell()
+	return self.spell
+end
+
 function SpellMonitor:Draggable(mouseButton)
 	mouseButton = (mouseButton == nil 	and "LeftButton")
 			   or (mouseButton ~= false and mouseButton)
@@ -108,7 +112,7 @@ function SpellMonitor:UpdateIcon(elapsed)
 	local cooldownStart, cooldownDuration, cooldownEnabled 	= self.spell:GetCooldown()
 
 	-- Percentage Indicator
-	if effectCaster == "player" then
+	if effectCaster == "player" and effectExpiration ~= 0 then
 		local duration = (effectExpiration - GetTime())
 		self.icon.digitalMeter:SetFormattedText((duration < 3 and "%1.1f" or "%2d"), duration)
 	else
@@ -209,6 +213,7 @@ local SpellMonitorDefault = {
 	SetAlpha			= SpellMonitor.SetAlpha,
 	SetTarget 			= SpellMonitor.SetTarget,
 	TrackSpell			= SpellMonitor.TrackSpell,
+	GetSpell			= SpellMonitor.GetSpell,
 	Draggable			= SpellMonitor.Draggable,
 	Reset				= SpellMonitor.Reset,
 	DigitalMeter		= SpellMonitor.DigitalMeter,

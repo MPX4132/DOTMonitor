@@ -22,6 +22,20 @@ function SpellMonitorManager:AssureMonitors(aSize)
 	return self
 end
 
+function SpellMonitorManager:AllMonitors()
+	return self.monitor
+end
+
+function SpellMonitorManager:AllSpells()
+	local allSpells = {}
+	for i, aMonitor in ipairs(self.monitor) do
+		if aMonitor:GetSpell() then
+			table.insert(allSpells, aMonitor:GetSpell())
+		end
+	end
+	return allSpells
+end
+
 function SpellMonitorManager:EnableMonitors(enable, count)
 	local monitorsToEnable = count or #self.monitor
 	for i, aMonitor in ipairs(self.monitor) do
@@ -79,6 +93,8 @@ local SpellMonitorManagerDefault = {
 	monitor = {},
 	GetMonitor		= SpellMonitorManager.GetMonitor,
 	AssureMonitors 	= SpellMonitorManager.AssureMonitors,
+	AllMonitors		= SpellMonitorManager.AllMonitors,
+	AllSpells		= SpellMonitorManager.AllSpells,
 	EnableMonitors	= SpellMonitorManager.EnableMonitors,
 	LockMonitors	= SpellMonitorManager.LockMonitors,
 	ShowEffectTimers = SpellMonitorManager.ShowEffectTimers,

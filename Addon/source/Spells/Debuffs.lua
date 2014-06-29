@@ -111,8 +111,12 @@ DOTMonitor_Debuffs = {
 
 	["MAGE"] = {
 		[62] = { 	-- "Arcane"
-			-- "Mage Bomb"		: "Mage Bomb"
-			[125430] = {114923, 113092, 44461}
+			-- "Frost Bomb"		: "Frost Bomb"
+			[112948] = 112948,
+			-- "Living Bomb"	: "Living Bomb"
+			[44457] = 44457,
+			-- "Nether Tempest"	: "Nether Tempest"
+			[114923] = 114923,
 		},
 		[63] = { 	-- "Fire"
 			-- "Pyroblast" 		: "Pyroblast"
@@ -123,14 +127,22 @@ DOTMonitor_Debuffs = {
 			[11129]	= 118271,
 			-- "Dragon's Breath": "Dragon's Breath"
 			[31661] = 29964,
-			-- "Mage Bomb"		: "Mage Bomb"
-			[125430] = {114923, 113092, 44461}
+			-- "Frost Bomb"		: "Frost Bomb"
+			[112948] = 112948,
+			-- "Living Bomb"	: "Living Bomb"
+			[44457] = 44457,
+			-- "Nether Tempest"	: "Nether Tempest"
+			[114923] = 114923,
 		},
 		[64] = { 	-- "Frost"
 			-- "Frozen Orb"		: "Frozen Orb"
 			[84714] = 84714,
-			-- "Mage Bomb"		: "Mage Bomb"
-			[125430] = {114923, 113092, 44461}
+			-- "Frost Bomb"		: "Frost Bomb"
+			[112948] = 112948,
+			-- "Living Bomb"	: "Living Bomb"
+			[44457] = 44457,
+			-- "Nether Tempest"	: "Nether Tempest"
+			[114923] = 114923,
 		}
 	},
 
@@ -231,12 +243,12 @@ DOTMonitor_Debuffs = {
 		[266] = {	-- "Demonology"
 			-- "Corruption" 			: "Corruption"
 			[172] 	= 146739,
-			-- "Curse of the Elements" 	: "Curse of the Elements", "Curse of Enfeeblement"
-			[1490]	= {1490, 109466},
+			-- "Curse of the Elements" 	: "Curse of the Elements", "Curse of Enfeeblement", "Aura of the Elements"
+			[1490]	= {1490, 109466, 116202},
 			-- "Metamorphosis: Doom" 	: "Doom"
 			[124913] = 603,
-			-- "Curse of Enfeeblement" 	: "Curse of Enfeeblement", "Curse of the Elements"
-			[109466] = {109466, 1490},
+			-- "Curse of Enfeeblement" 	: "Curse of Enfeeblement", "Curse of the Elements", "Aura of the Elements"
+			[109466] = {109466, 1490, 116202},
 			-- "Hand of Gul'dan"		: "Shadowflame", "Chaos Wave"
 			[105174] = {47960, 124917},
 		},

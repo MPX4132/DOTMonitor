@@ -29,23 +29,41 @@ function DOTMonitor:SyncToPlayer(player)
 
 	self.enabled = self.player and self.player:HasSpec()
 
-	if not self.enabled then
+	if self.enabled then
+		local _, spellUpdate = self.player:Sync()
+
+		for atIndex, aDebuff in ipairs(self.player:GetDebuff()) do
+			self.manager:GetMonitor(atIndex):TrackSpell(aDebuff)
+		end
+
+		if spellUpdate then
+			self:PrintSpells()
+		end
+	end
+end
+
+function DOTMonitor:PrintSpells()
+	if self.enabled then
+		self.terminal.outputStream:Print(self.localize("adjusted for") .. " " .. tostring(self.player), "epic")
+		for i, aSpell in ipairs(self.player:GetDebuff()) do
+			if aSpell:IsReady() then
+				self.terminal.outputStream:Print(self.localize("Tracking") .. " " .. tostring(aSpell), 100/255, 1, 0)
+			end
+		end
+	end
+end
+
+function DOTMonitor:PrintFault(fault)
+	if not fault then
 		if self.player then
-			local msg = (self.player:Level() < 10 and self.localize("Player not ready due to low level"))
-						   or (not self.player:HasSpec() and self.localize("Player not ready due to no spec"))
+			local msg = self.player:SupportsSpec() 	and self.localize("Player not ready due to low level")
+													or  self.localize("Player not ready due to no spec")
 			self.terminal.outputStream:Print(msg, "warning")
 		else
-			self.terminal.outputStream:Log(self.localize("Player Unavailable!"))
+			self.terminal.outputStream:Log(self.localize("Player Unavailable!"), "warning")
 		end
-		return false
-	end
-
-	self.player:Sync()
-
-	self.terminal.outputStream:Print(self.localize("Adjusted for") .. " " .. tostring(self.player), "info")
-	for atIndex, aDebuff in ipairs(self.player:GetDebuff()) do
-		local aMonitor = self.manager:GetMonitor(atIndex)
-		self.terminal.outputStream:Print(self.localize("Tracking") .. " " .. aMonitor:TrackSpell(aDebuff))
+	else
+		self.terminal.outputStream:Log(self.localize(fault), "warning")
 	end
 end
 
@@ -53,7 +71,11 @@ function DOTMonitor:Update(monitor, effectDuration, effectExpiration, effectCast
 	local iconAlpha	= 1
 
 	if effectCaster == "player" then
-		iconAlpha = 1 - ((effectDuration ~= 0) and ((effectExpiration - GetTime()) / effectDuration) or 0)
+		if effectDuration ~= 0 then
+			iconAlpha = 1 - ((effectExpiration - GetTime()) / effectDuration)
+		else
+			iconAlpha = (effectExpiration > 0) and 1 or 0
+		end
 	end
 
 	monitor.icon:SetBorder("Interface\\AddOns\\DOTMonitor\\Graphics\\" .. (((UnitPower("player") < monitor.spell.cost) and "IconBorderDark")
@@ -115,6 +137,7 @@ end
 
 function DOTMonitor:ResetHUD()
 	if self.enabled then
+		self.manager:LockMonitors(true)	-- Lock them to disable user I/O
 		self.database.layout[self.player:Spec()] = nil
 		self.database.label = {} -- clear it
 		self:LoadSpecSetup()
@@ -130,6 +153,8 @@ local DOTMonitorDefault = {
 	locked 	= true,
 	enabled = false,
 	SyncToPlayer 	= DOTMonitor.SyncToPlayer,
+	PrintSpells		= DOTMonitor.PrintSpells,
+	PrintFault		= DOTMonitor.PrintFault,
 	Update			= DOTMonitor.Update,
 	HUDAutoLayout	= DOTMonitor.HUDAutoLayout,
 	EnableMonitors 	= DOTMonitor.EnableMonitors,
@@ -248,42 +273,28 @@ function DOTMonitor:New(databaseID)
 
 
 	-- Player Updates
+	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
+		self.terminal.outputStream:Log("Handling Learned Spell In Tab:")
+		--self.manager:LockMonitors(true)
+		self:SyncToPlayer(nil)
+		self:LoadSpecSetup()
+	end), "SPELLS_CHANGED")-- "LEARNED_SPELL_IN_TAB")
 	--[[
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self.terminal.outputStream:Log("Handling Player Leveled Up:")
-		if self.player and self.player:Level() >= 10 then
-			self:SyncToPlayer(nil)
-			self:LoadSpecSetup()
-		else -- skip if the player isn't available or player the level is below 10
-			self.terminal.outputStream:Log("Skipped: Player not ready")
+		if 	 self.enabled
+		then self:PrintSpells()
+		else self:PrintFault()
 		end
-	end), "PLAYER_LEVEL_UP") -- New spells are available from this point
-	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
-		self.terminal.outputStream:Log("Handling Player Talent Update:")
-		if self.player and self.player:Level() >= 10 then
-			self:SyncToPlayer(nil)
-			self:LoadSpecSetup()
-		else -- skip if the player isn't available or player the level is below 10
-			self.terminal.outputStream:Log("Skipped: Player not ready")
-		end
-	end), "PLAYER_TALENT_UPDATE") -- Fires on level up, weird...
-	--]]
+	end), "PLAYER_LEVEL_UP")
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
 		self.terminal.outputStream:Log("Handling Player Talent Group Change:")
 		self.manager:LockMonitors(true) -- Want to lock everything
-		--self:SyncToPlayer(nil)
-		--self:LoadSpecSetup()
+		self:SyncToPlayer(nil)
+		self:LoadSpecSetup()
+		self:PrintSpells()				-- Show Spells
 	end), "ACTIVE_TALENT_GROUP_CHANGED")
-
-	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
-		self.terminal.outputStream:Log("Handling Learned Spell In Tab:")
-		if self.player and self.player:Level() >= 10 then
-			self:SyncToPlayer(nil)
-			self:LoadSpecSetup()
-		else -- skip if the player isn't available or player the level is below 10
-			self.terminal.outputStream:Log("Skipped: Player not ready")
-		end
-	end), "LEARNED_SPELL_IN_TAB")
+	--]]
 
 
 	-- Restoration
@@ -291,8 +302,10 @@ function DOTMonitor:New(databaseID)
 		self.terminal.outputStream:Log("Handling Player Entering World:")
 		self:SyncToPlayer(Player:New()) -- Default player is "Player"
 		self:LoadSpecSetup()
-		self.terminal.outputStream:Print(self.enabled and self.localize("Ready") or self.localize("Pending"), "epic")
+		self:PrintSpells()
+		self.terminal.outputStream:Print(self.enabled and self.localize("ready") or self.localize("Pending"), "epic")
 	end), "PLAYER_ENTERING_WORLD")
+
 	dotMonitor.eventListener:AddActionForEvent((function(self, addon)
 		if addon ~= "DOTMonitor" then return end
 		-- Attempt to reload the database, otherwise the backup database passed in is used
