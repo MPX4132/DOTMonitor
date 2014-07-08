@@ -9,4 +9,5 @@
 	<Script file="EventManager.lua"/>
 	<Script file="Localizer.lua"/>
 	<Script file="Table.lua"/>
+	<Script file="TableSet.lua"/>
 </Ui>

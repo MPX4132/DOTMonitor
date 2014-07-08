@@ -3,9 +3,11 @@
 --	Simple spell monitoring class for the World of Warcraft environment.
 -- =======================================================================================
 
+local TableSet 		= _G["MPXFoundation_TableSet"]
 local Icon 			= _G["MPXUIKit_Icon"]
 local Spell			= _G["MPXWOWKit_Spell"]
 local TextureSprite = _G["MPXUIKit_TextureSprite"]
+
 
 local SpellMonitor = {} -- Local Namespace
 
@@ -136,17 +138,14 @@ function SpellMonitor:UpdateIcon(elapsed)
 end
 
 function SpellMonitor:AddDelegateForUpdate(delegate)
-	if (delegate == nil) or (type(delegate.Update) ~= "function") then return false end
-	table.insert(self.callback, delegate)
+	if (delegate == nil) or (type(delegate.Update) ~= "function") then
+		return false
+	end
+	self.callback:AddObject(delegate)
 end
 
 function SpellMonitor:RemoveDelegateForUpdate(delegate)
-	for i, aDelegate in ipairs(self.callback) do
-		if aDelegate == delegate then
-			table.remove(self.callback, i)
-			break
-		end
-	end
+	self.callback:RemoveObject(delegate)
 end
 
 function SpellMonitor:ClearDelegatesForUpdate()
@@ -234,7 +233,7 @@ function SpellMonitor:New(ID, spell)
 	spellMonitor.ID = ID
 	spellMonitor.icon = self:IconMake(ID, spellMonitor)
 
-	spellMonitor.callback = {} -- Callback Queue
+	spellMonitor.callback = TableSet:New() -- Callback Set Queue
 
 	spellMonitor.icon:OnUpdate((function(self, elapsed)
 		if not self.updating then return end
