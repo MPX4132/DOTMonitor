@@ -250,7 +250,7 @@ DOTMonitor_Debuffs = {
 			-- "Curse of Enfeeblement" 	: "Curse of Enfeeblement", "Curse of the Elements", "Aura of the Elements"
 			[109466] = {109466, 1490, 116202},
 			-- "Hand of Gul'dan"		: "Shadowflame", "Chaos Wave"
-			[105174] = {47960, 124917},
+			[105174] = {47960, 124915},
 		},
 		[267] = { 	-- "Destruction"
 			-- "Immolate" 				: "Immolate"
