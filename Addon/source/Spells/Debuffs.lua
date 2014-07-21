@@ -1,163 +1,161 @@
+local Spell	= _G["MPXWOWKit_Spell"]
+
 -- The following spec/debuff combos will be monitored by DOTMonitor
 DOTMonitor_Debuffs = {
 	["DEATHKNIGHT"] = {
 		[250] = { 	-- "Blood"
 			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
-			[77575] = {55078, 55095},
+			Spell:New(77575, {55078, 55095}, "DOT"),
 			-- "Icy Touch" 		: "Frost Fever"
-			[45477]	= 55095,
+			Spell:New(45477, 55095, "DOT"),
 			-- "Plague Strike"	: "Blood Plague"
-			[45462]	= 55078,
-			-- "Scarlet Fever"	: "Weakened Blows"
-			-- [81132] = 115798,
+			Spell:New(45462, 55078, "DOT"),
 		},
 		[251] = { 	-- "Frost"
 			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
-			[77575] = {55078, 55095},
+			Spell:New(77575, {55078, 55095}, "DOT"),
 			-- "Icy Touch" 		: "Frost Fever"
-			[45477]	= 55095,
+			Spell:New(45477, 55095, "DOT"),
 			-- "Plague Strike"	: "Blood Plague"
-			[45462]	= 55078,
+			Spell:New(45462, 55078, "DOT"),
 		},
 		[252] = { 	-- "Unholy"
 			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
-			[77575] = {55078, 55095},
+			Spell:New(77575, {55078, 55095}, "DOT"),
 			-- "Icy Touch" 		: "Frost Fever"
-			[45477]	= 55095,
+			Spell:New(45477, 55095, "DOT"),
 			-- "Plague Strike"	: "Blood Plague"
-			[45462]	= 55078,
+			Spell:New(45462, 55078, "DOT"),
 		}
 	},
 
 	["DRUID"] = {
 		[102] = {	-- "Balance"
 			-- "Moonfire"		: "Moonfire"
-			[8921] 	= 8921,
+			Spell:New(8921,		8921,	"DOT"),
 			-- "Sunfire"		: "Sunfire"
-			[93402]	= 93402,
+			Spell:New(93402,	93402,	"DOT"),
 			-- "Lacerate"		: "Lacerate"
-			[33745]	= 33745,
+			Spell:New(33745,	33745,	"DOT", 	{5}),
 			-- "Pounce"			: "Pounce"
-			[9005]	= 9005,
+			Spell:New(9005,		9005,	"DOT", 	{1}),
 			-- "Rake"			: "Rake"
-			[1822]	= 1822,
+			Spell:New(1822,		1822,	"DOT", 	{1}),
 		},
 		[103] = { 	-- "Feral"
 			-- "Moonfire"		: "Moonfire"
-			[8921] 	= 8921,
+			Spell:New(8921,		8921,	"DOT"),
 			-- "Thrash"			: "Thrash"
-			[77758]	= 77758,
+			Spell:New(77758,	77758,	"DOT", 	{1}),
 			-- "Lacerate"		: "Lacerate"
-			[33745]	= 33745,
+			Spell:New(33745,	33745,	"DOT", 	{5}),
 			-- "Pounce"			: "Pounce"
-			[9005]	= 9005,
+			Spell:New(9005,		9005,	"DOT", 	{1}),
 			-- "Rake"			: "Rake"
-			[1822]	= 1822,
+			Spell:New(1822,		1822,	"DOT", 	{1}),
 		},
 		[104] = { 	-- "Guardian"
 			-- "Moonfire"		: "Moonfire"
-			[8921] 	= 8921,
+			Spell:New(8921,		8921,	"DOT"),
 			-- "Thrash"			: "Thrash"
-			[77758]	= 77758,
+			Spell:New(77758,	77758,	"DOT",  {1}),
 			-- "Lacerate"		: "Lacerate"
-			[33745]	= 33745,
+			Spell:New(33745,	33745,	"DOT", 	{5}),
 			-- "Pounce"			: "Pounce"
-			[9005]	= 9005,
+			Spell:New(9005,		9005,	"DOT", 	{1}),
 			-- "Rake"			: "Rake"
-			[1822]	= 1822,
+			Spell:New(1822,		1822,	"DOT", 	{1}),
 		},
 		[105] = { 	-- "Restoration"
 			-- "Moonfire"		: "Moonfire"
-			[8921] 	= 8921,
+			Spell:New(8921,		8921,	"DOT"),
 			-- "Lacerate"		: "Lacerate"
-			[33745]	= 33745,
+			Spell:New(33745,	33745,	"DOT", 	{5}),
 			-- "Pounce"			: "Pounce"
-			[9005]	= 9005,
+			Spell:New(9005,		9005,	"DOT", 	{1}),
 			-- "Rake"			: "Rake"
-			[1822]	= 1822,
+			Spell:New(1822,		1822,	"DOT", 	{1}),
 		}
 	},
 
 	["HUNTER"] = {
 		[253] = { 	-- "Beast_Mastery"
 			-- "Serpent Sting"	: "Serpent Sting"
-			[1978]	= 1978,
-			-- "Widow Venom"	: "Widow Venom"
-			[82654] = 82654,
-			-- "Hunter's Mark" 	: "Hunter's Mark"
-			--[1130] = 1130,
+			Spell:New(1978,		1978,	"DOT"),
 			-- "Glaive Toss" 	: "Glaive Toss"
-			[117050] = 117050,
+			Spell:New(117050,	117050,	"DOT"),
+			-- "Widow Venom"	: "Widow Venom"
+			Spell:New(82654,	82654,	"DOT"),
 		},
 		[254] = {	-- "Marksmanship"
 			-- "Serpent Sting"	: "Serpent Sting"
-			[1978]	= 1978,
-			-- "Widow Venom"	: "Widow Venom"
-			[82654] = 82654,
+			Spell:New(1978,		1978,	"DOT"),
 			-- "Glaive Toss" 	: "Glaive Toss"
-			[117050] = 117050,
+			Spell:New(117050,	117050,	"DOT"),
+			-- "Widow Venom"	: "Widow Venom"
+			Spell:New(82654,	82654,	"DOT"),
 		},
 		[255] = { 	-- "Survival"
 			-- "Serpent Sting"	: "Serpent Sting"
-			[1978]	= 1978,
+			Spell:New(1978,		1978,	"DOT"),
 			-- "Widow Venom"	: "Widow Venom"
-			[82654] = 82654,
-			-- "Black Arrow"	: "Black Arrow"
-			[3674]	= 3674,
+			Spell:New(82654,	82654,	"DOT"),
 			-- "Glaive Toss" 	: "Glaive Toss"
-			[117050] = 117050,
+			Spell:New(117050,	117050,	"DOT"),
+			-- "Black Arrow"	: "Black Arrow"
+			Spell:New(3674,		3674,	"DOT"),
 		}
 	},
 
 	["MAGE"] = {
 		[62] = { 	-- "Arcane"
 			-- "Frost Bomb"		: "Frost Bomb"
-			[112948] = 112948,
+			Spell:New(112948,	112948,	"DOT"),
 			-- "Living Bomb"	: "Living Bomb"
-			[44457] = 44457,
+			Spell:New(44457,	44457,	"DOT"),
 			-- "Nether Tempest"	: "Nether Tempest"
-			[114923] = 114923,
+			Spell:New(114923,	114923,	"DOT"),
 		},
 		[63] = { 	-- "Fire"
 			-- "Pyroblast" 		: "Pyroblast"
-			[11366] = 11366,
+			Spell:New(11366,	11366,	"DOT"),
 			-- "Mastery: Ignite": "Ignite"
-			[12846] = 12654,
+			Spell:New(12846,	12654,	"DOT"),
 			-- "Combustion"		: "Combustion Impact"
-			[11129]	= 118271,
+			Spell:New(11129,	118271,	"DOT"),
 			-- "Dragon's Breath": "Dragon's Breath"
-			[31661] = 29964,
+			Spell:New(31661,	29964,	"DOT"),
 			-- "Frost Bomb"		: "Frost Bomb"
-			[112948] = 112948,
+			Spell:New(112948,	112948,	"DOT"),
 			-- "Living Bomb"	: "Living Bomb"
-			[44457] = 44457,
+			Spell:New(44457,	44457,	"DOT"),
 			-- "Nether Tempest"	: "Nether Tempest"
-			[114923] = 114923,
+			Spell:New(114923,	114923,	"DOT"),
 		},
 		[64] = { 	-- "Frost"
 			-- "Frozen Orb"		: "Frozen Orb"
-			[84714] = 84714,
+			Spell:New(84714,	84714,	"DOT"),
 			-- "Frost Bomb"		: "Frost Bomb"
-			[112948] = 112948,
+			Spell:New(112948,	112948,	"DOT"),
 			-- "Living Bomb"	: "Living Bomb"
-			[44457] = 44457,
+			Spell:New(44457,	44457,	"DOT"),
 			-- "Nether Tempest"	: "Nether Tempest"
-			[114923] = 114923,
+			Spell:New(114923,	114923,	"DOT"),
 		}
 	},
 
 	["MONK"] = {
 		[268] = { 	-- "Brewmaster"
 			-- "Keg Smash"		: "Weakened Blows", "Dizzying Haze"
-			[121253] = {115798, 123727},
+			Spell:New(121253,	{115798, 123727},	"DOT"),
 			-- "Dizzying Haze"	: "Dizzying Haze"
-			[123727] = 123727,
+			Spell:New(123727,	123727,	"DOT"),
 			-- "Breath of Fire"	: "Breath of Fire"
-			[115181] 	= 115181,
+			Spell:New(115181,	115181,	"DOT"),
 		},
 		[269] = { 	-- "Windwalker"
 			-- "Rising Sun Kick": "Mortal Wounds"
-			[107428] = 115804,
+			Spell:New(107428,	115804,	"DOT"),
 		},
 		[270] = { 	-- "Mistweaver"
 		},
@@ -167,13 +165,13 @@ DOTMonitor_Debuffs = {
 		[65] = {}, 	-- "Holy"
 		[66] = {	-- "Protection"
 			-- "Hammer of the Righteous"	: "Weakened Blows"
-			[53595] = 115798,
+			Spell:New(53595, 	115798,	"DOT"),
 		},
 		[70] = { 	-- "Retribution"
 			-- "Hammer of the Righteous"	: "Weakened Blows"
-			[53595]	= 115798,
+			Spell:New(53595, 	115798,	"DOT"),
 			-- "Judgments of the Bold" 		: "Physical Vulnerability"
-			[111529] = 81326,
+			Spell:New(111529, 	81326, 	"DOT"),
 		}
 	},
 
@@ -182,43 +180,43 @@ DOTMonitor_Debuffs = {
 		[257] = {}, -- "Holy"
 		[258] = { 	-- "Shadow"
 			-- "Shadow Word: Pain" 	: "Shadow Word: Pain"
-			[589] = 589,
+			Spell:New(589, 		589, 	"DOT"),
 			-- "Vampiric Touch"		: "Vampiric Touch"
-			[34914] = 34914,
+			Spell:New(34914, 	34914,	"DOT"),
 		}
 	},
 
 	["ROGUE"] = {
 		[259] = { 	-- "Assassination"
 			-- "Expose Armor"		: "Weakened Armor"
-			[8647] 	= 113746,
+			Spell:New(8647, 	113746, "DOT"),
 		},
 		[260] = { 	-- "Combat"
 			-- "Revealing Strike" 	: "Revealing Strike"
-			[84617] = 84617,
+			Spell:New(84617, 	84617,	"DOT"),
 			-- "Expose Armor"		: "Weakened Armor"
-			[8647] 	= 113746,
+			Spell:New(8647, 	113746, "DOT"),
 		},
 		[261] = { 	-- "Subtlety"
 			-- "Hemorrhage"			: "Hemorrhage"
-			[16511]	= 16511,
+			Spell:New(16511, 	16511,	"DOT"),
 			-- "Expose Armor"		: "Weakened Armor"
-			[8647] 	= 113746,
+			Spell:New(8647, 	113746, "DOT"),
 		}
 	},
 
 	["SHAMAN"] = {
 		[262] = { 	-- "Elemental"
 			-- "Flame Shock"		: "Flame Shock"
-			[8050] 	= 8050,
+			Spell:New(8050, 	8050, 	"DOT"),
 			-- "Earth Shock"		: "Weakened Blows"
-			[8042]	= 115798,
+			Spell:New(8042, 	115798, "DOT"),
 		},
 		[263] = {	-- "Enhancement"
 			-- "Flame Shock"		: "Flame Shock"
-			[8050] 	= 8050,
+			Spell:New(8050, 	8050, 	"DOT"),
 			-- "Earth Shock"		: "Weakened Blows"
-			[8042]	= 115798,
+			Spell:New(8042, 	115798, "DOT"),
 		},
 		[264] = {} 	-- "Restoration"
 	},
@@ -226,68 +224,68 @@ DOTMonitor_Debuffs = {
 	["WARLOCK"] = {
 		[265] = { 	-- "Affliction"
 			-- "Agony" 					: "Agony"
-			[980] 	= 980,
+			Spell:New(980, 		980, 	"DOT"),
 			-- "Corruption" 			: "Corruption"
-			[172] 	= 146739,
+			Spell:New(172, 		146739, "DOT"),
 			-- "Haunt"					: "Haunt"
-			[48181] = 48181,
+			Spell:New(48181, 	48181, 	"DOT"),
 			-- "Unstable Affliction" 	: "Unstable Affliction"
-			[131736] = 131736,
+			Spell:New(131736, 	131736, "DOT"),
 			-- "Seed of Corruption"		: "Seed of Corruption"
-			[44141]	= 44141,
+			Spell:New(44141, 	44141, 	"DOT"),
 			-- "Curse of the Elements" 	: "Curse of the Elements", "Curse of Enfeeblement"
-			[1490]	= {1490, 109466},
+			Spell:New(1490, 	{1490, 109466}, "DOT"),
 			-- "Curse of Enfeeblement" 	: "Curse of Enfeeblement", "Curse of the Elements"
-			[109466] = {109466, 1490},
+			Spell:New(109466, 	{109466, 1490}, "DOT"),
 		},
 		[266] = {	-- "Demonology"
 			-- "Corruption" 			: "Corruption"
-			[172] 	= 146739,
+			Spell:New({172}, 	146739, "DOT"),
 			-- "Curse of the Elements" 	: "Curse of the Elements", "Curse of Enfeeblement", "Aura of the Elements"
-			[1490]	= {1490, 109466, 116202},
+			Spell:New(1490, 	{1490, 109466, 116202}, "DOT"),
 			-- "Metamorphosis: Doom" 	: "Doom"
-			[124913] = 603,
+			Spell:New(124913, 	603, 	"DOT"),
 			-- "Curse of Enfeeblement" 	: "Curse of Enfeeblement", "Curse of the Elements", "Aura of the Elements"
-			[109466] = {109466, 1490, 116202},
+			Spell:New(109466, 	{109466, 1490, 116202}, "DOT"),
 			-- "Hand of Gul'dan"		: "Shadowflame", "Chaos Wave"
-			[105174] = {47960, 124915},
+			Spell:New(105174, 	{47960, 124915}, 		"DOT"),
 		},
 		[267] = { 	-- "Destruction"
 			-- "Immolate" 				: "Immolate"
-			[348] = 348,
+			Spell:New(348, 		348, 	"DOT"),
 			-- "Curse of the Elements"	: "Curse of the Elements"
-			[1490]	= 1490,
+			Spell:New(1490, 	1490, 	"DOT"),
 		}
 	},
 
 	["WARRIOR"] = {
 		[71] = { 	-- "Arms"
 			-- "Mortal Strike"		: "Mortal Wounds"
-			[12294] = 115804,
+			Spell:New(12294, 	115804, "DOT"),
 			-- "Thunder Clap"		: "Weakened Blows"
-			[6343]	= 115798,
+			Spell:New(6343, 	115798, "DOT"),
 			-- "Colossus Smash"		: "Colossus Smash"
-			[86346] = 86346,
+			Spell:New(86346, 	86346, 	"DOT"),
 			-- "Shattering Throw"	: "Shattering Throw"
-			[64382]	= 64382,
+			Spell:New(64382, 	64382, 	"DOT"),
 		},
 		[72] = { 	-- "Fury"
 			-- "Bloodthirst"		: "Deep Wounds"
-			[23881] = 115768,
+			Spell:New(23881, 	115768, "DOT"),
 			-- "Wild Strike"		: "Mortal Wounds"
-			[100130] = 115804,
+			Spell:New(100130, 	115804, "DOT"),
 			-- "Colossus Smash"		: "Colossus Smash"
-			[86346] = 86346,
+			Spell:New(86346, 	86346, 	"DOT"),
 			-- "Shattering Throw"	: "Shattering Throw"
-			[64382]	= 64382,
+			Spell:New(64382, 	64382, 	"DOT"),
 		},
 		[73] = {	-- "Protection"
 			-- "Devastate"			: "Weakened Armor"
-			[20243] = 113746,
+			Spell:New(20243, 	113746, "DOT"),
 			-- "Thunder Clap"		: "Weakened Blows"
-			[6343]	= 115798,
+			Spell:New(6343, 	115798, "DOT"),
 			-- "Shattering Throw"	: "Shattering Throw"
-			[64382]	= 64382,
+			Spell:New(64382, 	64382, 	"DOT"),
 		}
 	}
 }

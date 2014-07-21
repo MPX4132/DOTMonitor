@@ -46,7 +46,7 @@ function DOTMonitor:PrintSpells()
 	if self.enabled then
 		self.terminal.outputStream:Print(self.localize("adjusted for") .. " " .. tostring(self.player), "epic")
 		for i, aSpell in ipairs(self.player:GetDebuff()) do
-			if aSpell:IsReady() then
+			if aSpell:IsAvailable() then
 				self.terminal.outputStream:Print(self.localize("Tracking") .. " " .. tostring(aSpell), 100/255, 1, 0)
 			end
 		end
@@ -274,7 +274,7 @@ function DOTMonitor:New(databaseID)
 
 	-- Player Updates
 	dotMonitor.eventListener:AddActionForEvent((function(self, ...)
-		self.terminal.outputStream:Log("Handling Learned Spell In Tab:")
+		self.terminal.outputStream:Log("Handling Spell Change:")
 		self:SyncToPlayer(nil)
 		self:LoadSpecSetup()
 	end), "SPELLS_CHANGED")

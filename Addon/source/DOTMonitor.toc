@@ -7,10 +7,10 @@
 
 Locale\Localization.xml
 
-Spells\Debuffs.lua
-
 Framework\Foundation\Foundation.xml
 Framework\UIKit\UIKit.xml
 Framework\WOWKit\WOWKit.xml
+
+Spells\Debuffs.lua
 
 DOTMonitor.lua

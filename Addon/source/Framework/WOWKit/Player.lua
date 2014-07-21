@@ -48,14 +48,11 @@ function Player:UpdateDebuffs()
 	local classDebuffs 	= _G["DOTMonitor_Debuffs"] and _G["DOTMonitor_Debuffs"][self:RealClass()] or {}
 	local specDebuffs	= Table:New(self:HasSpec() and classDebuffs[self:SpecID()] or {})
 
-	local debuffSpell	= specDebuffs:Keys()
-	local debuffEffect	= specDebuffs:Values(debuffSpell)
-
 	self.debuff = {} -- Clear it
-	for i = 1, specDebuffs:Count() do
-		local spell = Spell:New(debuffSpell[i], debuffEffect[i])
-		if spell:IsReady() then
-			table.insert(self.debuff, spell)
+	for i, aDebuff in ipairs(specDebuffs) do
+		aDebuff:Update()
+		if aDebuff:IsAvailable() then
+			table.insert(self.debuff, aDebuff)
 		end
 	end
 
