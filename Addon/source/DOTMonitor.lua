@@ -306,7 +306,7 @@ function DOTMonitor:New(databaseID)
 			end
 		end
 
-		self.terminal:Output("Only spells being monitored/tracked may be ignored:")
+		self.terminal:Output(self.localize("Only the following may be ignored"))
 		self:PrintSpells(false, true)
 		return self.localize("Attempted to Ignore: ") .. (arguments or "[N/A]")
 	end
@@ -325,7 +325,7 @@ function DOTMonitor:New(databaseID)
 			end
 		end
 
-		self.terminal:Output("Only the following may be monitored")
+		self.terminal:Output(self.localize("Only the following may be monitored"))
 
 		for i, debuffID in pairs(self.database.spells.ignored) do
 			self.terminal:Output("> "..tostring(Spell:New(debuffID)), 100/255, 1, 0)

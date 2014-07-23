@@ -245,12 +245,12 @@ DOTMonitor_Debuffs = {
 			Spell:New({172}, 	146739, "DOT"),
 			-- "Curse of the Elements" 	: "Curse of the Elements", "Curse of Enfeeblement", "Aura of the Elements"
 			Spell:New(1490, 	{1490, 109466, 116202}, "DOT"),
+			-- "Metamorphosis: Doom" 	: "Doom"
+			Spell:New(124913, 	603, 	"DOT"),
 			-- "Curse of Enfeeblement" 	: "Curse of Enfeeblement", "Curse of the Elements", "Aura of the Elements"
 			Spell:New(109466, 	{109466, 1490, 116202}, "DOT"),
 			-- "Hand of Gul'dan"		: "Shadowflame", "Chaos Wave"
 			Spell:New(105174, 	{47960, 124915}, 		"DOT"),
-			-- "Metamorphosis: Doom" 	: "Doom"
-			Spell:New(124913, 	603, 	"DOT"),
 		},
 		[267] = { 	-- "Destruction"
 			-- "Immolate" 				: "Immolate"
