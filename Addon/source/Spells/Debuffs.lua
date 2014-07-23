@@ -1,6 +1,8 @@
 local Spell	= _G["MPXWOWKit_Spell"]
 
 -- The following spec/debuff combos will be monitored by DOTMonitor
+-- Remember to place the form/stance specific spells at the end of the list to prevent
+-- dynamic icons from replacing the other static icons' position when updated.
 DOTMonitor_Debuffs = {
 	["DEATHKNIGHT"] = {
 		[250] = { 	-- "Blood"
@@ -36,45 +38,45 @@ DOTMonitor_Debuffs = {
 			-- "Sunfire"		: "Sunfire"
 			Spell:New(93402,	93402,	"DOT"),
 			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{5}),
+			Spell:New(33745,	33745,	"DOT", 	{1}),	-- Only on bear form
 			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{1}),
+			Spell:New(9005,		9005,	"DOT", 	{3}),	-- Only on cat form
 			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{1}),
+			Spell:New(1822,		1822,	"DOT", 	{3}),	-- Only on cat form
 		},
 		[103] = { 	-- "Feral"
 			-- "Moonfire"		: "Moonfire"
 			Spell:New(8921,		8921,	"DOT"),
 			-- "Thrash"			: "Thrash"
-			Spell:New(77758,	77758,	"DOT", 	{1}),
+			Spell:New(77758,	77758,	"DOT", 	{3}),	-- Only on cat form
 			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{5}),
+			Spell:New(33745,	33745,	"DOT", 	{1}),	-- Only on bear form
 			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{1}),
+			Spell:New(9005,		9005,	"DOT", 	{3}),	-- Only on cat form
 			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{1}),
+			Spell:New(1822,		1822,	"DOT", 	{3}),	-- Only on cat form
 		},
 		[104] = { 	-- "Guardian"
 			-- "Moonfire"		: "Moonfire"
 			Spell:New(8921,		8921,	"DOT"),
 			-- "Thrash"			: "Thrash"
-			Spell:New(77758,	77758,	"DOT",  {1}),
+			Spell:New(77758,	77758,	"DOT",  {3}),	-- Only on cat form
 			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{5}),
+			Spell:New(33745,	33745,	"DOT", 	{1}),	-- Only on bear form
 			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{1}),
+			Spell:New(9005,		9005,	"DOT", 	{3}),	-- Only on cat form
 			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{1}),
+			Spell:New(1822,		1822,	"DOT", 	{3}),	-- Only on cat form
 		},
 		[105] = { 	-- "Restoration"
 			-- "Moonfire"		: "Moonfire"
 			Spell:New(8921,		8921,	"DOT"),
 			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{5}),
+			Spell:New(33745,	33745,	"DOT", 	{1}),	-- Only on bear form
 			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{1}),
+			Spell:New(9005,		9005,	"DOT", 	{3}),	-- Only on cat form
 			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{1}),
+			Spell:New(1822,		1822,	"DOT", 	{3}),	-- Only on cat form
 		}
 	},
 
@@ -243,12 +245,12 @@ DOTMonitor_Debuffs = {
 			Spell:New({172}, 	146739, "DOT"),
 			-- "Curse of the Elements" 	: "Curse of the Elements", "Curse of Enfeeblement", "Aura of the Elements"
 			Spell:New(1490, 	{1490, 109466, 116202}, "DOT"),
-			-- "Metamorphosis: Doom" 	: "Doom"
-			Spell:New(124913, 	603, 	"DOT"),
 			-- "Curse of Enfeeblement" 	: "Curse of Enfeeblement", "Curse of the Elements", "Aura of the Elements"
 			Spell:New(109466, 	{109466, 1490, 116202}, "DOT"),
 			-- "Hand of Gul'dan"		: "Shadowflame", "Chaos Wave"
 			Spell:New(105174, 	{47960, 124915}, 		"DOT"),
+			-- "Metamorphosis: Doom" 	: "Doom"
+			Spell:New(124913, 	603, 	"DOT"),
 		},
 		[267] = { 	-- "Destruction"
 			-- "Immolate" 				: "Immolate"

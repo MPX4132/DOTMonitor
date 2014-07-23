@@ -17,7 +17,7 @@ function Spell:Set(ID, effect)
 
 	if type(ID) == "string" then
 		local link = self:Link(ID)
-		ID = link and link:match("spell:(%d+)") or false
+		ID = tonumber(link and link:match("spell:(%d+)")) or false
 		if not ID then return end
 	end
 
@@ -48,11 +48,11 @@ function Spell:HasDynamicTexture()
 end
 
 function Spell:HasRequiredForm()
-	if not self.requiredForm and
+	if not self.requiredForm then
 		return true -- Assume it's supported
 	end
 
-	self.requiredForm:Contains(GetShapeshiftFormID() or 0)
+	return self.requiredForm:ContainsObject(GetShapeshiftForm())
 end
 
 function Spell:IsAvailable()

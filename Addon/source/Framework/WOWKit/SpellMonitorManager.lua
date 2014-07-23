@@ -7,6 +7,14 @@ local SpellMonitor = _G["MPXWOWKit_SpellMonitor"]
 
 local SpellMonitorManager = {} -- Local Namespace
 
+function SpellMonitorManager:TrackSpells(spells)
+	if type(spells) ~= "table" then return false end
+
+	for atIndex, aSpell in ipairs(spells) do
+		self:GetMonitor(atIndex):TrackSpell(aSpell)
+	end
+end
+
 function SpellMonitorManager:GetMonitor(anIndex)
 	self:AssureMonitors(anIndex)
 	return self.monitor[anIndex]
@@ -91,6 +99,7 @@ end
 local SpellMonitorManagerDefault = {
 	ID = "MPXWOWKit_SpellMonitorManager",
 	monitor = {},
+	TrackSpells		= SpellMonitorManager.TrackSpells,
 	GetMonitor		= SpellMonitorManager.GetMonitor,
 	AssureMonitors 	= SpellMonitorManager.AssureMonitors,
 	AllMonitors		= SpellMonitorManager.AllMonitors,

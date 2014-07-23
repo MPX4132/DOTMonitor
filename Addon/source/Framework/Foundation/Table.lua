@@ -1,9 +1,27 @@
 -- =======================================================================================
--- Table V0.1
+-- Table V0.2
 -- Simple table "super-class" for WOW
 -- =======================================================================================
 
-local Table = {} -- Pun intended
+local Object	= MPXFoundation_Object
+local Table 	= Object:Subclass()
+
+function Table:Array()
+	local newArray = {}
+	for k, v in pairs(self) do
+		table.insert(newArray, v)
+	end
+	return newArray
+end
+
+
+function Table:Copy()
+	local newTable = Table:New()
+	for k, v in pairs(self) do
+		newTable[k] = v
+	end
+	return newTable
+end
 
 function Table:Count()
 	local counter = 0
@@ -42,15 +60,18 @@ function Table:Equals(tbl)
 	return true
 end
 
-local TableDefault = {
-	Count 	= Table.Count,
-	Keys 	= Table.Keys,
-	Values 	= Table.Values
-}
+function Table:ContainsObject(value)
+	for k, v in pairs(self) do	-- Simple sequential search, expect small lists
+		if value == v then
+			return k
+		end
+	end
+	return nil
+end
 
 function Table:New(t)
 	local newTable = t or {}
-	setmetatable(newTable, {__index = TableDefault, __eq = self.Equals})
+	setmetatable(newTable, {__index = Table, __eq = Table.Equals})
 
 	return newTable
 end

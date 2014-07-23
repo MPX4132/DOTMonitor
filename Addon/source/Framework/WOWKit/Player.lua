@@ -3,8 +3,9 @@
 -- Simple player abstraction for WOW
 -- =======================================================================================
 
-local Table = _G["MPXFoundation_Table"]
-local Spell	= _G["MPXWOWKit_Spell"]
+--local Table 	= _G["MPXFoundation_Table"]
+local TableSet 	= _G["MPXFoundation_TableSet"]
+local Spell		= _G["MPXWOWKit_Spell"]
 
 local Player = {} -- Local Namespace
 
@@ -43,20 +44,20 @@ function Player:Spec()
 end
 
 function Player:UpdateDebuffs()
-	local pastDebuffs 	= Table:New(self.debuff or {})	-- To detect changes
+	local pastDebuffs 	= self.debuff or TableSet:New()		-- To detect changes
 
 	local classDebuffs 	= _G["DOTMonitor_Debuffs"] and _G["DOTMonitor_Debuffs"][self:RealClass()] or {}
-	local specDebuffs	= Table:New(self:HasSpec() and classDebuffs[self:SpecID()] or {})
+	local specDebuffs	= TableSet:New(self:HasSpec() and classDebuffs[self:SpecID()] or {})
 
-	self.debuff = {} -- Clear it
+	self.debuff = TableSet:New() -- Clear it
 	for i, aDebuff in ipairs(specDebuffs) do
 		aDebuff:Update()
 		if aDebuff:IsAvailable() then
-			table.insert(self.debuff, aDebuff)
+			self.debuff:AddObject(aDebuff)
 		end
 	end
 
-	return pastDebuffs ~= Table:New(self.debuff)	-- True if there was a debuff update
+	return pastDebuffs ~= self.debuff	-- True if there was a change
 end
 
 function Player:GetDebuff(index)
