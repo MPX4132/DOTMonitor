@@ -328,7 +328,7 @@ function DOTMonitor:New(databaseID)
 		self.terminal:Output(self.localize("Only the following may be monitored"))
 
 		for i, debuffID in pairs(self.database.spells.ignored) do
-			self.terminal:Output("> "..tostring(Spell:New(debuffID)), 100/255, 1, 0)
+			self.terminal:Output(string.format("> %s (ID:%d)", tostring(Spell:New(debuffID)), debuffID), 100/255, 1, 0)
 		end
 
 		return self.localize("Attempted to Monitor: ") .. (arguments or "[N/A]")
