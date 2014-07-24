@@ -267,20 +267,22 @@ DOTMonitor_Debuffs = {
 
 	["WARLOCK"] = {
 		[265] = { 	-- "Affliction"
-			-- "Agony" 					: "Agony"
-			Spell:New(980, 		980, 	"DOT"),
+			-- "Curse of Enfeeblement" 	: "Curse of Enfeeblement", "Curse of the Elements", "Curse of Exhaustion"
+			Spell:New(109466, 	{109466, 1490, 18223}, "DOT"),
 			-- "Corruption" 			: "Corruption"
 			Spell:New(172, 		146739, "DOT"),
 			-- "Haunt"					: "Haunt"
 			Spell:New(48181, 	48181, 	"DOT"),
+			-- "Seed of Corruption"		: "Seed of Corruption"
+			-- Spell:New(44141, 	44141, 	"DOT"), -- If you need this spell, remove the first "--"
+			-- "Curse of the Elements" 	: "Curse of the Elements", "Curse of Enfeeblement", "Curse of Exhaustion"
+			Spell:New(1490, 	{1490, 109466, 18223}, "DOT"),
+			-- "Agony" 					: "Agony"
+			Spell:New(980, 		980, 	"DOT"),
 			-- "Unstable Affliction" 	: "Unstable Affliction"
 			Spell:New(131736, 	131736, "DOT"),
-			-- "Seed of Corruption"		: "Seed of Corruption"
-			Spell:New(44141, 	44141, 	"DOT"),
-			-- "Curse of the Elements" 	: "Curse of the Elements", "Curse of Enfeeblement"
-			Spell:New(1490, 	{1490, 109466}, "DOT"),
-			-- "Curse of Enfeeblement" 	: "Curse of Enfeeblement", "Curse of the Elements"
-			Spell:New(109466, 	{109466, 1490}, "DOT"),
+			-- "Curse of Exhaustion" 	: "Curse of Exhaustion", "Curse of Enfeeblement", "Curse of the Elements"
+			Spell:New(18223, 	{18223, 109466, 1490}, "DOT"),
 		},
 		[266] = {	-- "Demonology"
 			-- "Corruption" 			: "Corruption"
