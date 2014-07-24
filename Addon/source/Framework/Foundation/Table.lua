@@ -16,7 +16,7 @@ end
 
 
 function Table:Copy()
-	local newTable = Table:New()
+	local newTable = self:New()
 	for k, v in pairs(self) do
 		newTable[k] = v
 	end

@@ -49,7 +49,7 @@ end
 
 function DOTMonitor:PlayerDebuffs()
 	if self.enabled then
-		local availableDebuffs 	= TableSet:New(self.player:GetDebuff():Copy())
+		local availableDebuffs 	= self.player:GetDebuff():Copy()
 		local ignoredDebuffs 	= self:IgnoredDebuffs()
 		return availableDebuffs - ignoredDebuffs
 	else
