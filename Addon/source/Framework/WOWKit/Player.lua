@@ -47,7 +47,7 @@ function Player:UpdateDebuffs()
 	local pastDebuffs 	= self.debuff or TableSet:New()		-- To detect changes
 
 	local classDebuffs 	= _G["DOTMonitor_Debuffs"] and _G["DOTMonitor_Debuffs"][self:RealClass()] or {}
-	local specDebuffs	= TableSet:New(self:HasSpec() and classDebuffs[self:SpecID()] or {})
+	local specDebuffs	= TableSet:New(classDebuffs[self:HasSpec() and self:SpecID() or "NO_SPEC"])
 
 	self.debuff = TableSet:New() -- Clear it
 	for i, aDebuff in ipairs(specDebuffs) do
@@ -122,7 +122,8 @@ local PlayerDefault = {
 }
 
 local playerAbout = function(player)
-	return string.format("%s %s", player:Spec(), player:Class())
+	local playerSpec = player:Spec()
+	return playerSpec and string.format("%s %s", playerSpec, player:Class()) or player:Class()
 end
 
 function Player:New(unit)

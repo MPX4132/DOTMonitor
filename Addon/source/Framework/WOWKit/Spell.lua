@@ -52,7 +52,7 @@ function Spell:HasRequiredForm()
 		return true -- Assume it's supported
 	end
 
-	return self.requiredForm:ContainsObject(GetShapeshiftForm())
+	return self.requiredForm:ContainsObject(GetShapeshiftFormID() or 0)
 end
 
 function Spell:IsAvailable()

@@ -28,7 +28,15 @@ DOTMonitor_Debuffs = {
 			Spell:New(45477, 55095, "DOT"),
 			-- "Plague Strike"	: "Blood Plague"
 			Spell:New(45462, 55078, "DOT"),
-		}
+		},
+		["NO_SPEC"] = {
+			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
+			Spell:New(77575, {55078, 55095}, "DOT"),
+			-- "Icy Touch" 		: "Frost Fever"
+			Spell:New(45477, 55095, "DOT"),
+			-- "Plague Strike"	: "Blood Plague"
+			Spell:New(45462, 55078, "DOT"),
+		},
 	},
 
 	["DRUID"] = {
@@ -38,46 +46,56 @@ DOTMonitor_Debuffs = {
 			-- "Sunfire"		: "Sunfire"
 			Spell:New(93402,	93402,	"DOT"),
 			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{1}),	-- Only on bear form
+			Spell:New(33745,	33745,	"DOT", 	{5}),	-- Only on bear form
 			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{3}),	-- Only on cat form
+			Spell:New(9005,		9005,	"DOT", 	{1}),	-- Only on cat form
 			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{3}),	-- Only on cat form
+			Spell:New(1822,		1822,	"DOT", 	{1}),	-- Only on cat form
 		},
 		[103] = { 	-- "Feral"
 			-- "Moonfire"		: "Moonfire"
 			Spell:New(8921,		8921,	"DOT"),
 			-- "Thrash"			: "Thrash"
-			Spell:New(77758,	77758,	"DOT", 	{3}),	-- Only on cat form
+			Spell:New(77758,	77758,	"DOT", 	{1}),	-- Only on cat form
 			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{1}),	-- Only on bear form
+			Spell:New(33745,	33745,	"DOT", 	{5}),	-- Only on bear form
 			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{3}),	-- Only on cat form
+			Spell:New(9005,		9005,	"DOT", 	{1}),	-- Only on cat form
 			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{3}),	-- Only on cat form
+			Spell:New(1822,		1822,	"DOT", 	{1}),	-- Only on cat form
 		},
 		[104] = { 	-- "Guardian"
 			-- "Moonfire"		: "Moonfire"
 			Spell:New(8921,		8921,	"DOT"),
 			-- "Thrash"			: "Thrash"
-			Spell:New(77758,	77758,	"DOT",  {3}),	-- Only on cat form
+			Spell:New(77758,	77758,	"DOT",  {1}),	-- Only on cat form
 			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{1}),	-- Only on bear form
+			Spell:New(33745,	33745,	"DOT", 	{5}),	-- Only on bear form
 			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{3}),	-- Only on cat form
+			Spell:New(9005,		9005,	"DOT", 	{1}),	-- Only on cat form
 			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{3}),	-- Only on cat form
+			Spell:New(1822,		1822,	"DOT", 	{1}),	-- Only on cat form
 		},
 		[105] = { 	-- "Restoration"
 			-- "Moonfire"		: "Moonfire"
 			Spell:New(8921,		8921,	"DOT"),
 			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{1}),	-- Only on bear form
+			Spell:New(33745,	33745,	"DOT", 	{5}),	-- Only on bear form
 			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{3}),	-- Only on cat form
+			Spell:New(9005,		9005,	"DOT", 	{1}),	-- Only on cat form
 			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{3}),	-- Only on cat form
-		}
+			Spell:New(1822,		1822,	"DOT", 	{1}),	-- Only on cat form
+		},
+		["NO_SPEC"] = {
+			-- "Moonfire"		: "Moonfire"
+			Spell:New(8921,		8921,	"DOT"),
+			-- "Lacerate"		: "Lacerate"
+			Spell:New(33745,	33745,	"DOT", 	{5}),	-- Only on bear form
+			-- "Pounce"			: "Pounce"
+			Spell:New(9005,		9005,	"DOT", 	{1}),	-- Only on cat form
+			-- "Rake"			: "Rake"
+			Spell:New(1822,		1822,	"DOT", 	{1}),	-- Only on cat form
+		},
 	},
 
 	["HUNTER"] = {
@@ -106,7 +124,13 @@ DOTMonitor_Debuffs = {
 			Spell:New(117050,	117050,	"DOT"),
 			-- "Black Arrow"	: "Black Arrow"
 			Spell:New(3674,		3674,	"DOT"),
-		}
+		},
+		["NO_SPEC"] = {
+			-- "Serpent Sting"	: "Serpent Sting"
+			Spell:New(1978,		1978,	"DOT"),
+			-- "Widow Venom"	: "Widow Venom"
+			Spell:New(82654,	82654,	"DOT"),
+		},
 	},
 
 	["MAGE"] = {
@@ -143,7 +167,9 @@ DOTMonitor_Debuffs = {
 			Spell:New(44457,	44457,	"DOT"),
 			-- "Nether Tempest"	: "Nether Tempest"
 			Spell:New(114923,	114923,	"DOT"),
-		}
+		},
+		["NO_SPEC"] = {
+		},
 	},
 
 	["MONK"] = {
@@ -161,6 +187,8 @@ DOTMonitor_Debuffs = {
 		},
 		[270] = { 	-- "Mistweaver"
 		},
+		["NO_SPEC"] = {
+		},
 	},
 
 	["PALADIN"] = {
@@ -174,7 +202,9 @@ DOTMonitor_Debuffs = {
 			Spell:New(53595, 	115798,	"DOT"),
 			-- "Judgments of the Bold" 		: "Physical Vulnerability"
 			Spell:New(111529, 	81326, 	"DOT"),
-		}
+		},
+		["NO_SPEC"] = {
+		},
 	},
 
 	["PRIEST"] = {
@@ -185,7 +215,9 @@ DOTMonitor_Debuffs = {
 			Spell:New(589, 		589, 	"DOT"),
 			-- "Vampiric Touch"		: "Vampiric Touch"
 			Spell:New(34914, 	34914,	"DOT"),
-		}
+		},
+		["NO_SPEC"] = {
+		},
 	},
 
 	["ROGUE"] = {
@@ -204,7 +236,11 @@ DOTMonitor_Debuffs = {
 			Spell:New(16511, 	16511,	"DOT"),
 			-- "Expose Armor"		: "Weakened Armor"
 			Spell:New(8647, 	113746, "DOT"),
-		}
+		},
+		["NO_SPEC"] = {
+			-- "Expose Armor"		: "Weakened Armor"
+			Spell:New(8647, 	113746, "DOT"),
+		},
 	},
 
 	["SHAMAN"] = {
@@ -220,7 +256,13 @@ DOTMonitor_Debuffs = {
 			-- "Earth Shock"		: "Weakened Blows"
 			Spell:New(8042, 	115798, "DOT"),
 		},
-		[264] = {} 	-- "Restoration"
+		[264] = {},	-- "Restoration"
+		["NO_SPEC"] = {
+			-- "Flame Shock"		: "Flame Shock"
+			Spell:New(8050, 	8050, 	"DOT"),
+			-- "Earth Shock"		: "Weakened Blows"
+			Spell:New(8042, 	115798, "DOT"),
+		},
 	},
 
 	["WARLOCK"] = {
@@ -257,7 +299,11 @@ DOTMonitor_Debuffs = {
 			Spell:New(348, 		348, 	"DOT"),
 			-- "Curse of the Elements"	: "Curse of the Elements"
 			Spell:New(1490, 	1490, 	"DOT"),
-		}
+		},
+		["NO_SPEC"] = {
+			-- "Corruption" 			: "Corruption"
+			Spell:New({172}, 	146739, "DOT"),
+		},
 	},
 
 	["WARRIOR"] = {
@@ -288,6 +334,12 @@ DOTMonitor_Debuffs = {
 			Spell:New(6343, 	115798, "DOT"),
 			-- "Shattering Throw"	: "Shattering Throw"
 			Spell:New(64382, 	64382, 	"DOT"),
-		}
+		},
+		["NO_SPEC"] = {
+			-- "Thunder Clap"		: "Weakened Blows"
+			Spell:New(6343, 	115798, "DOT"),
+			-- "Shattering Throw"	: "Shattering Throw"
+			Spell:New(64382, 	64382, 	"DOT"),
+		},
 	}
 }

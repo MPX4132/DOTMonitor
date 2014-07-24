@@ -28,7 +28,7 @@ function DOTMonitor:SyncToPlayer(player)
 	self.terminal.outputStream:Log("Syncing Player")
 	self.player 	= player or self.player
 
-	self.enabled 	= self.player and self.player:HasSpec()
+	self.enabled 	= self.player and true
 
 	if self.enabled then
 		local _, spellUpdate = self.player:Sync()
@@ -39,13 +39,18 @@ function DOTMonitor:SyncToPlayer(player)
 	end
 end
 
+function DOTMonitor:IgnoredDebuffs()
+	local ignoredDebuffs = TableSet:New()
+	for i, debuffID in pairs(self.database.spells.ignored) do
+		ignoredDebuffs:AddObject(Spell:New(debuffID))
+	end
+	return ignoredDebuffs
+end
+
 function DOTMonitor:PlayerDebuffs()
 	if self.enabled then
 		local availableDebuffs 	= TableSet:New(self.player:GetDebuff():Copy())
-		local ignoredDebuffs 	= TableSet:New()
-		for i, debuffID in pairs(self.database.spells.ignored) do
-			ignoredDebuffs:AddObject(Spell:New(debuffID))
-		end
+		local ignoredDebuffs 	= self:IgnoredDebuffs()
 		return availableDebuffs - ignoredDebuffs
 	else
 		return TableSet:New()
@@ -59,8 +64,16 @@ function DOTMonitor:PrintSpells(showClass, showID)
 		end
 		for i, aSpell in pairs(self:PlayerDebuffs()) do
 			if aSpell:IsAvailable() then
-				local msg = string.format(showID and "> %s (ID:%d)" or "> %s", tostring(aSpell), aSpell:ID())
+				local msg = showID and string.format("> (ID:%06d) %s", aSpell:ID(), tostring(aSpell)) or
+									   string.format("> %s", tostring(aSpell))
 				self.terminal.outputStream:Print(msg, 100/255, 1, 0)
+			end
+		end
+		for i, aSpell in pairs(self:IgnoredDebuffs()) do
+			if aSpell:IsAvailable() then
+				local msg = showID and string.format("- (ID:%06d) %s", aSpell:ID(), tostring(aSpell)) or
+									   string.format("- %s", tostring(aSpell))
+				self.terminal.outputStream:Print(msg, 0.50, 0.50, 0.50)
 			end
 		end
 	end
@@ -68,15 +81,13 @@ end
 
 function DOTMonitor:PrintFault(fault)
 	if not fault then
-		if self.player then
-			local msg = self.player:SupportsSpec() 	and self.localize("player not ready due to low level")
-													or  self.localize("player not ready due to no spec")
-			self.terminal.outputStream:Print(msg, "critical")
+		if not self.player then
+			self.terminal:Output(self.localize("player unavailable!"), "critical")
 		else
-			self.terminal.outputStream:Log(self.localize("player unavailable!"), "critical")
+			self.terminal:Output(self.localize("an error has occured, something broke!!!"), "critical")
 		end
 	else
-		self.terminal.outputStream:Log(self.localize(fault), "warning")
+		self.terminal:Output(self.localize(fault), "warning")
 	end
 end
 
@@ -156,6 +167,7 @@ function DOTMonitor:ResetHUD()
 		self.database.layout[self.player:Spec()] = nil
 		self.database.label = {} -- clear it
 		self:SyncToPlayer()
+		self:PrintSpells(true)
 		self:LoadSpecSetup()
 		self:ToggleHUD()
 		return self.localize("HUD was reset!")
@@ -170,6 +182,7 @@ local DOTMonitorDefault = {
 	locked 	= true,
 	enabled = false,
 	SyncToPlayer 	= DOTMonitor.SyncToPlayer,
+	IgnoredDebuffs	= DOTMonitor.IgnoredDebuffs,
 	PlayerDebuffs	= DOTMonitor.PlayerDebuffs,
 	PrintSpells		= DOTMonitor.PrintSpells,
 	PrintFault		= DOTMonitor.PrintFault,
@@ -241,10 +254,10 @@ function DOTMonitor:New(databaseID)
 
 		-- No matching argument, show some help
 		if arguments then
-			self.terminal:Output(string.format(self.localize("Invalid Command: \"%s\""), arguments), "warning")
+			self.terminal:Output(string.format(self.localize("Invalid command: \"%s\""), arguments), "warning")
 		end
 
-		self.terminal:Output(self.localize("Valid Commands are:"))
+		self.terminal:Output(self.localize("Valid commands are:"))
 		self.terminal:Output("> " .. self.localize("cooldowns"))
 		self.terminal:Output("> " .. self.localize("timers"))
 
@@ -266,10 +279,10 @@ function DOTMonitor:New(databaseID)
 
 		-- No matching argument, show some help
 		if arguments then
-			self.terminal:Output(string.format(self.localize("Invalid Command: \"%s\""), arguments), "warning")
+			self.terminal:Output(string.format(self.localize("Invalid command: \"%s\""), arguments), "warning")
 		end
 
-		self.terminal:Output(self.localize("Valid Commands are:"))
+		self.terminal:Output(self.localize("Valid commands are:"))
 		self.terminal:Output("> " .. self.localize("cooldowns"))
 		self.terminal:Output("> " .. self.localize("timers"))
 
@@ -301,12 +314,13 @@ function DOTMonitor:New(databaseID)
 				self:SyncToPlayer()
 				self:LoadSpecSetup()
 				self:ToggleHUD()
+				self.terminal:Output(self.localize("Spell Overview"), "info")
 				self:PrintSpells()
-				return self.localize("Now Ignoring: ") .. arguments
+				return string.format(self.localize("Ignoring %s"), arguments)
 			end
 		end
 
-		self.terminal:Output(self.localize("Only the following may be ignored"))
+		self.terminal:Output(self.localize("only the green may be ignored"), "warning")
 		self:PrintSpells(false, true)
 		return self.localize("Attempted to Ignore: ") .. (arguments or "[N/A]")
 	end
@@ -320,17 +334,14 @@ function DOTMonitor:New(databaseID)
 				self:SyncToPlayer()
 				self:LoadSpecSetup()
 				self:ToggleHUD()
+				self.terminal:Output(self.localize("Spell Overview"), "info")
 				self:PrintSpells()
-				return self.localize("Now Monitoring: ") .. arguments
+				return string.format(self.localize("Monitoring %s"), arguments)
 			end
 		end
 
-		self.terminal:Output(self.localize("Only the following may be monitored"))
-
-		for i, debuffID in pairs(self.database.spells.ignored) do
-			self.terminal:Output(string.format("> %s (ID:%d)", tostring(Spell:New(debuffID)), debuffID), 100/255, 1, 0)
-		end
-
+		self.terminal:Output(self.localize("only the gray may be monitored"), "warning")
+		self:PrintSpells(false, true)
 		return self.localize("Attempted to Monitor: ") .. (arguments or "[N/A]")
 	end
 	-- ===================================================================================
