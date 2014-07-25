@@ -43,6 +43,10 @@ function Player:Spec()
 	return (select(2, GetSpecializationInfo(GetSpecialization())))
 end
 
+function Player:Form()
+	return GetShapeshiftFormID() or 0
+end
+
 function Player:UpdateDebuffs()
 	local pastDebuffs 	= self.debuff or TableSet:New()		-- To detect changes
 
@@ -109,6 +113,7 @@ local PlayerDefault = {
 	HasSpec			= Player.HasSpec,
 	SpecID			= Player.SpecID,
 	Spec			= Player.Spec,
+	Form			= Player.Form,
 	UpdateDebuffs 	= Player.UpdateDebuffs,
 	GetDebuff		= Player.GetDebuff,
 	GetHeals		= Player.GetHeals,

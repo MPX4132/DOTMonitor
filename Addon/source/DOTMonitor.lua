@@ -133,27 +133,33 @@ function DOTMonitor:ToggleHUD()
 	end
 end
 
-function DOTMonitor:SaveSpecSetup()
-	if self.enabled then
-		local spec = self.player:Spec()
-		self.database.layout[spec] = self.database.layout[spec] or {}
+function DOTMonitor:LoadSpecLayout()
+	if not self.enabled then return end
+	local defaultLayout = self:HUDAutoLayout()
+	local customLayout 	= self.database.layout[self.player:Spec() or "NO_SPEC"]
+	local formLayout 	= customLayout and (customLayout[self.player:Form()] or customLayout[0]) -- Try humanoid form if no form-specific layout
+	for atIndex, aDefaultPosition in ipairs(defaultLayout) do
+		local aMonitor = self.manager:GetMonitor(atIndex)
+		local position = formLayout and formLayout[atIndex] or aDefaultPosition
+		aMonitor.icon:SetCenter(position.x, position.y)
+	end
+end
 
-		for anIndex, aMonitor in ipairs(self.manager.monitor) do
-			local iconX, iconY = aMonitor.icon:GetCenterRelativeToPoint("CENTER")
-			self.database.layout[spec][anIndex] = {x = iconX, y = iconY}
-		end
+function DOTMonitor:SaveSpecLayout()
+	if not self.enabled then return end
+	local spec = self.player:Spec() or "NO_SPEC"
+	local form = self.player:Form()
+	self.database.layout[spec] = self.database.layout[spec] or {}
+	self.database.layout[spec][form] = self.database.layout[spec][form] or {}
+	for i, aMonitor in ipairs(self.manager.monitor) do -- Want to save ALL custom locations
+		local iconX, iconY = aMonitor.icon:GetCenterRelativeToPoint("CENTER")
+		self.database.layout[spec][form][i] = {x = iconX, y = iconY}
 	end
 end
 
 function DOTMonitor:LoadSpecSetup()
 	if self.enabled then
-		local spec = self.player:Spec()
-		for i, position in ipairs(self.database.layout[spec] or self:HUDAutoLayout()) do
-			local monitor = self.manager.monitor[i]
-			if monitor then
-				monitor.icon:SetCenter(position.x, position.y)
-			end
-		end
+		self:LoadSpecLayout()
 
 		self.manager:ShowEffectTimers(self.database.label.timers or false)
 		self.manager:ShowCooldownTimers(self.database.label.cooldowns or false)
@@ -192,7 +198,8 @@ local DOTMonitorDefault = {
 	StopMonitors 	= DOTMonitor.StopMonitors,
 	StartMonitors 	= DOTMonitor.StartMonitors,
 	ToggleHUD		= DOTMonitor.ToggleHUD,
-	SaveSpecSetup	= DOTMonitor.SaveSpecSetup,
+	LoadSpecLayout	= DOTMonitor.LoadSpecLayout,
+	SaveSpecLayout	= DOTMonitor.SaveSpecLayout,
 	LoadSpecSetup	= DOTMonitor.LoadSpecSetup,
 	ResetHUD		= DOTMonitor.ResetHUD,
 }
@@ -220,7 +227,7 @@ function DOTMonitor:New(databaseID)
 	info[dotMonitor.localize("lock")] = dotMonitor.localize("Locks the monitor icons")
 	command[dotMonitor.localize("lock")] = function(self, arguments)
 		self.manager:LockMonitors(true) -- Want to lock everything
-		self:SaveSpecSetup()
+		self:SaveSpecLayout()
 		self:ToggleHUD()
 		return self.localize("HUD Locked")
 	end
