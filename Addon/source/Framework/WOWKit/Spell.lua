@@ -30,6 +30,8 @@ end
 function Spell:Update()
 	self.name, self.rank, newTexture, self.cost, self.funnel,
 	self.power, self.castTime, self.range.min, self.range.max = GetSpellInfo(self:ID())
+	
+	self.requiredLevel = GetSpellLevelLearned(self:ID()) or 0
 
 	self.icon = (self:HasDynamicTexture() and newTexture) or self.icon or newTexture
 end
@@ -47,20 +49,25 @@ function Spell:HasDynamicTexture()
 	return self.dynamicTexture or false
 end
 
-function Spell:HasRequiredForm()
+function Spell:HasRequiredLevel(level)
+	return self.requiredLevel > 0 and level >= self.requiredLevel
+end
+
+function Spell:HasRequiredForm(form)
 	if not self.requiredForm then
 		return true -- Assume it's supported
 	end
 
-	return self.requiredForm:ContainsObject(GetShapeshiftFormID() or 0)
+	return self.requiredForm:ContainsObject(form or 0)
 end
 
-function Spell:IsAvailable()
-	-- IsSpellKnown is notorious for giving out false info
-	-- return self.name ~= nil and IsSpellKnown(self.id)
-
-	-- Using hack to see if anything's returned from spell info
-	return GetSpellInfo(self.name) ~= nil and self:HasRequiredForm() -- Check for a name & stance
+function Spell:IsAvailable(player)
+	if self:IsTalent() then
+		return GetSpellInfo(self.name) ~= nil
+	end
+	
+	-- It's a regular spell, check the typical
+	return self:HasRequiredLevel(player:Level()) and self:HasRequiredForm(player:Form())
 end
 
 function Spell:IsInstant()
@@ -73,6 +80,10 @@ end
 
 function Spell:GetCooldown()
 	return GetSpellCooldown(self.id or self.name);
+end
+
+function Spell:IsTalent()
+	return type(self.effectType) == "table"
 end
 
 function Spell:IsHarmful()
@@ -88,8 +99,8 @@ function Spell:IsMisc()
 	return not self:IsHarmful() and not self:IsHelpful()
 end
 
-function Spell:Type(aType)
-	return self.effectType
+function Spell:Type()
+	return type(self.effectType) == "table" and unpack(self.effectType) or self.effectType
 end
 
 -- WARNING BELOW
@@ -98,11 +109,11 @@ function Spell:EffectIsInstant()
 end
 
 function Spell:IsDOT()
-	return self.effectType == "DOT"
+	return self:Type() == "DOT"
 end
 
 function Spell:IsHOT()
-	return self.effectType == "HOT"
+	return self:Type() == "HOT"
 end
 
 function Spell:HasMultipleEffects()
@@ -167,11 +178,13 @@ local SpellDefault = {
 	Update				= Spell.Update,
 	SetDynamicTexture 	= Spell.SetDynamicTexture,
 	HasDynamicTexture	= Spell.HasDynamicTexture,
+	HasRequiredLevel	= Spell.HasRequiredLevel,
 	HasRequiredForm		= Spell.HasRequiredForm,
 	IsAvailable			= Spell.IsAvailable,
 	IsInstant			= Spell.IsInstant,
 	CastTime			= Spell.CastTime,
 	GetCooldown			= Spell.GetCooldown,
+	IsTalent			= Spell.IsTalent,
 	IsHarmful			= Spell.IsHarmful,
 	IsHelpful			= Spell.IsHelpful,
 	IsMisc				= Spell.IsMisc,

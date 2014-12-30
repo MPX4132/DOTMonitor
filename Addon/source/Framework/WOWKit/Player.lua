@@ -5,6 +5,7 @@
 
 --local Table 	= _G["MPXFoundation_Table"]
 local TableSet 	= _G["MPXFoundation_TableSet"]
+local SpellBook	= _G["MPXWOWKit_SpellBook"]
 local Spell		= _G["MPXWOWKit_Spell"]
 
 local Player = {} -- Local Namespace
@@ -40,7 +41,7 @@ end
 
 function Player:Spec()
 	if not self:HasSpec() then return false end
-	return (select(2, GetSpecializationInfo(GetSpecialization())))
+	return (select(2, self:SpecID())) or "NO_SPEC"
 end
 
 function Player:Form()
@@ -56,7 +57,7 @@ function Player:UpdateDebuffs()
 	self.debuff = TableSet:New() -- Clear it
 	for i, aDebuff in ipairs(specDebuffs) do
 		aDebuff:Update()
-		if aDebuff:IsAvailable() then
+		if aDebuff:IsAvailable(self) then
 			self.debuff:AddObject(aDebuff)
 		end
 	end
@@ -138,6 +139,7 @@ function Player:New(unit)
 	player.subject 	= unit
 	player.class, player.realClass = UnitClassBase(player.subject)
 	player.class = player.class:gsub("^%l", string.upper) -- Doesn't change
+	--player.spellbook = SpellBook:New(player)
 
 	return player:Sync()
 end

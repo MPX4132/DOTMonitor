@@ -1,146 +1,159 @@
 local Spell	= _G["MPXWOWKit_Spell"]
 
--- The following spec/debuff combos will be monitored by DOTMonitor
+-- The following spec/debuff combos will be monitored by this add-on.
+--
 -- Remember to place the form/stance specific spells at the end of the list to prevent
 -- dynamic icons from replacing the other static icons' position when updated.
+--
+-- The spell class constructor parameters have the following format:
+-- Spell:New(spellID, effectID, spellType [, requiredForm ])
+-- 		spellID: represents the icon which will be displayed
+--			- If this spell is in a table, "{spellID}", the spell icon will not change
+--
+--		effectID: represents the spell effect which be tracked
+--			- If this is a table, "{spellIDA, spellIDB, ...}", the first found will be tracked
+--
+--		spellType: represents the spell type
+--			- Could be: HOT, DOT
+-- 			- If this is a table, "{spellType}", the spell is a talent, not a regular spell
+--
+--		requiredForm: represents a possible form
+--			- If no form is given, then the spell will show for any form
+
 DOTMonitor_Debuffs = {
 	["DEATHKNIGHT"] = {
 		[250] = { 	-- "Blood"
-			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
-			Spell:New(77575, {55078, 55095}, "DOT"),
 			-- "Icy Touch" 		: "Frost Fever"
 			Spell:New(45477, 55095, "DOT"),
+			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
+			Spell:New(77575, {55078, 55095}, "DOT"),
 			-- "Plague Strike"	: "Blood Plague"
 			Spell:New(45462, 55078, "DOT"),
 		},
 		[251] = { 	-- "Frost"
-			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
-			Spell:New(77575, {55078, 55095}, "DOT"),
 			-- "Icy Touch" 		: "Frost Fever"
 			Spell:New(45477, 55095, "DOT"),
+			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
+			Spell:New(77575, {55078, 55095}, "DOT"),
 			-- "Plague Strike"	: "Blood Plague"
-			Spell:New(45462, 55078, "DOT"),
-		},
+			Spell:New(45462, 55078, "DOT"),		},
 		[252] = { 	-- "Unholy"
-			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
-			Spell:New(77575, {55078, 55095}, "DOT"),
 			-- "Icy Touch" 		: "Frost Fever"
 			Spell:New(45477, 55095, "DOT"),
+			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
+			Spell:New(77575, {55078, 55095}, "DOT"),
 			-- "Plague Strike"	: "Blood Plague"
 			Spell:New(45462, 55078, "DOT"),
 		},
 		["NO_SPEC"] = {
-			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
-			Spell:New(77575, {55078, 55095}, "DOT"),
 			-- "Icy Touch" 		: "Frost Fever"
 			Spell:New(45477, 55095, "DOT"),
+			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
+			Spell:New(77575, {55078, 55095}, "DOT"),
 			-- "Plague Strike"	: "Blood Plague"
 			Spell:New(45462, 55078, "DOT"),
 		},
 	},
 
-	["DRUID"] = {
+	["DRUID"] = {	-- Forms: 1 -> Cat, 5 -> Bear
 		[102] = {	-- "Balance"
 			-- "Moonfire"		: "Moonfire"
-			Spell:New(8921,		8921,	"DOT"),
+			Spell:New({8921},	8921,	"DOT"),
 			-- "Sunfire"		: "Sunfire"
-			Spell:New(93402,	93402,	"DOT"),
-			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{5}),	-- Only on bear form
-			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{1}),	-- Only on cat form
-			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{1}),	-- Only on cat form
+			Spell:New({93402},	93402,	"DOT"),
+			-- "Thrash"			: "Thrash"
+			Spell:New(77758,	77758,	"DOT", 	{1, 5}),
+			-- "Mangle"			: "Infected Wounds"
+			Spell:New(33917, 	58180, 	"DOT",	{5}),
 		},
 		[103] = { 	-- "Feral"
 			-- "Moonfire"		: "Moonfire"
 			Spell:New(8921,		8921,	"DOT"),
 			-- "Thrash"			: "Thrash"
-			Spell:New(77758,	77758,	"DOT", 	{1}),	-- Only on cat form
-			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{5}),	-- Only on bear form
-			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{1}),	-- Only on cat form
+			Spell:New(77758,	77758,	"DOT", 	{1, 5}),
+			-- "Mangle"			: "Infected Wounds"
+			Spell:New(33917, 	58180, 	"DOT",	{5}),
 			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{1}),	-- Only on cat form
+			Spell:New(1822,		1822,	"DOT", 	{1}),
 		},
 		[104] = { 	-- "Guardian"
 			-- "Moonfire"		: "Moonfire"
 			Spell:New(8921,		8921,	"DOT"),
 			-- "Thrash"			: "Thrash"
-			Spell:New(77758,	77758,	"DOT",  {1}),	-- Only on cat form
+			Spell:New(77758,	77758,	"DOT", 	{5}),
+			-- "Thrash"			: "Thrash"
+			Spell:New(106830,	106830,	"DOT", 	{1}),
+			-- "Mangle"			: "Infected Wounds"
+			Spell:New(33917, 	58180, 	"DOT",	{5}),
 			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{5}),	-- Only on bear form
-			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{1}),	-- Only on cat form
-			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{1}),	-- Only on cat form
+			Spell:New(33745, 	33745, 	"DOT",	{5}),
 		},
 		[105] = { 	-- "Restoration"
-			-- "Moonfire"		: "Moonfire"
-			Spell:New(8921,		8921,	"DOT"),
-			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{5}),	-- Only on bear form
-			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{1}),	-- Only on cat form
-			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{1}),	-- Only on cat form
+			-- This is a healing spec, don't show the HUD at all
 		},
 		["NO_SPEC"] = {
 			-- "Moonfire"		: "Moonfire"
 			Spell:New(8921,		8921,	"DOT"),
-			-- "Lacerate"		: "Lacerate"
-			Spell:New(33745,	33745,	"DOT", 	{5}),	-- Only on bear form
-			-- "Pounce"			: "Pounce"
-			Spell:New(9005,		9005,	"DOT", 	{1}),	-- Only on cat form
-			-- "Rake"			: "Rake"
-			Spell:New(1822,		1822,	"DOT", 	{1}),	-- Only on cat form
+			-- "Thrash"			: "Thrash"
+			Spell:New(77758,	77758,	"DOT", 	{5}),
+			-- "Thrash"			: "Thrash"
+			Spell:New(106830,	106830,	"DOT", 	{1}),
 		},
 	},
 
 	["HUNTER"] = {
-		[253] = { 	-- "Beast_Mastery"
-			-- "Serpent Sting"	: "Serpent Sting"
-			Spell:New(1978,		1978,	"DOT"),
+		[253] = { 	-- "Beast Mastery"
+			-- "Concussive Shot": "Concussive Shot"
+			Spell:New(5116, 	5116, 	"DOT"),
+			-- "A Murder of Crows" : "A Murder of Crows"
+			Spell:New(131894, 	131894, {"DOT"}),
+			-- "Stampede" 		: "Stampede"
+			Spell:New(121818, 	121818, {"DOT"}),
 			-- "Glaive Toss" 	: "Glaive Toss"
-			Spell:New(117050,	117050,	"DOT"),
-			-- "Widow Venom"	: "Widow Venom"
-			Spell:New(82654,	82654,	"DOT"),
+			Spell:New(117050,	117050,	{"DOT"}),
+			-- "Power Shot" 	: "Power Shot"
+			Spell:New(109259,	109259,	{"DOT"}),
+			-- "Barrage" 		: "Barrage"
+			Spell:New(120360,	120360,	{"DOT"}),
 		},
 		[254] = {	-- "Marksmanship"
-			-- "Serpent Sting"	: "Serpent Sting"
-			Spell:New(1978,		1978,	"DOT"),
+			-- "Concussive Shot": "Concussive Shot"
+			Spell:New(5116, 	5116, 	"DOT"),
+			-- "A Murder of Crows" : "A Murder of Crows"
+			Spell:New(131894, 	131894, {"DOT"}),
+			-- "Stampede" 		: "Stampede"
+			Spell:New(121818, 	121818, {"DOT"}),
 			-- "Glaive Toss" 	: "Glaive Toss"
-			Spell:New(117050,	117050,	"DOT"),
-			-- "Widow Venom"	: "Widow Venom"
-			Spell:New(82654,	82654,	"DOT"),
+			Spell:New(117050,	117050,	{"DOT"}),
+			-- "Power Shot" 	: "Power Shot"
+			Spell:New(109259,	109259,	{"DOT"}),
+			-- "Barrage" 		: "Barrage"
+			Spell:New(120360,	120360,	{"DOT"}),
 		},
 		[255] = { 	-- "Survival"
-			-- "Serpent Sting"	: "Serpent Sting"
-			Spell:New(1978,		1978,	"DOT"),
-			-- "Widow Venom"	: "Widow Venom"
-			Spell:New(82654,	82654,	"DOT"),
+			-- "Concussive Shot": "Concussive Shot"
+			Spell:New(5116, 	5116, 	"DOT"),
+			-- "A Murder of Crows" : "A Murder of Crows"
+			Spell:New(131894, 	131894, {"DOT"}),
+			-- "Stampede" 		: "Stampede"
+			Spell:New(121818, 	121818, {"DOT"}),
 			-- "Glaive Toss" 	: "Glaive Toss"
-			Spell:New(117050,	117050,	"DOT"),
-			-- "Black Arrow"	: "Black Arrow"
-			Spell:New(3674,		3674,	"DOT"),
+			Spell:New(117050,	117050,	{"DOT"}),
+			-- "Power Shot" 	: "Power Shot"
+			Spell:New(109259,	109259,	{"DOT"}),
+			-- "Barrage" 		: "Barrage"
+			Spell:New(120360,	120360,	{"DOT"}),
 		},
 		["NO_SPEC"] = {
-			-- "Serpent Sting"	: "Serpent Sting"
-			Spell:New(1978,		1978,	"DOT"),
-			-- "Widow Venom"	: "Widow Venom"
-			Spell:New(82654,	82654,	"DOT"),
+			-- "Concussive Shot": "Concussive Shot"
+			Spell:New(5116, 	5116, 	"DOT"),
 		},
 	},
 
 	["MAGE"] = {
 		[62] = { 	-- "Arcane"
-			-- "Frost Bomb"		: "Frost Bomb"
-			Spell:New(112948,	112948,	"DOT"),
-			-- "Living Bomb"	: "Living Bomb"
-			Spell:New(44457,	44457,	"DOT"),
 			-- "Nether Tempest"	: "Nether Tempest"
-			Spell:New(114923,	114923,	"DOT"),
+			Spell:New(114923,	114923,	{"DOT"}),
 		},
 		[63] = { 	-- "Fire"
 			-- "Pyroblast" 		: "Pyroblast"
@@ -151,22 +164,14 @@ DOTMonitor_Debuffs = {
 			Spell:New(11129,	118271,	"DOT"),
 			-- "Dragon's Breath": "Dragon's Breath"
 			Spell:New(31661,	29964,	"DOT"),
-			-- "Frost Bomb"		: "Frost Bomb"
-			Spell:New(112948,	112948,	"DOT"),
 			-- "Living Bomb"	: "Living Bomb"
-			Spell:New(44457,	44457,	"DOT"),
-			-- "Nether Tempest"	: "Nether Tempest"
-			Spell:New(114923,	114923,	"DOT"),
+			Spell:New(44457,	44457,	{"DOT"}),
 		},
 		[64] = { 	-- "Frost"
 			-- "Frozen Orb"		: "Frozen Orb"
 			Spell:New(84714,	84714,	"DOT"),
 			-- "Frost Bomb"		: "Frost Bomb"
-			Spell:New(112948,	112948,	"DOT"),
-			-- "Living Bomb"	: "Living Bomb"
-			Spell:New(44457,	44457,	"DOT"),
-			-- "Nether Tempest"	: "Nether Tempest"
-			Spell:New(114923,	114923,	"DOT"),
+			Spell:New(112948,	112948,	{"DOT"}),
 		},
 		["NO_SPEC"] = {
 		},
@@ -267,40 +272,28 @@ DOTMonitor_Debuffs = {
 
 	["WARLOCK"] = {
 		[265] = { 	-- "Affliction"
-			-- "Curse of Enfeeblement" 	: "Curse of Enfeeblement", "Curse of the Elements", "Curse of Exhaustion"
-			Spell:New(109466, 	{109466, 1490, 18223}, "DOT"),
 			-- "Corruption" 			: "Corruption"
 			Spell:New(172, 		146739, "DOT"),
 			-- "Haunt"					: "Haunt"
 			Spell:New(48181, 	48181, 	"DOT"),
 			-- "Seed of Corruption"		: "Seed of Corruption"
-			-- Spell:New(44141, 	44141, 	"DOT"), -- If you need this spell, remove the first "--"
-			-- "Curse of the Elements" 	: "Curse of the Elements", "Curse of Enfeeblement", "Curse of Exhaustion"
-			Spell:New(1490, 	{1490, 109466, 18223}, "DOT"),
+			Spell:New(44141, 	44141, 	"DOT"),
 			-- "Agony" 					: "Agony"
 			Spell:New(980, 		980, 	"DOT"),
 			-- "Unstable Affliction" 	: "Unstable Affliction"
 			Spell:New(131736, 	131736, "DOT"),
-			-- "Curse of Exhaustion" 	: "Curse of Exhaustion", "Curse of Enfeeblement", "Curse of the Elements"
-			Spell:New(18223, 	{18223, 109466, 1490}, "DOT"),
 		},
 		[266] = {	-- "Demonology"
 			-- "Corruption" 			: "Corruption"
 			Spell:New({172}, 	146739, "DOT"),
-			-- "Curse of the Elements" 	: "Curse of the Elements", "Curse of Enfeeblement", "Aura of the Elements"
-			Spell:New(1490, 	{1490, 109466, 116202}, "DOT"),
 			-- "Metamorphosis: Doom" 	: "Doom"
 			Spell:New(124913, 	603, 	"DOT"),
-			-- "Curse of Enfeeblement" 	: "Curse of Enfeeblement", "Curse of the Elements", "Aura of the Elements"
-			Spell:New(109466, 	{109466, 1490, 116202}, "DOT"),
 			-- "Hand of Gul'dan"		: "Shadowflame", "Chaos Wave"
 			Spell:New(105174, 	{47960, 124915}, 		"DOT"),
 		},
 		[267] = { 	-- "Destruction"
 			-- "Immolate" 				: "Immolate"
 			Spell:New(348, 		348, 	"DOT"),
-			-- "Curse of the Elements"	: "Curse of the Elements"
-			Spell:New(1490, 	1490, 	"DOT"),
 		},
 		["NO_SPEC"] = {
 			-- "Corruption" 			: "Corruption"

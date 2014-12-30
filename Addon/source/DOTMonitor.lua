@@ -63,14 +63,14 @@ function DOTMonitor:PrintSpells(showClass, showID)
 			self.terminal.outputStream:Print(tostring(self.player), "epic")
 		end
 		for i, aSpell in pairs(self:PlayerDebuffs()) do
-			if aSpell:IsAvailable() then
+			if aSpell:IsAvailable(self.player) then
 				local msg = showID and string.format("> (ID:%06d) %s", aSpell:ID(), tostring(aSpell)) or
 									   string.format("> %s", tostring(aSpell))
 				self.terminal.outputStream:Print(msg, 100/255, 1, 0)
 			end
 		end
 		for i, aSpell in pairs(self:IgnoredDebuffs()) do
-			if aSpell:IsAvailable() then
+			if aSpell:IsAvailable(self.player) then
 				local msg = showID and string.format("- (ID:%06d) %s", aSpell:ID(), tostring(aSpell)) or
 									   string.format("- %s", tostring(aSpell))
 				self.terminal.outputStream:Print(msg, 0.50, 0.50, 0.50)
@@ -209,7 +209,7 @@ function DOTMonitor:New(databaseID)
 	setmetatable(dotMonitor, {__index = DOTMonitorDefault})
 
 	-- Localization instantiation
-	dotMonitor.localize 	= Localizer:New(LocaleDatabase)
+	dotMonitor.localize = Localizer:New(LocaleDatabase)
 
 
 	-- Terminal and Console instantiation
@@ -366,6 +366,8 @@ function DOTMonitor:New(databaseID)
 	end
 	-- ===================================================================================
 
+
+	-- Populate the terminal executables
 	dotMonitor.terminal:SetExecutables(command, info)
 
 
@@ -410,7 +412,7 @@ function DOTMonitor:New(databaseID)
 		if addon ~= "DOTMonitor" then return end
 		-- Attempt to reload the database, otherwise the backup database passed in is used
 		local database 	= {layout = {}, label = {}, spells = {}} -- Backup database
-		self.database 	= Database:New(self.databaseID, "0.3.0", database)
+		self.database 	= Database:New(self.databaseID, "0.4.0", database)
 		self.database.spells.ignored = TableSet:New(self.database.spells.ignored)
 		self.manager 	= SpellMonitorManager:Restore(self.database, "DOTMonitor", self)
 	end), "ADDON_LOADED")
@@ -425,4 +427,9 @@ function DOTMonitor:New(databaseID)
 	return dotMonitor
 end
 
+-- The following line creates a new object of the DOTMonitor class,
+-- and is where the DOTMonitor code will begin its execution.
+-- The add-on claims the global identifier "DOTMonitor" as its own,
+-- this is mainly for simplicity and extensibility, that is, in case
+-- another add-on decides to call the methods or modify this add-on.
 _G["DOTMonitor"] = DOTMonitor:New("DOTMonitorPreferences")
