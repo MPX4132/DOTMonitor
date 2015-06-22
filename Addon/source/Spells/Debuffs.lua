@@ -7,18 +7,18 @@ local Spell	= _G["MPXWOWKit_Spell"]
 --
 -- The spell class constructor parameters have the following format:
 -- Spell:New(spellID, effectID, spellType [, requiredForm ])
--- 		spellID: represents the icon which will be displayed
---			- If this spell is in a table, "{spellID}", the spell icon will not change
+-- 		spellID: represents the icon which will be displayed, these are dynamic by default
+--			- If this spell is wrapped in a table, "{spellID}", the spell icon will not change
 --
 --		effectID: represents the spell effect which be tracked
---			- If this is a table, "{spellIDA, spellIDB, ...}", the first found will be tracked
+--			- If this spell is wrapped in a table, "{spellIDA, spellIDB, ...}", the first matching effect will be tracked
 --
 --		spellType: represents the spell type
---			- Could be: HOT, DOT
--- 			- If this is a table, "{spellType}", the spell is a talent, not a regular spell
+--			- Could be: HOT, DOT...
+-- 			- If this spell is wrapped in a table, "{spellType}", the spell is a talent, not a regular spell
 --
 --		requiredForm: represents a possible form
---			- If no form is given, then the spell will show for any form
+--			- If no form is given, then the spell will show for all forms
 
 DOTMonitor_Debuffs = {
 	["DEATHKNIGHT"] = {
@@ -36,7 +36,8 @@ DOTMonitor_Debuffs = {
 			-- "Outbreak" 		: "Blood Plague", "Frost Fever"
 			Spell:New(77575, {55078, 55095}, "DOT"),
 			-- "Plague Strike"	: "Blood Plague"
-			Spell:New(45462, 55078, "DOT"),		},
+			Spell:New(45462, 55078, "DOT"),
+		},
 		[252] = { 	-- "Unholy"
 			-- "Icy Touch" 		: "Frost Fever"
 			Spell:New(45477, 55095, "DOT"),
